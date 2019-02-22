@@ -1,0 +1,3 @@
+time expiration
+duration duration
+string regex_end_condition

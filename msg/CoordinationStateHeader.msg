@@ -1,0 +1,3 @@
+string id
+
+CoordinationTransition transitions[]
