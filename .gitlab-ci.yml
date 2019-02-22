@@ -24,7 +24,7 @@
 .indigo_before_template : &indigo_before_definition
   before_script:
   - source /opt/ros/indigo/setup.bash
-  - apt-get update -qq && apt-get install -y libcppunit-1.12-1 libcppunit-dev
+  - apt-get update -qq && apt-get install -y libcppunit-dev
 
 .kinetic_before_template : &kinetic_before_definition
   before_script:
