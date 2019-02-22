@@ -4,7 +4,7 @@
     - cd ~/ros_ws
     - catkin_make
     - cd src
-    - cp -r /builds/laas-hri/ressource_management .
+    - cp -r /builds/laas-hri/resource_management .
     - cd ..
     - catkin_make
 
@@ -14,7 +14,7 @@
     - cd ~/ros_ws
     - catkin_make
     - cd src
-    - cp -r /builds/laas-hri/ressource_management .
+    - cp -r /builds/laas-hri/resource_management .
     - cd ..
     - source devel/setup.bash
     - catkin_make
