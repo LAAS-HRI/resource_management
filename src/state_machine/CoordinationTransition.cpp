@@ -1,6 +1,6 @@
 #include "state_machine/CoordinationTransition.h"
 
-CoordinationTransition(int32_t duration, int32_t time_out, std::vector<std::string> regexs)
+CoordinationTransition::CoordinationTransition(int32_t duration, int32_t time_out, std::vector<std::string> regexs)
 {
   duration_ = duration;
   time_out_ = time_out;
@@ -23,11 +23,11 @@ void CoordinationTransition::reset()
 
 transtition_state_t CoordinationTransition::evaluate()
 {
-  std::chrono::high_resolution_clock::time_point now = high_resolution_clock::now();
+  std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
 
-  if((time_out_ != -1) && (duration_cast<duration<double>>(now - start_).count >= time_out_))
+  if((time_out_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= time_out_))
     return transition_timeout;
-  else if((duration_ != 0) && (duration_cast<duration<double>>(now - start_).count >= duration_))
+  else if((duration_ != 0) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= duration_))
     return transition_pass;
   else
     return transition_wait;
@@ -35,12 +35,27 @@ transtition_state_t CoordinationTransition::evaluate()
 
 transtition_state_t CoordinationTransition::evaluate(std::string event)
 {
-  std::chrono::high_resolution_clock::time_point now = high_resolution_clock::now();
+  std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
 
-  if((time_out_ != -1) && (duration_cast<duration<double>>(now - start_).count >= time_out_))
+  if((time_out_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= time_out_))
     return transition_timeout;
-  else if((duration_ != 0) && (duration_cast<duration<double>>(now - start_).count >= duration_))
+  else if((duration_ != 0) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= duration_))
     return transition_pass;
   else
-    return transition_wait;
+  {
+    bool pass = true;
+    for(size_t i = 0; i < regexs_validation_.size(); i++)
+    {
+      std::smatch match;
+      if(std::regex_match(event, match, regexs_[i]))
+        regexs_validation_[i] = true;
+      else if(regexs_validation_[i] == false)
+        pass = false;
+    }
+
+    if(pass == true)
+      return transition_pass;
+    else
+      return transition_wait;
+  }
 }

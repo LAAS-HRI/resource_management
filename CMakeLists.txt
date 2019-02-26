@@ -8,7 +8,8 @@ include_directories(
 )
 
 add_library(state_machine_lib
-  binaryManagement/BitFileGenerator.cpp
+  src/state_machine/CoordinationTransition.cpp
+  src/state_machine/CoordinationState.cpp
 )
 
 add_executable(state_machine src/st_main.cpp)

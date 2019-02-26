@@ -1,4 +1,4 @@
-#include "state_machine/CoordinationSate.h"
+#include "state_machine/CoordinationState.h"
 
 CoordinationSate::CoordinationSate(std::string id)
 {

@@ -3,6 +3,7 @@
 
 #include <regex>
 #include <chrono>
+#include <string>
 
 enum transtition_state_t
 {
