@@ -15,8 +15,8 @@ public:
   std::string getName() { return id_; }
 
   void startState();
-  transtition_state_t update(CoordinationState* current_state, const std::string& event = "");
-  
+  transtition_state_t update(CoordinationState** current_state, const std::string& event = "");
+
 private:
   std::string id_;
   std::vector<CoordinationTransition> transitions_conditions_;

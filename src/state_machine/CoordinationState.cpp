@@ -19,10 +19,13 @@ void CoordinationState::startState()
     transition.start();
 }
 
-transtition_state_t CoordinationState::update(CoordinationState* current_state, const std::string& event)
+transtition_state_t CoordinationState::update(CoordinationState** current_state, const std::string& event)
 {
   transtition_state_t transtition_state = transition_none;
   size_t next_index = -1;
+
+  if(transitions_conditions_.size() == 0)
+    *current_state =  nullptr;
 
   for(size_t i = 0; i < transitions_conditions_.size(); i++)
   {
@@ -41,11 +44,11 @@ transtition_state_t CoordinationState::update(CoordinationState* current_state, 
   }
 
   if((transtition_state == transition_pass_on_event) || (transtition_state == transition_pass_on_duration))
-    current_state = transitions_next_state_[next_index];
+    *current_state = transitions_next_state_[next_index];
   else if(transtition_state == transition_timeout)
-    current_state =  nullptr;
-  else
-    current_state = this;
+    *current_state =  nullptr;
+  else if(transtition_state == transition_wait)
+    *current_state = this;
 
   return transtition_state;
 }

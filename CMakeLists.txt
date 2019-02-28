@@ -1,7 +1,9 @@
 cmake_minimum_required (VERSION 3.5)
 project (resource_management)
 
-add_compile_options(-std=c++14 -Wall)
+add_compile_options(-std=c++14 -Wall -pthread)
+
+find_package (Threads)
 
 include_directories(
   include
@@ -16,3 +18,4 @@ add_library(state_machine_lib
 
 add_executable(state_machine src/st_main.cpp)
 target_link_libraries(state_machine state_machine_lib)
+target_link_libraries(state_machine ${CMAKE_THREAD_LIBS_INIT})

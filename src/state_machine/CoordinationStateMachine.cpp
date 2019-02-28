@@ -1,6 +1,7 @@
 #include "state_machine/CoordinationStateMachine.h"
 
 #include <unistd.h>
+#include <iostream>
 
 CoordinationStateMachine::CoordinationStateMachine(int32_t time_out, float rate)
 {
@@ -67,8 +68,8 @@ void CoordinationStateMachine::setPublicationFunction(void (*publishState)(Coord
 
 void CoordinationStateMachine::runOnceNoEvent()
 {
-  CoordinationState* tmp_state = nullptr;
-  transtition_state_t tmp_transition = internal_state_.state_->update(tmp_state);
+  CoordinationState* tmp_state = internal_state_.state_;
+  transtition_state_t tmp_transition = internal_state_.state_->update(&tmp_state);
 
   if(tmp_state != internal_state_.state_)
   {
@@ -78,7 +79,8 @@ void CoordinationStateMachine::runOnceNoEvent()
     if(publishState_ != nullptr)
       publishState_(internal_state_);
 
-    internal_state_.state_->startState();
+    if(internal_state_.state_ != nullptr)
+      internal_state_.state_->startState();
   }
   else if(tmp_transition != internal_state_.transition_state_)
   {
@@ -99,8 +101,8 @@ void CoordinationStateMachine::runOnceWithEvents(std::queue<std::string>& events
     std::string event = events.front();
     events.pop();
 
-    CoordinationState* tmp_state = nullptr;
-    transtition_state_t tmp_transition = internal_state_.state_->update(tmp_state);
+    CoordinationState* tmp_state = internal_state_.state_;
+    transtition_state_t tmp_transition = internal_state_.state_->update(&tmp_state);
 
     if(tmp_state != internal_state_.state_)
     {
@@ -110,7 +112,8 @@ void CoordinationStateMachine::runOnceWithEvents(std::queue<std::string>& events
       if(publishState_ != nullptr)
         publishState_(internal_state_);
 
-      internal_state_.state_->startState();
+      if(internal_state_.state_ != nullptr)
+        internal_state_.state_->startState();
     }
     else if(tmp_transition != internal_state_.transition_state_)
     {
