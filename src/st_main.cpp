@@ -30,9 +30,13 @@ int main(int argc, char** argv)
 {
   CoordinationState s1("state1");
   CoordinationState s2("state2");
+  CoordinationState s3("state3");
 
   CoordinationTransition t1(1, -1, std::vector<std::string>());
   s1.setTransition(&s2, t1);
+
+  CoordinationTransition t2(-1, 5, std::vector<std::string>({"regex"}));
+  s2.setTransition(&s3, t2);
 
   CoordinationStateMachine sm;
   sm.setPublicationFunction(&publishState);
