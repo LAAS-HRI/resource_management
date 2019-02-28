@@ -25,9 +25,9 @@ transtition_state_t CoordinationTransition::evaluate()
 {
   std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
 
-  if((time_out_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= time_out_))
+  if((time_out_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(now - start_).count() >= time_out_))
     return transition_timeout;
-  else if((duration_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= duration_))
+  else if((duration_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(now - start_).count() >= duration_))
     return transition_pass_on_duration;
   else
     return transition_wait;
@@ -37,9 +37,9 @@ transtition_state_t CoordinationTransition::evaluate(const std::string& event)
 {
   std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
 
-  if((time_out_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= time_out_))
+  if((time_out_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(now - start_).count() >= time_out_))
     return transition_timeout;
-  else if((duration_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= duration_))
+  else if((duration_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(now - start_).count() >= duration_))
     return transition_pass_on_duration;
   else
   {

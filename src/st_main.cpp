@@ -32,10 +32,10 @@ int main(int argc, char** argv)
   CoordinationState s2("state2");
   CoordinationState s3("state3");
 
-  CoordinationTransition t1(1, -1, std::vector<std::string>());
+  CoordinationTransition t1(1000, -1, std::vector<std::string>());
   s1.setTransition(&s2, t1);
 
-  CoordinationTransition t2(-1, 5, std::vector<std::string>({"regex"}));
+  CoordinationTransition t2(-1, 5000, std::vector<std::string>({"regex"}));
   s2.setTransition(&s3, t2);
 
   CoordinationStateMachine sm;
