@@ -1,7 +1,6 @@
 #include "state_machine/CoordinationStateMachine.h"
 
 #include <unistd.h>
-#include <iostream>
 
 CoordinationStateMachine::CoordinationStateMachine(int32_t time_out, float rate)
 {
