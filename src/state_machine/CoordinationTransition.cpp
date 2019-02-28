@@ -28,7 +28,7 @@ transtition_state_t CoordinationTransition::evaluate()
   if((time_out_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= time_out_))
     return transition_timeout;
   else if((duration_ != 0) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= duration_))
-    return transition_pass;
+    return transition_pass_on_duration;
   else
     return transition_wait;
 }
@@ -40,7 +40,7 @@ transtition_state_t CoordinationTransition::evaluate(std::string event)
   if((time_out_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= time_out_))
     return transition_timeout;
   else if((duration_ != 0) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_).count() >= duration_))
-    return transition_pass;
+    return transition_pass_on_duration;
   else
   {
     bool pass = true;
@@ -54,7 +54,7 @@ transtition_state_t CoordinationTransition::evaluate(std::string event)
     }
 
     if(pass == true)
-      return transition_pass;
+      return transition_pass_on_event;
     else
       return transition_wait;
   }
