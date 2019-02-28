@@ -23,7 +23,7 @@ public:
   void reset();
 
   transtition_state_t evaluate();
-  transtition_state_t evaluate(std::string event);
+  transtition_state_t evaluate(const std::string& event);
 
 private:
   int32_t duration_;

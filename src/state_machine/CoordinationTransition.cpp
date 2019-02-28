@@ -33,7 +33,7 @@ transtition_state_t CoordinationTransition::evaluate()
     return transition_wait;
 }
 
-transtition_state_t CoordinationTransition::evaluate(std::string event)
+transtition_state_t CoordinationTransition::evaluate(const std::string& event)
 {
   std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
 
