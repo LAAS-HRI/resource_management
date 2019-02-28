@@ -42,6 +42,9 @@ private:
   void (*publishState_)(CoordinationInternalState_t);
   CoordinationInternalState_t internal_state_;
   std::mutex internal_state_mutex_;
+
+  void runOnceNoEvent();
+  void runOnceWithEvents(std::queue<std::string>& events);
 };
 
 #endif // COORDINATIONSTATEMACHINE_H
