@@ -35,6 +35,9 @@ public:
   void run();
   CoordinationInternalState_t getInternalState();
 
+  void setInitialState(CoordinationState* state);
+  void setPublicationFunction(void (*publishState)(CoordinationInternalState_t));
+
 private:
   uint32_t us_sleep_time_;
   int32_t time_out_;

@@ -52,6 +52,19 @@ CoordinationInternalState_t CoordinationStateMachine::getInternalState()
   return tmp;
 }
 
+void CoordinationStateMachine::setInitialState(CoordinationState* state)
+{
+  internal_state_mutex_.lock();
+  internal_state_.state_ = state;
+  internal_state_.transition_state_ = transition_none;
+  internal_state_mutex_.unlock();
+}
+
+void CoordinationStateMachine::setPublicationFunction(void (*publishState)(CoordinationInternalState_t))
+{
+  publishState_ = publishState;
+}
+
 void CoordinationStateMachine::runOnceNoEvent()
 {
   CoordinationState* tmp_state = nullptr;
