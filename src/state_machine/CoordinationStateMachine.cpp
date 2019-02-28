@@ -2,9 +2,10 @@
 
 #include <unistd.h>
 
-CoordinationStateMachine::CoordinationStateMachine(float rate)
+CoordinationStateMachine::CoordinationStateMachine(int32_t time_out, float rate)
 {
   publishState_ = nullptr;
+  time_out_ = time_out;
   us_sleep_time_ = (uint32_t)(1000000.0 / rate);
 }
 
@@ -13,12 +14,27 @@ void CoordinationStateMachine::run()
   if(internal_state_.state_ != nullptr)
     internal_state_.state_->startState();
 
+  std::chrono::high_resolution_clock::time_point start_time = std::chrono::high_resolution_clock::now();
+
   while(internal_state_.state_ != nullptr)
   {
+    internal_state_mutex_.lock();
+    
+    std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
+    if((time_out_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double>>(now - start_time).count() >= time_out_))
+    {
+      internal_state_.state_ = nullptr;
+      internal_state_.transition_state_ = transition_global_timeout;
+
+      if(publishState_ != nullptr)
+        publishState_(internal_state_);
+
+      break;
+    }
+
     CoordinationState* tmp_state = nullptr;
     transtition_state_t tmp_transition = internal_state_.state_->update(tmp_state);
 
-    internal_state_mutex_.lock();
     if(tmp_state != internal_state_.state_)
     {
       internal_state_.state_ = tmp_state;

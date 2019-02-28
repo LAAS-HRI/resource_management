@@ -28,13 +28,14 @@ struct CoordinationInternalState_t
 class CoordinationStateMachine
 {
 public:
-  CoordinationStateMachine(float rate = 100);
+  CoordinationStateMachine(int32_t time_out = -1, float rate = 100);
 
   void run();
   CoordinationInternalState_t getInternalState();
 
 private:
   uint32_t us_sleep_time_;
+  int32_t time_out_;
 
   void (*publishState_)(CoordinationInternalState_t);
   CoordinationInternalState_t internal_state_;
