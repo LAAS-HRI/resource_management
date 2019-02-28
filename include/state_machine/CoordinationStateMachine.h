@@ -1,6 +1,8 @@
 #ifndef COORDINATIONSTATEMACHINE_H
 #define COORDINATIONSTATEMACHINE_H
 
+#include "state_machine/EventStorage.h"
+
 #include "state_machine/CoordinationTransition.h"
 #include "state_machine/CoordinationState.h"
 
@@ -25,7 +27,7 @@ struct CoordinationInternalState_t
   }
 };
 
-class CoordinationStateMachine
+class CoordinationStateMachine : public EventStorage
 {
 public:
   CoordinationStateMachine(int32_t time_out = -1, float rate = 100);
