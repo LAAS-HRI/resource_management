@@ -1,4 +1,4 @@
-#include "state_machine/CoordinationState.h"
+#include "state_machine/CoordinationStateMachine.h"
 
 int main(int argc, char** argv)
 {

@@ -6,19 +6,21 @@
 #include <string>
 #include <vector>
 
-class CoordinationSate
+class CoordinationState
 {
 public:
-  CoordinationSate(std::string id);
+  CoordinationState(std::string id);
 
-  void setTransition(CoordinationSate* next, CoordinationTransition tansition);
+  void setTransition(CoordinationState* next, CoordinationTransition tansition);
   std::string getName() { return id_; }
 
-  transtition_state_t update(CoordinationSate* current_state, const std::string& event = "");
+  void startState();
+  transtition_state_t update(CoordinationState* current_state, const std::string& event = "");
+  
 private:
   std::string id_;
   std::vector<CoordinationTransition> transitions_conditions_;
-  std::vector<CoordinationSate*> transitions_next_state_;
+  std::vector<CoordinationState*> transitions_next_state_;
 };
 
 #endif // COORDINATIONSTATE_H

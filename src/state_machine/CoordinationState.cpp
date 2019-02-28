@@ -2,18 +2,24 @@
 
 #include <iostream>
 
-CoordinationSate::CoordinationSate(std::string id)
+CoordinationState::CoordinationState(std::string id)
 {
   id_ = id;
 }
 
-void CoordinationSate::setTransition(CoordinationSate* next, CoordinationTransition tansition)
+void CoordinationState::setTransition(CoordinationState* next, CoordinationTransition tansition)
 {
   transitions_conditions_.push_back(tansition);
   transitions_next_state_.push_back(next);
 }
 
-transtition_state_t CoordinationSate::update(CoordinationSate* current_state, const std::string& event)
+void CoordinationState::startState()
+{
+  for(auto& transition : transitions_conditions_)
+    transition.start();
+}
+
+transtition_state_t CoordinationState::update(CoordinationState* current_state, const std::string& event)
 {
   transtition_state_t transtition_state = transition_none;
   size_t next_index = -1;
