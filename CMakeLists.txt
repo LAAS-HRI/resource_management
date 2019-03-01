@@ -14,6 +14,7 @@ add_library(state_machine_lib
   src/state_machine/CoordinationState.cpp
   src/state_machine/CoordinationStateMachine.cpp
   src/state_machine/EventStorage.cpp
+  src/state_machine/StateStorage.cpp
 )
 
 add_executable(state_machine src/st_main.cpp)

@@ -1,4 +1,5 @@
 #include "state_machine/CoordinationStateMachine.h"
+#include "state_machine/StateStorage.h"
 
 #include <iostream>
 #include <thread>
@@ -28,19 +29,21 @@ void publishState(CoordinationInternalState_t state)
 
 int main(int argc, char** argv)
 {
-  CoordinationState s1("state1");
-  CoordinationState s2("state2");
-  CoordinationState s3("state3");
+  StateStorage states;
+
+  states.addState("state1");
+  states.addState("state2");
+  states.addState("state3");
 
   CoordinationTransition t1(1000, -1, std::vector<std::string>());
-  s1.setTransition(&s2, t1);
+  states.addTransition("state1", "state2", t1);
 
   CoordinationTransition t2(-1, 5000, std::vector<std::string>({"regex"}));
-  s2.setTransition(&s3, t2);
+  states.addTransition("state2", "state3", t2);
 
   CoordinationStateMachine sm;
   sm.setPublicationFunction(&publishState);
-  sm.setInitialState(&s1);
+  sm.setInitialState(states["state1"]);
 
   std::thread th(&CoordinationStateMachine::run, &sm);
   th.join();
