@@ -34,6 +34,7 @@ public:
 
   void run();
   CoordinationInternalState_t getInternalState();
+  std::string getCurrentStateName();
 
   void setInitialState(CoordinationState* state);
   void setPublicationFunction(void (*publishState)(CoordinationInternalState_t));

@@ -42,6 +42,11 @@ void CoordinationStateMachine::run()
 
     usleep(us_sleep_time_);
   }
+
+  internal_state_mutex_.lock();
+  internal_state_.state_ = nullptr;
+  internal_state_.transition_state_ = transition_none;
+  internal_state_mutex_.unlock();
 }
 
 CoordinationInternalState_t CoordinationStateMachine::getInternalState()
@@ -50,6 +55,16 @@ CoordinationInternalState_t CoordinationStateMachine::getInternalState()
   CoordinationInternalState_t tmp = internal_state_;
   internal_state_mutex_.unlock();
   return tmp;
+}
+
+std::string CoordinationStateMachine::getCurrentStateName()
+{
+  std::string name = "";
+  internal_state_mutex_.lock();
+  if(internal_state_.state_ != nullptr)
+    name = internal_state_.state_->getName();
+  internal_state_mutex_.unlock();
+  return name;
 }
 
 void CoordinationStateMachine::setInitialState(CoordinationState* state)
