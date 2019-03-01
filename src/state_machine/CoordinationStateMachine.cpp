@@ -101,7 +101,7 @@ void CoordinationStateMachine::runOnceWithEvents(std::queue<std::string>& events
     events.pop();
 
     CoordinationState* tmp_state = internal_state_.state_;
-    transtition_state_t tmp_transition = internal_state_.state_->update(&tmp_state);
+    transtition_state_t tmp_transition = internal_state_.state_->update(&tmp_state, event);
 
     if(tmp_state != internal_state_.state_)
     {

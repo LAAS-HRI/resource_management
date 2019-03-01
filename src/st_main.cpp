@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <thread>
+#include <unistd.h>
 
 void publishState(CoordinationInternalState_t state)
 {
@@ -46,6 +47,8 @@ int main(int argc, char** argv)
   sm.setInitialState(states["state1"]);
 
   std::thread th(&CoordinationStateMachine::run, &sm);
+  usleep(2000000);
+  sm.addEvent("regex");
   th.join();
 
   return 0;
