@@ -31,9 +31,9 @@ int main(int argc, char** argv)
 {
   StateStorage states;
 
-  states.addState("state1");
+  /*states.addState("state1");
   states.addState("state2");
-  states.addState("state3");
+  states.addState("state3");*/
 
   CoordinationTransition t1(1000, -1, std::vector<std::string>());
   states.addTransition("state1", "state2", t1);
