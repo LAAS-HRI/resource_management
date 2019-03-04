@@ -10,6 +10,7 @@ public:
 
   MessageWrapper& operator=(const T& data);
   MessageWrapper& operator=(const MessageWrapper& other);
+  T& operator()();
 
   void registerPublishFunction(void (*publish)(T));
   void publish();
@@ -48,6 +49,12 @@ MessageWrapper<T>& MessageWrapper<T>::operator=(const MessageWrapper& other)
     publish_ = other.publish_;
   }
   return *this;
+}
+
+template<typename T>
+T& MessageWrapper<T>::operator()()
+{
+  return data_;
 }
 
 template<typename T>
