@@ -1,8 +1,10 @@
 #ifndef MESSAGEWRAPPER_H
 #define MESSAGEWRAPPER_H
 
+#include "message_storage/MessageAbstraction.h"
+
 template<typename T>
-class MessageWrapper
+class MessageWrapper : public MessageAbstraction
 {
 public:
   MessageWrapper();

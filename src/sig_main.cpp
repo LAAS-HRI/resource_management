@@ -1,4 +1,5 @@
 #include "message_storage/MessageWrapper.h"
+#include "message_storage/ReactiveBuffer.h"
 
 #include <iostream>
 #include <thread>
@@ -43,6 +44,33 @@ int main(int argc, char** argv)
   m3.registerPublishFunction(&publishTestMsg);
   m3().msg = "m3";
   m3.publish();
+
+
+  /*****************/
+
+  std::cout << "*****" << std::endl;
+
+  ReactiveBuffer monitoring("monitoring");
+  ReactiveBuffer speaking("speaking");
+
+  monitoring.setPriority(10);
+  speaking.setPriority(5);
+
+  m1 = "m1";
+  monitoring.setData(&m1);
+  speaking.setData(&m2);
+
+  if(speaking > monitoring)
+    speaking()->publish();
+  else
+    monitoring()->publish();
+
+  monitoring.setData(&m3);
+
+  if(speaking > monitoring)
+    speaking()->publish();
+  else
+    monitoring()->publish();
 
   return 0;
 }

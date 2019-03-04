@@ -17,9 +17,15 @@ add_library(state_machine_lib
   src/state_machine/StateStorage.cpp
 )
 
+add_library(message_lib
+  src/message_storage/PriorityHolder.cpp
+  src/message_storage/ReactiveBuffer.cpp
+)
+
 add_executable(state_machine src/st_main.cpp)
 target_link_libraries(state_machine state_machine_lib)
 target_link_libraries(state_machine ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(signals src/sig_main.cpp)
+target_link_libraries(signals message_lib)
 target_link_libraries(signals ${CMAKE_THREAD_LIBS_INIT})
