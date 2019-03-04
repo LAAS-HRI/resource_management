@@ -14,6 +14,7 @@ public:
   std::string getName() { return name_; }
 
   void setData(MessageAbstraction* data);
+  void replaceData(MessageAbstraction* data);
   MessageAbstraction* operator()();
 
 private:

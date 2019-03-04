@@ -4,6 +4,8 @@
 class MessageAbstraction
 {
 public:
+  virtual ~MessageAbstraction() {}
+
   virtual void publish() = 0;
 };
 
