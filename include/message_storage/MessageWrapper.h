@@ -14,24 +14,25 @@ public:
   MessageWrapper& operator=(const MessageWrapper& other);
   T& operator()();
 
-  void registerPublishFunction(void (*publish)(T));
+  static void registerPublishFunction(void (*publish)(T));
   void publish();
 
 private:
   T data_;
-  void (*publish_)(T);
+  static void (*publish_)(T);
 };
+
+template<typename T>
+void (*MessageWrapper<T>::publish_)(T) = nullptr;
 
 template<typename T>
 MessageWrapper<T>::MessageWrapper()
 {
-  publish_ = nullptr;
 }
 
 template<typename T>
 MessageWrapper<T>::MessageWrapper(const T& data)
 {
-  publish_ = nullptr;
   data_ = data;
 }
 

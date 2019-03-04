@@ -13,22 +13,22 @@ struct test_t
 
 void publishStrMsg(std::string msg)
 {
-  std::cout << msg << std::endl;
+  std::cout << "[StrMsg] " << msg << std::endl;
 }
 
 void publishTestMsg(test_t msg)
 {
-  std::cout << msg.msg << std::endl;
+  std::cout << "[TestMsg] "  << msg.msg << std::endl;
 }
 
 int main(int argc, char** argv)
 {
+  MessageWrapper<std::string>::registerPublishFunction(&publishStrMsg);
+  MessageWrapper<test_t>::registerPublishFunction(&publishTestMsg);
+
   MessageWrapper<std::string> m1("m1");
   MessageWrapper<std::string> m2;
   m2 = "m2";
-
-  m1.registerPublishFunction(&publishStrMsg);
-  m2.registerPublishFunction(&publishStrMsg);
 
   m1.publish();
   m2.publish();
@@ -41,7 +41,6 @@ int main(int argc, char** argv)
   /*******************/
 
   MessageWrapper<test_t> m3;
-  m3.registerPublishFunction(&publishTestMsg);
   m3().msg = "m3";
   m3.publish();
 
