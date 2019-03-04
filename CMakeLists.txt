@@ -20,6 +20,7 @@ add_library(state_machine_lib
 add_library(message_lib
   src/message_storage/PriorityHolder.cpp
   src/message_storage/ReactiveBuffer.cpp
+  src/message_storage/ReactiveBufferStorage.cpp
 )
 
 add_executable(state_machine src/st_main.cpp)

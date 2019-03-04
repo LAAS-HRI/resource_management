@@ -1,7 +1,9 @@
 #ifndef MESSAGEABSTRACTION_H
 #define MESSAGEABSTRACTION_H
 
-class MessageAbstraction
+#include "message_storage/PriorityHolder.h"
+
+class MessageAbstraction : public PriorityHolder
 {
 public:
   virtual ~MessageAbstraction() {}
