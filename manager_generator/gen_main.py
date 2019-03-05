@@ -43,7 +43,8 @@ def createCatkinFiles(args,msg_files):
     'CATKIN_DEPENDS roscpp message_runtime\n'
     '# DEPENDS\n'
     ')\n'
-    '#add_executable(${{PROJECT_NAME}} src/${{PROJECT_NAME}}.cpp)'.format(args.package_name,msgs=" ".join(msg_files))
+    'include_directories(${{catkin_INCLUDE_DIRS}})\n'
+    'add_executable(${{PROJECT_NAME}} src/${{PROJECT_NAME}}.cpp)'.format(args.package_name,msgs=" ".join(msg_files))
     )
     fcmake.close()
 
@@ -117,7 +118,7 @@ fo.write('#include "{}/{}.h"\n'.format(args.package_name,"CoordinationSignal"))
 if args.target_types:
     for x in args.target_types:
         msg=x.split(':')[0]
-        fo.write('#include "{}/{}.h"\n'.format(args.package_name,msg))
+        fo.write('#include "{}/Priority{}.h"\n'.format(args.package_name,msg))
 
 
 #main
