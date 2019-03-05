@@ -3,6 +3,28 @@ project (resource_management)
 
 add_compile_options(-std=c++14 -Wall -pthread)
 
+find_package(catkin REQUIRED COMPONENTS
+    message_generation
+    std_msgs
+    )
+
+add_message_files(
+    FILES
+    CoordinationStateHeader.msg
+    CoordinationTransition.msg
+    EndCondition.msg
+    PriorityTargetHeader.msg
+)
+
+generate_messages(DEPENDENCIES std_msgs)
+
+catkin_package(
+    INCLUDE_DIRS include
+    LIBRARIES message_lib state_machine_lib
+    CATKIN_DEPENDS roscpp message_runtime
+    # DEPENDS
+    )
+
 find_package (Threads)
 
 include_directories(
