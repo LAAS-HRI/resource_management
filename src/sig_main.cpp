@@ -54,21 +54,21 @@ int main(int argc, char** argv)
   ReactiveBuffer monitoring("monitoring");
   ReactiveBuffer speaking("speaking");
 
-  monitoring.setPriority(9);
-  speaking.setPriority(6);
+  monitoring.setPriority(prioritize);
+  speaking.setPriority(normal);
 
   m1 = "m1";
   monitoring.setData(&m1);
   speaking.setData(&m2);
 
-  if(speaking > monitoring)
+  if(speaking.getPriority() > monitoring.getPriority())
     speaking()->publish();
   else
     monitoring()->publish();
 
   monitoring.setData(&m3);
 
-  if(speaking > monitoring)
+  if(speaking.getPriority() > monitoring.getPriority())
     speaking()->publish();
   else
     monitoring()->publish();
@@ -79,20 +79,23 @@ int main(int argc, char** argv)
 
   ReactiveBufferStorage buffers({"monitoring", "speaking"});
 
-  buffers.setPriority("monitoring", 9);
-  buffers.setPriority("speaking", 6);
+  buffers.setPriority("monitoring", prioritize);
+  buffers.setPriority("speaking", normal);
+
+  m1.setPriority(helpful);
+  m2.setPriority(helpful);
 
   buffers["monitoring"]->setData(&m1);
   buffers["speaking"]->setData(&m2);
 
   buffers.getMorePriorityData()->publish();
 
-  m1.setPriority(50);
-  m2.setPriority(255);
+  m2.setPriority(vital);
 
   buffers.getMorePriorityData()->publish();
 
-  m2.setPriority(0);
+  m2.setPriority(avoid);
+  m3.setPriority(helpful);
   buffers["monitoring"]->setData(&m3);
 
   buffers.getMorePriorityData()->publish();

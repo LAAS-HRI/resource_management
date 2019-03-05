@@ -6,7 +6,7 @@
 
 #include <string>
 
-class ReactiveBuffer : public PriorityHolder
+class ReactiveBuffer : public PriorityHolder<focus_priority_t>
 {
 public:
   ReactiveBuffer(std::string name);

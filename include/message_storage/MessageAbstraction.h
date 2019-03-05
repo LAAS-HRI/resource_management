@@ -3,7 +3,7 @@
 
 #include "message_storage/PriorityHolder.h"
 
-class MessageAbstraction : public PriorityHolder
+class MessageAbstraction : public PriorityHolder<importance_priority_t>
 {
 public:
   virtual ~MessageAbstraction() {}

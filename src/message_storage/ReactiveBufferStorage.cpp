@@ -12,7 +12,7 @@ ReactiveBufferStorage::~ReactiveBufferStorage()
     delete it.second;
 }
 
-void ReactiveBufferStorage::setPriority(std::string name, uint8_t priority)
+void ReactiveBufferStorage::setPriority(std::string name, focus_priority_t priority)
 {
   if(buffers_.find(name) != buffers_.end())
     buffers_[name]->setPriority(priority);
@@ -32,6 +32,7 @@ ReactiveBuffer* ReactiveBufferStorage::getMorePriority()
 
   for(const auto& it : buffers_)
   {
+    //TODO change cost function
     int16_t tmp = it.second->getPriority() * (1 + (float)((*it.second)()->getPriority() / 255.0f));
     if(tmp > max_priority)
     {

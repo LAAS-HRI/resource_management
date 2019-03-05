@@ -13,7 +13,7 @@ public:
   ReactiveBufferStorage(std::vector<std::string> names);
   ~ReactiveBufferStorage();
 
-  void setPriority(std::string name, uint8_t priority);
+  void setPriority(std::string name, focus_priority_t priority);
   ReactiveBuffer* operator[](const std::string& name);
   ReactiveBuffer* getMorePriority();
   MessageAbstraction* getMorePriorityData();
