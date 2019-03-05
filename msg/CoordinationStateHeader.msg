@@ -1,3 +1,3 @@
 string id
 
-CoordinationTransition transitions[]
+CoordinationTransition[] transitions
