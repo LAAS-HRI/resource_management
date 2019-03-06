@@ -20,6 +20,7 @@ public:
 
 private:
   std::map<std::string, ReactiveBuffer*> buffers_;
+  std::vector<std::vector<int8_t> > priorities_;
 };
 
 #endif // REACTIVEBUFFERSTORAGE_H
