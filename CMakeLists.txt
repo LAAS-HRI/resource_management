@@ -15,6 +15,8 @@ add_message_files(
     CoordinationTransition.msg
     EndCondition.msg
     PriorityTargetHeader.msg
+    MessagePriority.msg
+    CoordinationSignalHeader.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs)
