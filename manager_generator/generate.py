@@ -82,8 +82,8 @@ reactive_input_names_cs = ', '.join(['"'+x+'"' for x in reactive_input_names])
 
 
 #package architecture
-os.makedirs(os.path.join(project_name,"src"))
-os.makedirs(os.path.join(project_name,"msg"))
+os.makedirs(os.path.join(project_name,"src"),exist_ok=True)
+os.makedirs(os.path.join(project_name,"msg"),exist_ok=True)
 
 
 # .msg files
@@ -96,7 +96,7 @@ for x in args.target_types :
     data_type=x.split(':')[1]
     filename='CoordinationState'+name+'.msg'
     msg_files.append(filename)
-    f = open(os.path.join(args.package_name,'msg',filename),'w')
+    f = open(os.path.join(args.package_name,'msg',filename),'w+')
     f.write("resource_management/CoordinationStateHeader header\n")
     f.write("{} data\n".format(data_type))
     f.close()
@@ -107,7 +107,7 @@ for x in args.target_types :
     data_type=x.split(':')[1]
     filename = ''+name+'.msg'
     msg_files.append(filename)
-    f = open(os.path.join(args.package_name,'msg',filename),'w')
+    f = open(os.path.join(args.package_name,'msg',filename),'w+')
     f.write("resource_management/PriorityTargetHeader priority\n")
     f.write("{} data\n".format(data_type))
     f.close()
@@ -116,7 +116,7 @@ for x in args.target_types :
 #   CoordinationSignal
 filename='CoordinationSignal.msg'
 msg_files.append(filename)
-f_signal=open(os.path.join(args.package_name,'msg',filename),'w')
+f_signal=open(os.path.join(args.package_name,'msg',filename),'w+')
 f_signal.write("resource_management/CoordinationSignalHeader header\n")
 for x in args.target_types :
     name=x.split(':')[0]
@@ -153,7 +153,7 @@ f_in.close()
 # write main cpp file
 mainfile=os.path.join(project_name, "src", project_name +".cpp")
 
-fo = open(mainfile,"w")
+fo = open(mainfile,"w+")
 fo.write(string.Template(tpl).substitute(**locals()))
 fo.close()
 
