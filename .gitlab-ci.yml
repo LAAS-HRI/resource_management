@@ -21,11 +21,6 @@
     - source devel/setup.bash
     #- catkin_make run_tests_resource_management_rostest && catkin_make test
 
-.indigo_before_template : &indigo_before_definition
-  before_script:
-  - source /opt/ros/indigo/setup.bash
-  - apt-get update -qq && apt-get install -y libcppunit-dev
-
 .kinetic_before_template : &kinetic_before_definition
   before_script:
   - source /opt/ros/kinetic/setup.bash
@@ -44,20 +39,6 @@
 stages:
   - build
   - test
-
-run-build-indigo:
-  image: ros:indigo-perception
-  stage: build
-  allow_failure : true
-  <<: *indigo_before_definition
-  <<: *build_script_definition
-
-run-test-indigo:
-  image: ros:indigo-perception
-  stage: test
-  allow_failure : true
-  <<: *indigo_before_definition
-  <<: *test_script_definition
 
 run-build-kinetic:
   image: ros:kinetic-perception-xenial
