@@ -1,5 +1,5 @@
-#ifndef _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_REACTIVE_INPUTS_HPP_
-#define _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_REACTIVE_INPUTS_HPP_
+#ifndef _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_REACTIVE_INPUTS_H_
+#define _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_REACTIVE_INPUTS_H_
 
 #include <string>
 #include <vector>
@@ -21,7 +21,7 @@ public:
     ReactiveInputs(ros::NodeHandlePtr nh, const std::vector<std::string> &prio_buffer_names);
 
 private:
-    void _subscriberCallback(size_t index, const T &msg);
+    void _subscriberCallback(size_t index, const boost::shared_ptr<const T> &msg);
 
     ros::NodeHandlePtr _nh;
     std::vector<ros::Subscriber> _subscribers;
@@ -33,14 +33,15 @@ ReactiveInputs<T>::ReactiveInputs(ros::NodeHandlePtr nh, const std::vector<std::
     _nh(std::move(nh))
 {
     for(size_t index = 0 ; index < prio_buffer_names.size(); ++index){
-        _subscribers.emplace_back(_nh->subscribe(prio_buffer_names[index],1,std::bind(&ReactiveInputs<T>::_subscriberCallback,this,index,std::placeholders::_1)));
+        auto sub=_nh->subscribe<T>(prio_buffer_names[index]+ros::message_traits::md5sum<T>(),1,boost::bind(&ReactiveInputs<T>::_subscriberCallback,this,index,_1));
+        _subscribers.push_back(sub);
     }
 }
 
 template<class T>
-void ReactiveInputs<T>::_subscriberCallback(size_t index, const T &msg)
+void ReactiveInputs<T>::_subscriberCallback(size_t index, const boost::shared_ptr<T const> &msg)
 {
-    _buffers[index]->setData(new MessageWrapper<T>(msg));
+    _buffers[index]->replaceData(new MessageWrapper<T>(*msg));
 }
 
-#endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_REACTIVE_INPUTS_HPP_
+#endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_REACTIVE_INPUTS_H_

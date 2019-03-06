@@ -1,5 +1,5 @@
-#ifndef _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_RESOURCE_MANAGER_HPP_
-#define _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_RESOURCE_MANAGER_HPP_
+#ifndef _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_RESOURCE_MANAGER_H_
+#define _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_RESOURCE_MANAGER_H_
 
 #include <vector>
 #include <string>
@@ -8,29 +8,30 @@
 #include <ros/ros.h>
 
 #include "resource_management/ReactiveInputs.h"
+#include "resource_management/CoordinationSignals.h"
+
 #include "message_storage/ReactiveBuffer.h"
 
-template<class CoordinationSignalMsg, class ... PriorityMsgs>
 class ResourceManager
 {
     public:
-    ResourceManager(ros::NodeHandlePtr nh, const std::vector<ReactiveInputs*> &prio_buffers);
+    ResourceManager(ros::NodeHandlePtr nh, CoordinationSignalsBase *coordinationSignals, std::vector<ReactiveInputsBase*> reactiveInputs);
 
 private:
 
     ros::NodeHandlePtr _nh;
 
-    std::vector<ReactiveInputsBase*> _prioInputs;
+    CoordinationSignalsBase *_coordinationSignalService;
+    std::vector<ReactiveInputsBase*> _reactiveInputs;
 
 
 };
 
 
-template<class CoordinationSignalMsg, class ...PriorityMsgs>
-ResourceManager<CoordinationSignalMsg,PriorityMsgs...>::ResourceManager(ros::NodeHandlePtr nh, const std::vector<ReactiveInputs *> &prio_buffers):
-    _nh(std::move(nh))
+ResourceManager::ResourceManager(ros::NodeHandlePtr nh, CoordinationSignalsBase *coordinationSignals, std::vector<ReactiveInputsBase *> reactiveInputs):
+    _nh(std::move(nh)), _coordinationSignalService(coordinationSignals), _reactiveInputs(reactiveInputs)
 {
 
 }
 
-#endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_RESOURCE_MANAGER_HPP_
+#endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_RESOURCE_MANAGER_H_
