@@ -6,6 +6,8 @@
 #include "state_machine/CoordinationTransition.h"
 #include "state_machine/CoordinationState.h"
 
+#include <ros/ros.h>
+
 #include <string>
 #include <mutex>
 
@@ -30,7 +32,7 @@ struct CoordinationInternalState_t
 class CoordinationStateMachine : public EventStorage
 {
 public:
-  CoordinationStateMachine(int32_t time_out = -1, float rate = 100);
+  CoordinationStateMachine(ros::Duration time_out = ros::Duration(-1), float rate = 100);
 
   void run();
   CoordinationInternalState_t getInternalState();
@@ -41,7 +43,7 @@ public:
 
 private:
   uint32_t us_sleep_time_;
-  int32_t time_out_;
+  ros::Duration time_out_;
 
   void (*publishState_)(CoordinationInternalState_t);
   CoordinationInternalState_t internal_state_;

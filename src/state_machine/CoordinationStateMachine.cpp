@@ -2,7 +2,7 @@
 
 #include <unistd.h>
 
-CoordinationStateMachine::CoordinationStateMachine(int32_t time_out, float rate)
+CoordinationStateMachine::CoordinationStateMachine(ros::Duration time_out, float rate)
 {
   publishState_ = nullptr;
   time_out_ = time_out;
@@ -14,14 +14,14 @@ void CoordinationStateMachine::run()
   if(internal_state_.state_ != nullptr)
     internal_state_.state_->startState();
 
-  std::chrono::high_resolution_clock::time_point start_time = std::chrono::high_resolution_clock::now();
+  ros::Time start_time = ros::Time::now();
 
   while(internal_state_.state_ != nullptr)
   {
     internal_state_mutex_.lock();
 
-    std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
-    if((time_out_ != -1) && (std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(now - start_time).count() >= time_out_))
+    ros::Time now = ros::Time::now();
+    if((time_out_ != ros::Duration(-1)) && (now - start_time >= time_out_))
     {
       internal_state_.state_ = nullptr;
       internal_state_.transition_state_ = transition_global_timeout;
