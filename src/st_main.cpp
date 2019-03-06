@@ -40,7 +40,7 @@ int main(int argc, char** argv)
   CoordinationSignalsStorage coordination_signals;
 
   /**********************/
-  std::shared_ptr<StateStorage> states = std::make_shared<StateStorage>();
+  std::shared_ptr<StateStorage> states = std::make_shared<StateStorage>(ros::Duration(-1),ros::Time::now());
   states->setPriority(important);
 
   CoordinationTransition t1(ros::Duration(1), ros::Duration(-1), std::vector<std::string>());
@@ -76,6 +76,8 @@ int main(int argc, char** argv)
     CoordinationStateMachine sm;
     sm.setPublicationFunction(&publishState);
     sm.setInitialState(current->getInitialState());
+    sm.setTimeout(current->getTimeout());
+    sm.setDeadLine(current->getDeadLine());
 
     std::thread th(&CoordinationStateMachine::run, &sm);
     usleep(2000000);

@@ -1,5 +1,11 @@
 #include "state_machine/StateStorage.h"
 
+StateStorage::StateStorage(ros::Duration time_out, ros::Time begin_dead_line)
+{
+  time_out_ = time_out;
+  begin_dead_line_ = begin_dead_line;
+}
+
 StateStorage::~StateStorage()
 {
   for(auto it : states_)
