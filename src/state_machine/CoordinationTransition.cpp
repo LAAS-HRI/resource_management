@@ -44,6 +44,10 @@ transtition_state_t CoordinationTransition::evaluate(const std::string& event)
   else
   {
     bool pass = true;
+
+    if(regexs_validation_.size() == 0)
+      pass = false;
+
     for(size_t i = 0; i < regexs_validation_.size(); i++)
     {
       std::smatch match;

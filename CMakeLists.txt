@@ -15,6 +15,7 @@ add_library(state_machine_lib
   src/state_machine/CoordinationStateMachine.cpp
   src/state_machine/EventStorage.cpp
   src/state_machine/StateStorage.cpp
+  src/state_machine/CoordinationSignalsStorage.cpp
 )
 
 add_library(message_lib

@@ -23,6 +23,19 @@ void StateStorage::addTransition(const std::string& id, const std::string& id_ne
   states_[id]->setTransition(states_[id_next], transition);
 }
 
+void StateStorage::setInitialState(const std::string& id)
+{
+  initial_state_ = id;
+}
+
+CoordinationState* StateStorage::getInitialState()
+{
+  if(states_.find(initial_state_) != states_.end())
+    return states_[initial_state_];
+  else
+    return nullptr;
+}
+
 CoordinationState* StateStorage::operator[](std::string id)
 {
   if(states_.find(id) != states_.end())
