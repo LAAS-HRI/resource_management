@@ -52,7 +52,7 @@ void CoordinationSignals<T>::_subscriberCallback(T msg)
 
     for(auto &t : transitions){
         resource_management::EndCondition &end_condition = std::get<2>(t);
-        CoordinationTransition transition(end_condition.duration.toSec(),end_condition.expiration.toSec(),end_condition.regex_end_condition);
+        CoordinationTransition transition(end_condition.duration,end_condition.timeout,end_condition.regex_end_condition);
         states.addTransition(std::get<0>(t),std::get<1>(t),transition);
     }
 

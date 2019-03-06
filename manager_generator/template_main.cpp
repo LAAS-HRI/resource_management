@@ -13,7 +13,7 @@ std::map<std::string,MessageAbstraction*> stateFromMsg(const ${project_name}::Co
 !!for data_type in messages_types_zip
     for(auto x : msg.states_{data_type[0]}){{
         auto wrap = states[x.header.id] = new MessageWrapper<{data_type[2]}>(x.data);
-        wrap->setPriority(msg.header.priority.value);
+        wrap->setPriority(static_cast<importance_priority_t>(msg.header.priority.value));
     }}
 !!end
     return states;
