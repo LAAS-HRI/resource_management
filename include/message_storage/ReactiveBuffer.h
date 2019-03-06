@@ -5,6 +5,7 @@
 #include "message_storage/MessageAbstraction.h"
 
 #include <string>
+#include <memory>
 
 class ReactiveBuffer : public PriorityHolder<focus_priority_t>
 {
@@ -13,13 +14,12 @@ public:
 
   std::string getName() { return name_; }
 
-  void setData(MessageAbstraction* data);
-  void replaceData(MessageAbstraction* data);
-  MessageAbstraction* operator()();
+  void setData(std::shared_ptr<MessageAbstraction> data);
+  std::shared_ptr<MessageAbstraction> operator()();
 
 private:
   std::string name_;
-  MessageAbstraction* data_;
+  std::shared_ptr<MessageAbstraction> data_;
 };
 
 #endif // REACTIVEBUFFER_H

@@ -58,15 +58,15 @@ int main(int argc, char** argv)
   speaking.setPriority(normal);
 
   m1 = "m1";
-  monitoring.setData(&m1);
-  speaking.setData(&m2);
+  monitoring.setData(std::make_shared<MessageWrapper<std::string>>(m1));
+  speaking.setData(std::make_shared<MessageWrapper<std::string>>(m2));
 
   if(speaking.getPriority() > monitoring.getPriority())
     speaking()->publish();
   else
     monitoring()->publish();
 
-  monitoring.setData(&m3);
+  monitoring.setData(std::make_shared<MessageWrapper<test_t>>(m3));
 
   if(speaking.getPriority() > monitoring.getPriority())
     speaking()->publish();
@@ -85,8 +85,8 @@ int main(int argc, char** argv)
   m1.setPriority(helpful);
   m2.setPriority(helpful);
 
-  buffers["monitoring"]->setData(&m1);
-  buffers["speaking"]->setData(&m2);
+  buffers["monitoring"]->setData(std::make_shared<MessageWrapper<std::string>>(m1));
+  buffers["speaking"]->setData(std::make_shared<MessageWrapper<std::string>>(m2));
 
   buffers.getMorePriorityData()->publish();
 
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 
   m2.setPriority(avoid);
   m3.setPriority(helpful);
-  buffers["monitoring"]->setData(&m3);
+  buffers["monitoring"]->setData(std::make_shared<MessageWrapper<test_t>>(m3));
 
   buffers.getMorePriorityData()->publish();
 

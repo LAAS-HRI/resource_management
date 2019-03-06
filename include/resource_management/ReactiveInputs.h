@@ -41,7 +41,7 @@ ReactiveInputs<T>::ReactiveInputs(ros::NodeHandlePtr nh, const std::vector<std::
 template<class T>
 void ReactiveInputs<T>::_subscriberCallback(size_t index, const boost::shared_ptr<T const> &msg)
 {
-    _buffers[index]->replaceData(new MessageWrapper<T>(*msg));
+    _buffers[index]->setData(std::make_shared<MessageWrapper<T>>(*msg));
 }
 
 #endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_REACTIVE_INPUTS_H_

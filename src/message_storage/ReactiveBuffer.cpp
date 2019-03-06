@@ -6,20 +6,12 @@ ReactiveBuffer::ReactiveBuffer(std::string name)
   data_ = nullptr;
 }
 
-void ReactiveBuffer::setData(MessageAbstraction* data)
+void ReactiveBuffer::setData(std::shared_ptr<MessageAbstraction> data)
 {
   data_ = data;
 }
 
-void ReactiveBuffer::replaceData(MessageAbstraction* data)
-{
-  if(data_ != nullptr)
-    delete data_;
-
-  data_ = data;
-}
-
-MessageAbstraction* ReactiveBuffer::operator()()
+std::shared_ptr<MessageAbstraction> ReactiveBuffer::operator()()
 {
   return data_;
 }

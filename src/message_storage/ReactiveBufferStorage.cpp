@@ -55,7 +55,7 @@ ReactiveBuffer* ReactiveBufferStorage::getMorePriority()
   return found;
 }
 
-MessageAbstraction* ReactiveBufferStorage::getMorePriorityData()
+std::shared_ptr<MessageAbstraction> ReactiveBufferStorage::getMorePriorityData()
 {
   ReactiveBuffer* max = getMorePriority();
   if(max != nullptr)
