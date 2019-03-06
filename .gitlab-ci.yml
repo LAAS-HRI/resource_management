@@ -7,10 +7,6 @@
     - cp -r /builds/laas-hri/resource_management .
     - cd ..
     - catkin_make
-    - cd src/resource_management
-    - mkdir build && cd build
-    - cmake ..
-    - make
 
 .test_script_template : &test_script_definition
   script:
