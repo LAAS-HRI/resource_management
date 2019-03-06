@@ -32,7 +32,7 @@ struct CoordinationInternalState_t
 class CoordinationStateMachine : public EventStorage
 {
 public:
-  CoordinationStateMachine(ros::Duration time_out = ros::Duration(-1), float rate = 100);
+  CoordinationStateMachine(ros::Duration time_out = ros::Duration(-1), ros::Time begin_dead_line = ros::Time(0), float rate = 100);
 
   void run();
   CoordinationInternalState_t getInternalState();
@@ -44,6 +44,7 @@ public:
 private:
   uint32_t us_sleep_time_;
   ros::Duration time_out_;
+  ros::Time begin_dead_line_;
 
   void (*publishState_)(CoordinationInternalState_t);
   CoordinationInternalState_t internal_state_;

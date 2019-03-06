@@ -2,10 +2,11 @@
 
 #include <unistd.h>
 
-CoordinationStateMachine::CoordinationStateMachine(ros::Duration time_out, float rate)
+CoordinationStateMachine::CoordinationStateMachine(ros::Duration time_out, ros::Time begin_dead_line, float rate)
 {
   publishState_ = nullptr;
   time_out_ = time_out;
+  begin_dead_line_ = begin_dead_line;
   us_sleep_time_ = (uint32_t)(1000000.0 / rate);
 }
 
@@ -15,6 +16,15 @@ void CoordinationStateMachine::run()
     internal_state_.state_->startState();
 
   ros::Time start_time = ros::Time::now();
+  if(begin_dead_line_ != ros::Time(0))
+    if(begin_dead_line_ < start_time)
+    {
+      internal_state_mutex_.lock();
+      internal_state_.state_ = nullptr;
+      internal_state_.transition_state_ = transition_dead_line;
+      internal_state_mutex_.unlock();
+      return;
+    }
 
   while(internal_state_.state_ != nullptr)
   {
