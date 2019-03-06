@@ -2,8 +2,9 @@
 
 ReactiveBufferStorage::ReactiveBufferStorage(std::vector<std::string> names)
 {
-  for(const auto& name : names)
-    buffers_[name] = new ReactiveBuffer(name);
+  for(const auto& name : names){
+    buffers_[name] = std::make_shared<ReactiveBuffer>(name);
+  }
 
   priorities_ = std::vector<std::vector<int8_t> >(
     {
@@ -18,28 +19,23 @@ ReactiveBufferStorage::ReactiveBufferStorage(std::vector<std::string> names)
   );
 }
 
-ReactiveBufferStorage::~ReactiveBufferStorage()
-{
-  for(const auto& it : buffers_)
-    delete it.second;
-}
-
 void ReactiveBufferStorage::setPriority(std::string name, focus_priority_t priority)
 {
   if(buffers_.find(name) != buffers_.end())
     buffers_[name]->setPriority(priority);
 }
 
-ReactiveBuffer* ReactiveBufferStorage::operator[](const std::string& name)
+std::shared_ptr<ReactiveBuffer> ReactiveBufferStorage::operator[](const std::string& name) const
 {
-  if(buffers_.find(name) != buffers_.end())
-    return buffers_[name];
+  auto search = buffers_.find(name);
+  if(search != buffers_.end())
+    return search->second;
   return nullptr;
 }
 
-ReactiveBuffer* ReactiveBufferStorage::getMorePriority()
+std::shared_ptr<ReactiveBuffer> ReactiveBufferStorage::getMorePriority()
 {
-  ReactiveBuffer* found = nullptr;
+  std::shared_ptr<ReactiveBuffer> found;
   int16_t max_priority = -100;
 
   for(const auto& it : buffers_)
@@ -57,8 +53,8 @@ ReactiveBuffer* ReactiveBufferStorage::getMorePriority()
 
 std::shared_ptr<MessageAbstraction> ReactiveBufferStorage::getMorePriorityData()
 {
-  ReactiveBuffer* max = getMorePriority();
-  if(max != nullptr)
+  std::shared_ptr<ReactiveBuffer> max = getMorePriority();
+  if(max)
     return (*max)();
-  return nullptr;
+  return {};
 }

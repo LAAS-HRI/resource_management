@@ -11,15 +11,15 @@ class ReactiveBufferStorage
 {
 public:
   ReactiveBufferStorage(std::vector<std::string> names);
-  ~ReactiveBufferStorage();
+  ~ReactiveBufferStorage() = default;
 
   void setPriority(std::string name, focus_priority_t priority);
-  ReactiveBuffer* operator[](const std::string& name);
-  ReactiveBuffer* getMorePriority();
+  std::shared_ptr<ReactiveBuffer> operator[](const std::string& name) const;
+  std::shared_ptr<ReactiveBuffer> getMorePriority();
   std::shared_ptr<MessageAbstraction> getMorePriorityData();
 
 private:
-  std::map<std::string, ReactiveBuffer*> buffers_;
+  std::map<std::string, std::shared_ptr<ReactiveBuffer>> buffers_;
   std::vector<std::vector<int8_t> > priorities_;
 };
 
