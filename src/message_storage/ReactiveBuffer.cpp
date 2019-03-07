@@ -4,6 +4,7 @@ ReactiveBuffer::ReactiveBuffer(std::string name)
 {
   name_ = name;
   data_ = nullptr;
+  setPriority(ignore);
 }
 
 void ReactiveBuffer::setData(std::shared_ptr<MessageAbstraction> data)

@@ -7,6 +7,8 @@
 #include <resource_management/ReactiveInputs.h>
 #include <resource_management/ResourceManager.h>
 
+#include <thread>
+
 class ${class_name} : public ResourceManager<${project_name}::CoordinationSignal
 !!for msg_name in message_names
       ,${{project_name}}::{msg_name}
@@ -78,5 +80,9 @@ int main(int argc, char *argv[]){
 
     ${class_name} mgr(nh);
 
+    std::thread th(&${class_name}::run, &mgr);
+
     ros::spin();
+
+    th.join();
 }

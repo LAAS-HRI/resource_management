@@ -40,6 +40,8 @@ public:
     /// also creates 2 buffers for artificial life and coordination signals
     ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames);
 
+    void run();
+
 protected:
     virtual std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const CoordinationSignalType &msg) = 0;
     virtual std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
@@ -68,6 +70,7 @@ private:
     std::vector<std::string> _bufferNames;
 
     ros::Subscriber _prioritiesSubscriber;
+    double hz_;
 };
 
 
@@ -86,6 +89,12 @@ ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::
     addBufferNames(reactiveInputNames);
     Impl<InputDataTypes...>::add(_reactiveInputs,_nh,reactiveInputNames,*_reactiveBufferStorage);
     _prioritiesSubscriber = _nh->subscribe("set_priorities", 10, &ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback, this);
+
+    if(!_nh->getParam("freq", hz_))
+    {
+      _nh->setParam("freq", 100);
+      hz_ = 100;
+    }
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
@@ -110,7 +119,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::createReactiveBu
 
     _reactiveBufferStorage->setPriority("artificial_life", fullfocus);
     _artificialLifeBuffer=_reactiveBufferStorage->operator[]("artificial_life");
-    
+
     _reactiveBufferStorage->setPriority("coordination_signals", fullfocus);
     _coordinationSignalBuffer=_reactiveBufferStorage->operator[]("coordination_signals");
 }
@@ -133,6 +142,30 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallba
 
     if(std::find(_reactiveBuffersNames.begin(), _reactiveBuffersNames.end(), msg.buffers[i]) != _reactiveBuffersNames.end())
       _reactiveBufferStorage->operator[](msg.buffers[i])->setPriority(priority);
+  }
+}
+
+template<typename CoordinationSignalType, typename ...InputDataTypes>
+void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
+{
+  size_t param_update = 0;
+  while (ros::ok())
+  {
+    std::shared_ptr<ReactiveBuffer> buff = _reactiveBufferStorage->getMorePriority();
+    if(buff)
+      if(buff->operator()())
+      {
+        buff->operator()()->publish();
+      }
+
+    if(++param_update > 10)
+    {
+      _nh->getParam("freq", hz_);
+      param_update = 0;
+    }
+
+    ros::Rate r(hz_);
+    r.sleep();
   }
 }
 

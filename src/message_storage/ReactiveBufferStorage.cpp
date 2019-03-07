@@ -40,11 +40,14 @@ std::shared_ptr<ReactiveBuffer> ReactiveBufferStorage::getMorePriority()
 
   for(const auto& it : buffers_)
   {
-    int16_t tmp = (int)priorities_[(int)(*it.second)()->getPriority() + 2][(int)it.second->getPriority()];
-    if(tmp > max_priority)
+    if((*it.second)())
     {
-      max_priority = tmp;
-      found = it.second;
+      int16_t tmp = (int)priorities_[(int)(*it.second)()->getPriority() + 2][(int)it.second->getPriority()];
+      if(tmp > max_priority)
+      {
+        max_priority = tmp;
+        found = it.second;
+      }
     }
   }
 
