@@ -85,7 +85,7 @@ ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::
     createReactiveBufferStorage();
     addBufferNames(reactiveInputNames);
     Impl<InputDataTypes...>::add(_reactiveInputs,_nh,reactiveInputNames,*_reactiveBufferStorage);
-    _prioritiesSubscriber = _nh->subscribe("setPriorities", 10, &ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback, this);
+    _prioritiesSubscriber = _nh->subscribe("set_priorities", 10, &ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback, this);
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
@@ -97,7 +97,7 @@ const std::vector<std::string> &ResourceManager<CoordinationSignalType,InputData
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::addBufferNames(const std::vector<std::string> &bufferNames)
 {
-    _reactiveBuffersNames.insert(_bufferNames.end(),bufferNames.begin(),bufferNames.end());
+    _reactiveBuffersNames.insert(_reactiveBuffersNames.end(),bufferNames.begin(),bufferNames.end());
     _bufferNames.insert(_bufferNames.end(),bufferNames.begin(),bufferNames.end());
 }
 
