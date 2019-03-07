@@ -9,6 +9,7 @@
 
 #include "resource_management/ReactiveInputs.h"
 #include "resource_management/CoordinationSignals.h"
+#include "resource_management/PrioritiesSetter.h"
 
 #include "message_storage/ReactiveBuffer.h"
 
@@ -52,6 +53,8 @@ private:
     /// also clear _reactiveInputs and _reactiveBuffers
     void createReactiveBufferStorage();
 
+    void prioritiesCallback(const resource_management::PrioritiesSetter& msg);
+
     ros::NodeHandlePtr _nh;
 
     std::shared_ptr<CoordinationSignalsBase> _coordinationSignalService;
@@ -59,11 +62,12 @@ private:
 
     std::shared_ptr<ReactiveBuffer> _artificialLifeBuffer;
     std::shared_ptr<ReactiveBuffer> _coordinationSignalBuffer;
-    std::vector<std::shared_ptr<ReactiveBuffer>> _reactiveBuffers;
     std::shared_ptr<ReactiveBufferStorage> _reactiveBufferStorage;
 
-private:
+    std::vector<std::string> _reactiveBuffersNames;
     std::vector<std::string> _bufferNames;
+
+    ros::Subscriber _prioritiesSubscriber;
 };
 
 
@@ -81,6 +85,7 @@ ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::
     createReactiveBufferStorage();
     addBufferNames(reactiveInputNames);
     Impl<InputDataTypes...>::add(_reactiveInputs,_nh,reactiveInputNames,*_reactiveBufferStorage);
+    _prioritiesSubscriber = _nh->subscribe("setPriorities", 10, &ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback, this);
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
@@ -92,6 +97,7 @@ const std::vector<std::string> &ResourceManager<CoordinationSignalType,InputData
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::addBufferNames(const std::vector<std::string> &bufferNames)
 {
+    _reactiveBuffersNames.insert(_bufferNames.end(),bufferNames.begin(),bufferNames.end());
     _bufferNames.insert(_bufferNames.end(),bufferNames.begin(),bufferNames.end());
 }
 
@@ -99,11 +105,31 @@ template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::createReactiveBufferStorage()
 {
     _reactiveInputs.clear();
-    _reactiveBuffers.clear();
+    _reactiveBuffersNames.clear();
     _reactiveBufferStorage=std::make_shared<ReactiveBufferStorage>(getBufferNames());
     _artificialLifeBuffer=_reactiveBufferStorage->operator[]("artificial_life");
     _coordinationSignalBuffer=_reactiveBufferStorage->operator[]("coordination_signals");
 }
 
+template<typename CoordinationSignalType, typename ...InputDataTypes>
+void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback(const resource_management::PrioritiesSetter& msg)
+{
+  size_t min = (msg.values.size() < msg.buffers.size()) ? msg.values.size() : msg.buffers.size();
+  focus_priority_t priority = ignore;
+
+  for(size_t i = 0; i < min; i++)
+  {
+    switch (msg.values[i]) {
+      case 4: priority = fullfocus; break;
+      case 3: priority = prioritize; break;
+      case 2: priority = normal; break;
+      case 1: priority = secondary; break;
+      default: priority = ignore; break;
+    }
+
+    if(std::find(_reactiveBuffersNames.begin(), _reactiveBuffersNames.end(), msg.buffers[i]) != _reactiveBuffersNames.end())
+      _reactiveBufferStorage->operator[](msg.buffers[i])->setPriority(priority);
+  }
+}
 
 #endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_RESOURCE_MANAGER_H_
