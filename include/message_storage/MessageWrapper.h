@@ -3,6 +3,8 @@
 
 #include "message_storage/MessageAbstraction.h"
 
+#include <functional>
+
 template<typename T>
 class MessageWrapper : public MessageAbstraction
 {
@@ -14,16 +16,17 @@ public:
   MessageWrapper& operator=(const MessageWrapper& other);
   T& operator()();
 
-  static void registerPublishFunction(void (*publish)(T));
+  static void registerPublishFunction(std::function<void(T)> publish);
   void publish();
 
 private:
   T data_;
-  static void (*publish_)(T);
+  static std::function<void(T)> publish_;
 };
 
 template<typename T>
-void (*MessageWrapper<T>::publish_)(T) = nullptr;
+std::function<void(T)> MessageWrapper<T>::publish_ = {};
+
 
 template<typename T>
 MessageWrapper<T>::MessageWrapper()
@@ -61,7 +64,7 @@ T& MessageWrapper<T>::operator()()
 }
 
 template<typename T>
-void MessageWrapper<T>::registerPublishFunction(void (*publish)(T))
+void MessageWrapper<T>::registerPublishFunction(std::function<void(T)> publish)
 {
   publish_ = publish;
 }
@@ -69,7 +72,7 @@ void MessageWrapper<T>::registerPublishFunction(void (*publish)(T))
 template<typename T>
 void MessageWrapper<T>::publish()
 {
-  if(publish_ != nullptr)
+  if(publish_)
     publish_(data_);
 }
 
