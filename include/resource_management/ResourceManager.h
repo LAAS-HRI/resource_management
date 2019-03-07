@@ -107,7 +107,11 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::createReactiveBu
     _reactiveInputs.clear();
     _reactiveBuffersNames.clear();
     _reactiveBufferStorage=std::make_shared<ReactiveBufferStorage>(getBufferNames());
+
+    _reactiveBufferStorage->setPriority("artificial_life", fullfocus);
     _artificialLifeBuffer=_reactiveBufferStorage->operator[]("artificial_life");
+    
+    _reactiveBufferStorage->setPriority("coordination_signals", fullfocus);
     _coordinationSignalBuffer=_reactiveBufferStorage->operator[]("coordination_signals");
 }
 
