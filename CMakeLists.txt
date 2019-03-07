@@ -17,6 +17,7 @@ add_message_files(
     PriorityTargetHeader.msg
     MessagePriority.msg
     CoordinationSignalHeader.msg
+    PrioritiesSetter.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs)
