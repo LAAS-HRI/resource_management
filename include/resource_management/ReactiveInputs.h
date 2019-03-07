@@ -44,7 +44,7 @@ template<class T>
 void ReactiveInputs<T>::_subscriberCallback(size_t index, const boost::shared_ptr<T const> &msg)
 {
     auto wrap = std::make_shared<MessageWrapper<typename T::_data_type>>(msg->data);
-    wrap->setPriority(static_cast<importance_priority_t>(msg->priority.priority));
+    wrap->setPriority(static_cast<importance_priority_t>(msg->priority.value));
     _buffers[index]->setData(wrap);
 }
 

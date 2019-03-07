@@ -1,0 +1,17 @@
+example usage:
+
+    roscd resource_management; cd ..
+    python3 ./resource_management/manager_generator/generate.py --package-name led_manager --target-types Color:float32:float OnOff:bool:bool --reactive-topics emotion tagada switch
+
+will create a ros package containing a manager which takes as input 2 types of data:
+    Color, which data is of type float32 (in ros msg) and float (in c++)
+    OnOff, which data is of type bool (in ros msg) and bool (in c++)
+
+These data can be received on 3 topics each, with names starting with "emotion", "tagada" and "switch"
+
+The package will be named led_manager as the node, so to start it you can call
+    rosrun led_manager led_manager
+
+
+Limitations:
+ - cannot use complex types for input messages (type name containing '/' (ros msg) or '::' (c++))
