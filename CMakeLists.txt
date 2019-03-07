@@ -14,7 +14,6 @@ add_message_files(
     CoordinationStateHeader.msg
     CoordinationTransition.msg
     EndCondition.msg
-    PriorityTargetHeader.msg
     MessagePriority.msg
     CoordinationSignalHeader.msg
 )
