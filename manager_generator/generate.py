@@ -60,6 +60,8 @@ def createCatkinFiles(args,msg_files):
     '</package>\n'.format(args.package_name))
     fpackage.close()
 
+def underscore_to_CamelCase(word):
+    return ''.join(x.capitalize() or '_' for x in word.split('_'))
 
 
 parser = argparse.ArgumentParser(description="generate a resource manager node")
@@ -77,6 +79,7 @@ ros_data_types=[x.split(':')[1] for x in args.target_types]
 cpp_types=[x.split(':')[2] for x in args.target_types]
 messages_types_zip=zip(message_names,ros_data_types,cpp_types)
 project_name=args.package_name
+class_name=underscore_to_CamelCase(project_name)
 reactive_input_names=args.reactive_topics
 reactive_input_names_cs = ', '.join(['"'+x+'"' for x in reactive_input_names])
 
@@ -108,7 +111,7 @@ for x in args.target_types :
     filename = ''+name+'.msg'
     msg_files.append(filename)
     f = open(os.path.join(args.package_name,'msg',filename),'w+')
-    f.write("resource_management/PriorityTargetHeader priority\n")
+    f.write("resource_management/MessagePriority priority\n")
     f.write("{} data\n".format(data_type))
     f.close()
 

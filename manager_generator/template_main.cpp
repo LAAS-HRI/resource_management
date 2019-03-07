@@ -7,19 +7,36 @@
 #include <resource_management/ReactiveInputs.h>
 #include <resource_management/ResourceManager.h>
 
-std::map<std::string,MessageAbstraction*> stateFromMsg(const ${project_name}::CoordinationSignal &msg)
+class ${class_name} : public ResourceManager<${project_name}::CoordinationSignal
+!!for msg_name in message_names
+      , ${{project_name}}::{msg_name}
+!!end
+  >
 {
-    std::map<std::string,MessageAbstraction*> states;
+public:
+    ${class_name}(const ros::NodeHandlePtr &nh):
+        ResourceManager (std::move(nh),{${reactive_input_names_cs}})
+    {}
+
+private:
+    std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const ${project_name}::CoordinationSignal &msg) override;
+    std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
+    transitionFromMsg(const ${project_name}::CoordinationSignal &msg) override;
+};
+
+std::map<std::string,std::shared_ptr<MessageAbstraction>> ${class_name}::stateFromMsg(const ${project_name}::CoordinationSignal &msg)
+{
+    std::map<std::string,std::shared_ptr<MessageAbstraction>> states;
 !!for data_type in messages_types_zip
     for(auto x : msg.states_{data_type[0]}){{
-        auto wrap = states[x.header.id] = new MessageWrapper<{data_type[2]}>(x.data);
+        auto wrap = states[x.header.id] = std::make_shared<MessageWrapper<{data_type[2]}>>(x.data);
         wrap->setPriority(static_cast<importance_priority_t>(msg.header.priority.value));
     }}
 !!end
     return states;
 }
 std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
-transitionFromMsg(const ${project_name}::CoordinationSignal &msg)
+${class_name}::transitionFromMsg(const ${project_name}::CoordinationSignal &msg)
 {
     std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>> transitions;
 !!for data_type in message_names
@@ -40,13 +57,7 @@ int main(int argc, char *argv[]){
     ros::init(argc,argv,"${project_name}");
     ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
 
-    auto coordSignals = new CoordinationSignals<${project_name}::CoordinationSignal>(nh,boost::bind(stateFromMsg,_1),boost::bind(transitionFromMsg,_1));
-    std::vector<std::string> reactiveInputNames = {${reactive_input_names_cs}};
-    std::vector<ReactiveInputsBase*> reactiveInputs;
-!!for msg_name in message_names
-    reactiveInputs.emplace_back(new ReactiveInputs<${{project_name}}::{msg_name}>(nh,reactiveInputNames));
-!!end
-    ResourceManager mgr(nh, coordSignals, reactiveInputs);
+    ${class_name} mgr(nh);
 
     ros::spin();
 }
