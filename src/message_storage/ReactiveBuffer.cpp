@@ -8,7 +8,7 @@ ReactiveBuffer::ReactiveBuffer(std::string name)
 
 void ReactiveBuffer::setData(std::shared_ptr<MessageAbstraction> data)
 {
-  data_ = data;
+  data_ = std::move(data);
 }
 
 std::shared_ptr<MessageAbstraction> ReactiveBuffer::operator()()

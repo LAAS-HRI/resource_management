@@ -21,7 +21,7 @@ template<class T>
 class CoordinationSignals : public CoordinationSignalsBase
 {
 public:
-    using StateFromMsgFn = boost::function<std::map<std::string,MessageAbstraction*>(const T&)>;
+    using StateFromMsgFn = boost::function<std::map<std::string,std::shared_ptr<MessageAbstraction>>(const T&)>;
     using TransitionFromMsgFn = boost::function<std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>(const T&)>;
 
     CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg);
@@ -30,8 +30,8 @@ private:
     void _subscriberCallback(T msg);
     ros::NodeHandlePtr _nh;
     ros::Subscriber _subscriber;
-    boost::function<std::map<std::string,MessageAbstraction*>(const T&)> _getStateDataFromCoordinationSignalMsg;
-    boost::function<std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>(const T&)> _getTransitionsFromCoordinationSignalMsg;
+    StateFromMsgFn _getStateDataFromCoordinationSignalMsg;
+    TransitionFromMsgFn _getTransitionsFromCoordinationSignalMsg;
 };
 
 template<class T>
