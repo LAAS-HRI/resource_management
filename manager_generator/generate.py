@@ -5,7 +5,6 @@ import os
 import sys
 import string
 
-
 def substitue_for_loop(tpl,for_var,the_list):
     res=""
     for x in the_list:
@@ -77,7 +76,9 @@ in_msg_dir = os.path.join(generator_dir,"cmake","gen","msg")
 message_names=[x.split(':')[0] for x in args.target_types]
 ros_data_types=[x.split(':')[1] for x in args.target_types]
 cpp_types=[x.split(':')[2] for x in args.target_types]
-messages_types_zip=zip(message_names,ros_data_types,cpp_types)
+messages_types_zip=[]
+for x in zip(message_names,ros_data_types,cpp_types):
+    messages_types_zip.append(x)
 project_name=args.package_name
 class_name=underscore_to_CamelCase(project_name)
 reactive_input_names=args.reactive_topics
@@ -144,7 +145,6 @@ for line in f_in:
         tpl_inside=""
     elif line.startswith('!!end'):
         inside=False
-        #command+='    tmp_tpl=Template(tpl_inside)\n    tpl+=tmp_tpl.safe_substitute({0}={0})'.format(for_var)
         tpl+=eval('substitue_for_loop(tpl_inside,for_var,{})'.format(for_list))
     elif inside:
         tpl_inside+=line
@@ -159,4 +159,3 @@ mainfile=os.path.join(project_name, "src", project_name +".cpp")
 fo = open(mainfile,"w+")
 fo.write(string.Template(tpl).substitute(**locals()))
 fo.close()
-
