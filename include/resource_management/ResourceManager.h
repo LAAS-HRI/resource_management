@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include <thread>
 
 #include <ros/ros.h>
 
@@ -74,6 +75,7 @@ private:
     ros::Publisher _activeBufferPublisher;
     double _hz;
     std::string _active_buffer;
+    CoordinationStateMachine _StateMachine;
 };
 
 
@@ -155,14 +157,39 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallba
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
 {
+  std::shared_ptr<StateStorage> current_state;
+  std::thread sm_th;
   bool coordination_running = false;
+
+  /*;
+  _StateMachine.setPublicationFunction(&publishState);
+  */
 
   size_t param_update = 0;
   while (ros::ok())
   {
     if(coordination_running == false)
     {
+      if(_coordinationSignalStorage->empty() == false)
+      {
+        current_state = _coordinationSignalStorage->pop();
+        _StateMachine.setInitialState(current_state->getInitialState());
+        _StateMachine.setTimeout(current_state->getTimeout());
+        _StateMachine.setDeadLine(current_state->getDeadLine());
 
+        sm_th = std::thread(&CoordinationStateMachine::run, &_StateMachine);
+        coordination_running = true;
+        continue;
+      }
+    }
+    else
+    {
+      if (sm_th.joinable())
+      {
+        sm_th.join();
+        coordination_running = false;
+        continue;
+      }
     }
 
     std::shared_ptr<ReactiveBuffer> buff = _reactiveBufferStorage->getMorePriority();
