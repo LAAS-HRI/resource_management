@@ -9,6 +9,7 @@
 
 #include "state_machine/CoordinationStateMachine.h"
 #include "state_machine/StateStorage.h"
+#include "state_machine/CoordinationSignalsStorage.h"
 
 #include "message_storage/MessageWrapper.h"
 #include "resource_management/CoordinationTransition.h"
@@ -24,7 +25,7 @@ public:
     using StateFromMsgFn = boost::function<std::map<std::string,std::shared_ptr<MessageAbstraction>>(const T&)>;
     using TransitionFromMsgFn = boost::function<std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>(const T&)>;
 
-    CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg);
+    CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, std::shared_ptr<CoordinationSignalsStorage> storage);
 
 private:
     void _subscriberCallback(T msg);
@@ -32,19 +33,21 @@ private:
     ros::Subscriber _subscriber;
     StateFromMsgFn _getStateDataFromCoordinationSignalMsg;
     TransitionFromMsgFn _getTransitionsFromCoordinationSignalMsg;
+    std::shared_ptr<CoordinationSignalsStorage> _storage;
 };
 
 template<class T>
-CoordinationSignals<T>::CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg):
+CoordinationSignals<T>::CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, std::shared_ptr<CoordinationSignalsStorage> storage):
     _nh(std::move(nh)), _getStateDataFromCoordinationSignalMsg(std::move(stateFromMsg)), _getTransitionsFromCoordinationSignalMsg(std::move(transitionFromMsg))
 {
+    _storage = storage;
     _subscriber = _nh->subscribe<T>("coordination_signals",100,&CoordinationSignals<T>::_subscriberCallback,this);
 }
 
 template<class T>
 void CoordinationSignals<T>::_subscriberCallback(T msg)
 {
-    StateStorage states; // FIXME: this should be unique/global?
+    std::shared_ptr<StateStorage> states = std::make_shared<StateStorage>();
 
     auto stateData = _getStateDataFromCoordinationSignalMsg(msg);
     // TODO: store coordination signal state data
@@ -53,9 +56,11 @@ void CoordinationSignals<T>::_subscriberCallback(T msg)
     for(auto &t : transitions){
         resource_management::EndCondition &end_condition = std::get<2>(t);
         CoordinationTransition transition(end_condition.duration,end_condition.timeout,end_condition.regex_end_condition);
-        states.addTransition(std::get<0>(t),std::get<1>(t),transition);
+        states->addTransition(std::get<0>(t),std::get<1>(t),transition);
     }
 
+    if(_storage)
+      _storage->push(states);
 }
 
 #endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_COORDINATION_SIGNALS_H_

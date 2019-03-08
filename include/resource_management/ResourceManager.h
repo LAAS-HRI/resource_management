@@ -59,6 +59,7 @@ private:
 
     ros::NodeHandlePtr _nh;
 
+    std::shared_ptr<CoordinationSignalsStorage> _coordinationSignalStorage;
     std::shared_ptr<CoordinationSignalsBase> _coordinationSignalService;
     std::vector<std::shared_ptr<ReactiveInputsBase>> _reactiveInputs;
 
@@ -80,12 +81,14 @@ template<typename CoordinationSignalType, typename ...InputDataTypes>
 ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames):
     _nh(std::move(nh)), _bufferNames({"artificial_life","coordination_signals"})
 {
+    _coordinationSignalStorage = std::make_shared<CoordinationSignalsStorage>();
     this->_coordinationSignalService =
             std::make_shared<CoordinationSignals<CoordinationSignalType>>
                                           (
                                               _nh,
                                               boost::bind(&ResourceManager<CoordinationSignalType,InputDataTypes...>::stateFromMsg,this,_1),
-                                              boost::bind(&ResourceManager<CoordinationSignalType,InputDataTypes...>::transitionFromMsg,this,_1)
+                                              boost::bind(&ResourceManager<CoordinationSignalType,InputDataTypes...>::transitionFromMsg,this,_1),
+                                              _coordinationSignalStorage
                                           );
     addBufferNames(reactiveInputNames);
     createReactiveBufferStorage();
@@ -152,9 +155,16 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallba
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
 {
+  bool coordination_running = false;
+
   size_t param_update = 0;
   while (ros::ok())
   {
+    if(coordination_running == false)
+    {
+
+    }
+
     std::shared_ptr<ReactiveBuffer> buff = _reactiveBufferStorage->getMorePriority();
     if(buff)
       if(buff->operator()())
