@@ -7,12 +7,12 @@
 
 #include <ros/ros.h>
 
+#include "std_msgs/String.h"
 #include "resource_management/ReactiveInputs.h"
 #include "resource_management/CoordinationSignals.h"
 #include "resource_management/PrioritiesSetter.h"
 
 #include "message_storage/ReactiveBuffer.h"
-
 
 template<typename ...Types>
 struct Impl;
@@ -70,7 +70,9 @@ private:
     std::vector<std::string> _bufferNames;
 
     ros::Subscriber _prioritiesSubscriber;
-    double hz_;
+    ros::Publisher _activeBufferPublisher;
+    double _hz;
+    std::string _active_buffer;
 };
 
 
@@ -85,15 +87,17 @@ ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::
                                               boost::bind(&ResourceManager<CoordinationSignalType,InputDataTypes...>::stateFromMsg,this,_1),
                                               boost::bind(&ResourceManager<CoordinationSignalType,InputDataTypes...>::transitionFromMsg,this,_1)
                                           );
-    createReactiveBufferStorage();
     addBufferNames(reactiveInputNames);
+    createReactiveBufferStorage();
     Impl<InputDataTypes...>::add(_reactiveInputs,_nh,reactiveInputNames,*_reactiveBufferStorage);
+    _activeBufferPublisher = _nh->advertise<std_msgs::String>("active_buffer", 10, true);
     _prioritiesSubscriber = _nh->subscribe("set_priorities", 10, &ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback, this);
 
-    if(!_nh->getParam("freq", hz_))
+    _active_buffer = "";
+    if(!_nh->getParam("freq", _hz))
     {
       _nh->setParam("freq", 100);
-      hz_ = 100;
+      _hz = 100;
     }
 }
 
@@ -156,15 +160,20 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
       if(buff->operator()())
       {
         buff->operator()()->publish();
+        if(buff->getName() != _active_buffer)
+        {
+          _active_buffer = buff->getName();
+          _activeBufferPublisher.publish(_active_buffer);
+        }
       }
 
     if(++param_update > 10)
     {
-      _nh->getParam("freq", hz_);
+      _nh->getParam("freq", _hz);
       param_update = 0;
     }
 
-    ros::Rate r(hz_);
+    ros::Rate r(_hz);
     r.sleep();
   }
 }
