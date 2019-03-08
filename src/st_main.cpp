@@ -74,7 +74,7 @@ int main(int argc, char** argv)
     std::shared_ptr<StateStorage> current = coordination_signals.pop();
 
     CoordinationStateMachine sm;
-    sm.setPublicationFunction(&publishState);
+    sm.setPublicationFunction(std::bind(publishState, std::placeholders::_1));
     sm.setInitialState(current->getInitialState());
     sm.setTimeout(current->getTimeout());
     sm.setDeadLine(current->getDeadLine());

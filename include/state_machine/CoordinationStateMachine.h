@@ -39,7 +39,7 @@ public:
   std::string getCurrentStateName();
 
   void setInitialState(CoordinationState* state);
-  void setPublicationFunction(void (*publishState)(CoordinationInternalState_t));
+  void setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState);
   void setTimeout(ros::Duration time_out) { time_out_ = time_out; }
   void setDeadLine(ros::Time begin_dead_line) { begin_dead_line_ = begin_dead_line; }
 
@@ -48,7 +48,7 @@ private:
   ros::Duration time_out_;
   ros::Time begin_dead_line_;
 
-  void (*publishState_)(CoordinationInternalState_t);
+  std::function<void(CoordinationInternalState_t)> publishState_;
   CoordinationInternalState_t internal_state_;
   std::mutex internal_state_mutex_;
 

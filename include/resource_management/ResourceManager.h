@@ -57,6 +57,7 @@ private:
     void createReactiveBufferStorage();
 
     void prioritiesCallback(const resource_management::PrioritiesSetter& msg);
+    void publishState(CoordinationInternalState_t state);
 
     ros::NodeHandlePtr _nh;
 
@@ -161,9 +162,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
   std::thread sm_th;
   bool coordination_running = false;
 
-  /*;
-  _StateMachine.setPublicationFunction(&publishState);
-  */
+  _StateMachine.setPublicationFunction(std::bind(ResourceManager<CoordinationSignalType,InputDataTypes...>::publishState, this, std::placeholders::_1));
 
   size_t param_update = 0;
   while (ros::ok())
@@ -213,6 +212,31 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
     ros::Rate r(_hz);
     r.sleep();
   }
+}
+
+template<typename CoordinationSignalType, typename ...InputDataTypes>
+void ResourceManager<CoordinationSignalType,InputDataTypes...>::publishState(CoordinationInternalState_t state)
+{
+  std::chrono::time_point<std::chrono::system_clock> now_point = std::chrono::system_clock::now();
+  std::time_t now = std::chrono::system_clock::to_time_t(now_point);
+  std::cout << "[" << std::ctime(&now) << "] ";
+
+  std::cout << "[STATE] ";
+  if(state.state_ != nullptr)
+    std::cout << state.state_->getName() << " : ";
+  else
+    std::cout << "end : ";
+
+  switch (state.transition_state_) {
+    case transition_pass_on_event : std::cout << "pass_on_event"; break;
+    case transition_pass_on_duration : std::cout << "pass_on_duration"; break;
+    case transition_timeout : std::cout << "timeout"; break;
+    case transition_wait : std::cout << "wait"; break;
+    case transition_global_timeout : std::cout << "global_timeout"; break;
+    case transition_dead_line : std::cout << "dead_line"; break;
+    case transition_none : std::cout << "none"; break;
+  }
+  std::cout << std::endl;
 }
 
 #endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_RESOURCE_MANAGER_H_

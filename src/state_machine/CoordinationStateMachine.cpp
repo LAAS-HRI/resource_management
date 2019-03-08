@@ -25,7 +25,7 @@ void CoordinationStateMachine::run()
 
       if(publishState_ != nullptr)
         publishState_(internal_state_);
-        
+
       internal_state_mutex_.unlock();
       return;
     }
@@ -89,7 +89,7 @@ void CoordinationStateMachine::setInitialState(CoordinationState* state)
   internal_state_mutex_.unlock();
 }
 
-void CoordinationStateMachine::setPublicationFunction(void (*publishState)(CoordinationInternalState_t))
+void CoordinationStateMachine::setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState)
 {
   publishState_ = publishState;
 }
@@ -104,7 +104,7 @@ void CoordinationStateMachine::runOnceNoEvent()
     internal_state_.state_ = tmp_state;
     internal_state_.transition_state_ = tmp_transition;
 
-    if(publishState_ != nullptr)
+    if(publishState_)
       publishState_(internal_state_);
 
     if(internal_state_.state_ != nullptr)
@@ -114,7 +114,7 @@ void CoordinationStateMachine::runOnceNoEvent()
   {
     internal_state_.transition_state_ = tmp_transition;
 
-    if(publishState_ != nullptr)
+    if(publishState_)
       publishState_(internal_state_);
   }
 }
@@ -137,7 +137,7 @@ void CoordinationStateMachine::runOnceWithEvents(std::queue<std::string>& events
       internal_state_.state_ = tmp_state;
       internal_state_.transition_state_ = tmp_transition;
 
-      if(publishState_ != nullptr)
+      if(publishState_)
         publishState_(internal_state_);
 
       if(internal_state_.state_ != nullptr)
@@ -147,7 +147,7 @@ void CoordinationStateMachine::runOnceWithEvents(std::queue<std::string>& events
     {
       internal_state_.transition_state_ = tmp_transition;
 
-      if(publishState_ != nullptr)
+      if(publishState_)
         publishState_(internal_state_);
     }
   }
