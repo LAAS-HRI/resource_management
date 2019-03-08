@@ -34,6 +34,7 @@ void CoordinationStateMachine::run()
   {
     internal_state_mutex_.lock();
 
+    //tets duration end condition
     ros::Time now = ros::Time::now();
     if((time_out_ != ros::Duration(-1)) && (now - start_time >= time_out_))
     {
@@ -47,6 +48,28 @@ void CoordinationStateMachine::run()
     }
 
     std::queue<std::string> events = getEvents();
+
+    // test preamption
+    // queue must be converted into vector to execture a find on it
+    std::queue<std::string> events_save = events;
+    std::vector<std::string> vect_events;
+    while(!events_save.empty())
+    {
+      vect_events.push_back(events_save.front());
+      events_save.pop();
+    }
+    if(std::find(vect_events.begin(), vect_events.end(), "__preamted__") != vect_events.end())
+    {
+      internal_state_.state_ = nullptr;
+      internal_state_.transition_state_ = transition_preampt;
+
+      if(publishState_ != nullptr)
+        publishState_(internal_state_);
+
+      break;
+    }
+
+    //run current state
     if(events.empty())
       runOnceNoEvent();
     else

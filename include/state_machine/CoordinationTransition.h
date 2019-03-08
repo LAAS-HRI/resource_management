@@ -14,6 +14,7 @@ enum transtition_state_t
   transition_timeout,
   transition_wait,
   transition_global_timeout,
+  transition_preampt,
   transition_dead_line,
   transition_none,
 };

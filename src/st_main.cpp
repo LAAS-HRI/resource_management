@@ -26,6 +26,7 @@ void publishState(CoordinationInternalState_t state)
     case transition_timeout : std::cout << "timeout"; break;
     case transition_wait : std::cout << "wait"; break;
     case transition_global_timeout : std::cout << "global_timeout"; break;
+    case transition_preampt : std::cout << "preampt"; break;
     case transition_dead_line : std::cout << "dead_line"; break;
     case transition_none : std::cout << "none"; break;
   }
