@@ -25,8 +25,8 @@ void publishTestMsg(test_t msg)
 int main(int argc, char** argv)
 {
   /******** MessageWrapper ******/
-  MessageWrapper<std::string>::registerPublishFunction(std::bind(publishStrMsg, std::placeholders::_1));
-  MessageWrapper<test_t>::registerPublishFunction(std::bind(publishTestMsg,std::placeholders::_1));
+  MessageWrapper<std::string>::registerPublishFunction(&publishStrMsg);
+  MessageWrapper<test_t>::registerPublishFunction(&publishTestMsg);
 
   MessageWrapper<std::string> m1("m1");
   MessageWrapper<std::string> m2;

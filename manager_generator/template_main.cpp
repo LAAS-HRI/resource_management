@@ -20,7 +20,7 @@ public:
         ResourceManager (std::move(nh),{${reactive_input_names_cs}})
     {
 !!for data_type in messages_types_zip
-        MessageWrapper<{data_type[2]}>::registerPublishFunction(std::bind(&${{class_name}}::publish{data_type[0]}Msg,this,std::placeholders::_1));
+        MessageWrapper<{data_type[2]}>::registerPublishFunction([this](auto data){{ publish{data_type[0]}Msg(data); }});
 !!end
     }
 

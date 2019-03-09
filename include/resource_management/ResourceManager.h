@@ -162,7 +162,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
   std::thread sm_th;
   bool coordination_running = false;
 
-  _StateMachine.setPublicationFunction(std::bind(ResourceManager<CoordinationSignalType,InputDataTypes...>::publishState, this, std::placeholders::_1));
+  _StateMachine.setPublicationFunction([this](auto state){ publishState(state); });
 
   size_t param_update = 0;
   while (ros::ok())
