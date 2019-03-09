@@ -2,6 +2,7 @@
 !!for msg_name in message_names
 #include "${{project_name}}/{msg_name}.h"
 !!end
+#include "${project_name}ArtificialLife.h"
 
 #include <resource_management/CoordinationSignals.h>
 #include <resource_management/ReactiveInputs.h>

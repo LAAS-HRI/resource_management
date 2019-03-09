@@ -34,8 +34,8 @@ def createCatkinFiles(args,msg_files):
     'CATKIN_DEPENDS roscpp message_runtime\n'
     '# DEPENDS\n'
     ')\n'
-    'include_directories(${{catkin_INCLUDE_DIRS}})\n'
-    'add_executable(${{PROJECT_NAME}} src/${{PROJECT_NAME}}.cpp)\n'
+    'include_directories(include ${{catkin_INCLUDE_DIRS}})\n'
+    'add_executable(${{PROJECT_NAME}} src/${{PROJECT_NAME}}.cpp src/${{PROJECT_NAME}}ArtificialLife.cpp)\n'
     'add_dependencies(${{PROJECT_NAME}} ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}})\n'
     'target_link_libraries(${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'.format(project_name,msgs=" ".join(msg_files))
     )
@@ -88,7 +88,7 @@ reactive_input_names_cs = ', '.join(['"'+x+'"' for x in reactive_input_names])
 #package architecture
 os.makedirs(os.path.join(project_name,"src"),exist_ok=True)
 os.makedirs(os.path.join(project_name,"msg"),exist_ok=True)
-
+os.makedirs(os.path.join(project_name,"include"),exist_ok=True)
 
 # .msg files
 
@@ -157,5 +157,67 @@ f_in.close()
 mainfile=os.path.join(project_name, "src", project_name +".cpp")
 
 fo = open(mainfile,"w+")
+fo.write(string.Template(tpl).substitute(**locals()))
+fo.close()
+
+#################
+f_in = open(os.path.join(generator_dir,'template_artificialLife.cpp'),'r')
+tpl = ""
+tpl_inside=""
+for_var=""
+inside=False
+for line in f_in:
+    if line.startswith('!!for '):
+        inside=True
+        command=line[2:-1]
+        for_var=command[command.find(' ')+1:]
+        for_var=for_var[0:for_var.find(' ')]
+        for_list=command[command.find(' in ')+4:]
+        tpl_inside=""
+    elif line.startswith('!!end'):
+        inside=False
+        tpl+=eval('substitue_for_loop(tpl_inside,for_var,{})'.format(for_list))
+    elif inside:
+        tpl_inside+=line
+    else:
+        tpl+=line
+f_in.close()
+
+
+# write main cpp file
+artificial_cpp_file=os.path.join(project_name, "src", project_name +"ArtificialLife.cpp")
+
+fo = open(artificial_cpp_file,"w+")
+fo.write(string.Template(tpl).substitute(**locals()))
+fo.close()
+
+#################
+f_in = open(os.path.join(generator_dir,'template_artificialLife.h'),'r')
+tpl = ""
+tpl_inside=""
+for_var=""
+inside=False
+for line in f_in:
+    if line.startswith('!!for '):
+        inside=True
+        command=line[2:-1]
+        for_var=command[command.find(' ')+1:]
+        for_var=for_var[0:for_var.find(' ')]
+        for_list=command[command.find(' in ')+4:]
+        tpl_inside=""
+    elif line.startswith('!!end'):
+        inside=False
+        tpl+=eval('substitue_for_loop(tpl_inside,for_var,{})'.format(for_list))
+    elif inside:
+        tpl_inside+=line
+    else:
+        tpl+=line
+f_in.close()
+
+
+# write main cpp file
+artificial_h_file=os.path.join(project_name, "include", project_name +"ArtificialLife.h")
+
+fo = open(artificial_h_file,"w+")
 fo.write(string.Template(tpl).substitute(**locals()))
 fo.close()
