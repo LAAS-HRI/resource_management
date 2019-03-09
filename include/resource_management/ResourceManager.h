@@ -15,6 +15,8 @@
 
 #include "message_storage/ReactiveBuffer.h"
 
+#include "artificial_life/ArtificialLife.h"
+
 template<typename ...Types>
 struct Impl;
 
@@ -47,6 +49,10 @@ protected:
     virtual std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const CoordinationSignalType &msg) = 0;
     virtual std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
         transitionFromMsg(const CoordinationSignalType &msg) = 0;
+
+    std::shared_ptr<ArtificialLife> _artificialLife;
+    std::shared_ptr<ReactiveBuffer> _artificialLifeBuffer;
+
 private:
 
     const std::vector<std::string> &getBufferNames() const;
@@ -65,7 +71,6 @@ private:
     std::shared_ptr<CoordinationSignalsBase> _coordinationSignalService;
     std::vector<std::shared_ptr<ReactiveInputsBase>> _reactiveInputs;
 
-    std::shared_ptr<ReactiveBuffer> _artificialLifeBuffer;
     std::shared_ptr<ReactiveBuffer> _coordinationSignalBuffer;
     std::shared_ptr<ReactiveBufferStorage> _reactiveBufferStorage;
 
@@ -161,6 +166,8 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
   std::shared_ptr<StateStorage> current_state;
   std::thread sm_th;
   bool coordination_running = false;
+  std::thread al_th;
+  bool artificial_life_running = false;
 
   _StateMachine.setPublicationFunction([this](auto state){ publishState(state); });
 
@@ -199,8 +206,21 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
         if(buff->getName() != _active_buffer)
         {
           _active_buffer = buff->getName();
+
           if((_active_buffer != "coordination_signals") && (coordination_running))
             _StateMachine.addEvent("__preamted__");
+          if((_active_buffer!= "artificial_life") && (artificial_life_running))
+            _artificialLife->stop();
+          if(_active_buffer == "artificial_life")
+          {
+            if(!artificial_life_running)
+            {
+              artificial_life_running = true;
+              _artificialLife->start();
+              al_th = std::thread(&ArtificialLife::run, _artificialLife);
+            }
+          }
+
           _activeBufferPublisher.publish(_active_buffer);
         }
       }

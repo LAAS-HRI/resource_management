@@ -23,6 +23,9 @@ public:
 !!for data_type in messages_types_zip
         MessageWrapper<{data_type[2]}>::registerPublishFunction([this](auto data){{ publish{data_type[0]}Msg(data); }});
 !!end
+
+        // Remove if your do not need artificial life
+        _artificialLife = (std::make_shared<${project_name}ArtificialLife>(_artificialLifeBuffer));
     }
 
 private:
