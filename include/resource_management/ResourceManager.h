@@ -221,7 +221,9 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
             }
           }
 
-          _activeBufferPublisher.publish(_active_buffer);
+          std_msgs::String active_buffer_msg;
+          active_buffer_msg.data = _active_buffer;
+          _activeBufferPublisher.publish(active_buffer_msg);
         }
       }
 
