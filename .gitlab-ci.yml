@@ -17,6 +17,9 @@
     - cp -r /builds/laas-hri/resource_management .
     - cd ..
     - source devel/setup.bash
+    - roscd resource_management; cd ..
+    - python3 ./resource_management/manager_generator/generate.py --package-name led_manager --target-types Color:float32:float OnOff:bool:bool --reactive-topics emotion tagada switch
+    - cd ..
     - catkin_make
     - source devel/setup.bash
     #- catkin_make run_tests_resource_management_rostest && catkin_make test
