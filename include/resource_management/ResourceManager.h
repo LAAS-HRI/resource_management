@@ -169,7 +169,8 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
   std::thread al_th;
   bool artificial_life_running = false;
 
-  _StateMachine.setPublicationFunction([this](auto state){ publishState(state); });
+  // this in lambda is necessary for gcc <= 5.1
+  _StateMachine.setPublicationFunction([this](auto state){ this->publishState(state); });
 
   size_t param_update = 0;
   while (ros::ok())

@@ -20,8 +20,9 @@ public:
     ${class_name}(const ros::NodeHandlePtr &nh):
         ResourceManager (std::move(nh),{${reactive_input_names_cs}})
     {
+        // this in lambda is necessary for gcc <= 5.1
 !!for data_type in messages_types_zip
-        MessageWrapper<{data_type[2]}>::registerPublishFunction([this](auto data){{ publish{data_type[0]}Msg(data); }});
+        MessageWrapper<{data_type[2]}>::registerPublishFunction([this](auto data){{ this->publish{data_type[0]}Msg(data); }});
 !!end
 
         // Remove if your do not need artificial life
