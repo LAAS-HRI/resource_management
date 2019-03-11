@@ -30,16 +30,16 @@ public:
     }
 
 private:
-    std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const ${project_name}::CoordinationSignal &msg) override;
+    std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const ${project_name}::CoordinationSignal::Request &msg) override;
     std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
-    transitionFromMsg(const ${project_name}::CoordinationSignal &msg) override;
+    transitionFromMsg(const ${project_name}::CoordinationSignal::Request &msg) override;
 
 !!for data_type in messages_types_zip
     void publish{data_type[0]}Msg({data_type[2]} msg);
 !!end
 };
 
-std::map<std::string,std::shared_ptr<MessageAbstraction>> ${class_name}::stateFromMsg(const ${project_name}::CoordinationSignal &msg)
+std::map<std::string,std::shared_ptr<MessageAbstraction>> ${class_name}::stateFromMsg(const ${project_name}::CoordinationSignal::Request &msg)
 {
     std::map<std::string,std::shared_ptr<MessageAbstraction>> states;
 !!for data_type in messages_types_zip
@@ -54,7 +54,7 @@ std::map<std::string,std::shared_ptr<MessageAbstraction>> ${class_name}::stateFr
 }
 
 std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
-${class_name}::transitionFromMsg(const ${project_name}::CoordinationSignal &msg)
+${class_name}::transitionFromMsg(const ${project_name}::CoordinationSignal::Request &msg)
 {
     std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>> transitions;
 !!for data_type in message_names

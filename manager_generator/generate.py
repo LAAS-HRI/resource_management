@@ -11,7 +11,7 @@ def substitue_for_loop(tpl,for_var,the_list):
         res+=eval('tpl.format({}=x)'.format(for_var))
     return res
 
-def createCatkinFiles(args,msg_files):
+def createCatkinFiles(args,msg_files,srv_files):
     # CmakeLists.txt
     fcmake = open(os.path.join(args.package_name, "CMakeLists.txt"),"w")
     fcmake.write('cmake_minimum_required(VERSION 2.8.3)\n'
@@ -23,10 +23,18 @@ def createCatkinFiles(args,msg_files):
     'resource_management\n'
     ')\n'
     '\n'
+    '## Generate messages in the \'msg\' folder\n'
     'add_message_files(\n'
     'FILES\n'
     '{msgs}\n'
     ')\n'
+    '\n'
+    '## Generate services in the \'srv\' folder\n'
+    'add_service_files(\n'
+    'FILES\n'
+    '{srvs}\n'
+    ')\n'
+    '\n'
     'generate_messages(DEPENDENCIES resource_management)\n'
     'catkin_package(\n'
     '#INCLUDE_DIRS include\n'
@@ -34,10 +42,11 @@ def createCatkinFiles(args,msg_files):
     'CATKIN_DEPENDS roscpp message_runtime\n'
     '# DEPENDS\n'
     ')\n'
+    '\n'
     'include_directories(include ${{catkin_INCLUDE_DIRS}})\n'
     'add_executable(${{PROJECT_NAME}} src/${{PROJECT_NAME}}.cpp src/${{PROJECT_NAME}}ArtificialLife.cpp)\n'
     'add_dependencies(${{PROJECT_NAME}} ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}})\n'
-    'target_link_libraries(${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'.format(project_name,msgs=" ".join(msg_files))
+    'target_link_libraries(${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'.format(project_name,msgs=" ".join(msg_files),srvs=" ".join(srv_files))
     )
     fcmake.close()
 
@@ -88,11 +97,13 @@ reactive_input_names_cs = ', '.join(['"'+x+'"' for x in reactive_input_names])
 #package architecture
 os.makedirs(os.path.join(project_name,"src"),exist_ok=True)
 os.makedirs(os.path.join(project_name,"msg"),exist_ok=True)
+os.makedirs(os.path.join(project_name,"srv"),exist_ok=True)
 os.makedirs(os.path.join(project_name,"include"),exist_ok=True)
 
 # .msg files
 
 msg_files=[]
+srv_files=[]
 
 #   CoordinationState
 for x in args.target_types :
@@ -118,16 +129,17 @@ for x in args.target_types :
 
 
 #   CoordinationSignal
-filename='CoordinationSignal.msg'
-msg_files.append(filename)
-f_signal=open(os.path.join(args.package_name,'msg',filename),'w+')
+filename='CoordinationSignal.srv'
+srv_files.append(filename)
+f_signal=open(os.path.join(args.package_name,'srv',filename),'w+')
 f_signal.write("resource_management/CoordinationSignalHeader header\n")
 for x in args.target_types :
     name=x.split(':')[0]
     #data_type=x.split(':')[1]
     f_signal.write("{}[] states_{}\n".format('CoordinationState'+name,name))
-
-createCatkinFiles(args,msg_files)
+f_signal.write("---")
+f_signal.write("uint32 id")
+createCatkinFiles(args,msg_files, srv_files)
 
 
 f_in = open(os.path.join(generator_dir,'template_main.cpp'),'r')

@@ -46,9 +46,9 @@ public:
     void run();
 
 protected:
-    virtual std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const CoordinationSignalType &msg) = 0;
+    virtual std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const typename CoordinationSignalType::Request &msg) = 0;
     virtual std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
-        transitionFromMsg(const CoordinationSignalType &msg) = 0;
+        transitionFromMsg(const typename CoordinationSignalType::Request &msg) = 0;
 
     std::shared_ptr<ArtificialLife> _artificialLife;
     std::shared_ptr<ReactiveBuffer> _artificialLifeBuffer;
