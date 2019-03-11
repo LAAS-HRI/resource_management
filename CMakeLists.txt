@@ -16,6 +16,7 @@ add_message_files(
     EndCondition.msg
     MessagePriority.msg
     CoordinationSignalHeader.msg
+    CoordinationSignalsStatus.msg
     PrioritiesSetter.msg
 )
 

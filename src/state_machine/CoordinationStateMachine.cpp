@@ -12,6 +12,7 @@ CoordinationStateMachine::CoordinationStateMachine(float rate)
 
 void CoordinationStateMachine::run()
 {
+  //state_machine_id.state_machine.id;
   if(internal_state_.state_ != nullptr)
     internal_state_.state_->startState();
 
@@ -104,9 +105,10 @@ std::string CoordinationStateMachine::getCurrentStateName()
   return name;
 }
 
-void CoordinationStateMachine::setInitialState(CoordinationState* state)
+void CoordinationStateMachine::setInitialState(CoordinationState* state, uint32_t state_machine_id)
 {
   internal_state_mutex_.lock();
+  internal_state_.state_machine_id = state_machine_id;
   internal_state_.state_ = state;
   internal_state_.transition_state_ = transition_none;
   internal_state_mutex_.unlock();

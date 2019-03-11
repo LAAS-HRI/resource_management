@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 
     CoordinationStateMachine sm;
     sm.setPublicationFunction(&publishState);
-    sm.setInitialState(current->getInitialState());
+    sm.setInitialState(current->getInitialState(), current->getId());
     sm.setTimeout(current->getTimeout());
     sm.setDeadLine(current->getDeadLine());
 

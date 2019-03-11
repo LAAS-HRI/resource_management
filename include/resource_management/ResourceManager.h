@@ -12,6 +12,7 @@
 #include "resource_management/ReactiveInputs.h"
 #include "resource_management/CoordinationSignals.h"
 #include "resource_management/PrioritiesSetter.h"
+#include "resource_management/CoordinationSignalsStatus.h"
 
 #include "message_storage/ReactiveBuffer.h"
 
@@ -81,6 +82,7 @@ private:
 
     ros::Subscriber _prioritiesSubscriber;
     ros::Publisher _activeBufferPublisher;
+    ros::Publisher _coordinationSignalStatusPublisher_;
     double _hz;
     std::string _active_buffer;
     CoordinationStateMachine _StateMachine;
@@ -107,6 +109,7 @@ ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::
     Impl<InputDataTypes...>::add(_reactiveInputs,_nh,reactiveInputNames,*_reactiveBufferStorage);
     _activeBufferPublisher = _nh->advertise<std_msgs::String>("active_buffer", 10, true);
     _prioritiesSubscriber = _nh->subscribe("set_priorities", 10, &ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback, this);
+    _coordinationSignalStatusPublisher_ = _nh->advertise<resource_management::CoordinationSignalsStatus>("coordination_signal_status", 10);
 
     _active_buffer = "";
     if(!_nh->getParam("freq", _hz))
@@ -250,27 +253,24 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::publishState(CoordinationInternalState_t state)
 {
-  std::chrono::time_point<std::chrono::system_clock> now_point = std::chrono::system_clock::now();
-  std::time_t now = std::chrono::system_clock::to_time_t(now_point);
-  std::cout << "[" << std::ctime(&now) << "] ";
-
-  std::cout << "[STATE] ";
-  if(state.state_ != nullptr)
-    std::cout << state.state_->getName() << " : ";
-  else
-    std::cout << "end : ";
-
+  std::string state_event;
   switch (state.transition_state_) {
-    case transition_pass_on_event : std::cout << "pass_on_event"; break;
-    case transition_pass_on_duration : std::cout << "pass_on_duration"; break;
-    case transition_timeout : std::cout << "timeout"; break;
-    case transition_wait : std::cout << "wait"; break;
-    case transition_global_timeout : std::cout << "global_timeout"; break;
-    case transition_preampt : std::cout << "preampt"; break;
-    case transition_dead_line : std::cout << "dead_line"; break;
-    case transition_none : std::cout << "none"; break;
+    case transition_pass_on_event : state_event = "pass_on_event"; break;
+    case transition_pass_on_duration : state_event = "pass_on_duration"; break;
+    case transition_timeout : state_event = "timeout"; break;
+    case transition_wait : state_event = "wait"; break;
+    case transition_global_timeout : state_event = "global_timeout"; break;
+    case transition_preampt : state_event = "preampt"; break;
+    case transition_dead_line : state_event = "dead_line"; break;
+    case transition_none : state_event = "none"; break;
   }
-  std::cout << std::endl;
+
+  resource_management::CoordinationSignalsStatus status;
+  status.state_event = state_event;
+  status.state_name = state.state_->getName();
+  status.id = state.state_machine_id;
+
+  _coordinationSignalStatusPublisher_.publish(status);
 }
 
 #endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_RESOURCE_MANAGER_H_

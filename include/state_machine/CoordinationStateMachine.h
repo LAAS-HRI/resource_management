@@ -13,6 +13,7 @@
 
 struct CoordinationInternalState_t
 {
+  uint32_t state_machine_id;
   CoordinationState* state_;
   transtition_state_t transition_state_;
 
@@ -38,7 +39,7 @@ public:
   CoordinationInternalState_t getInternalState();
   std::string getCurrentStateName();
 
-  void setInitialState(CoordinationState* state);
+  void setInitialState(CoordinationState* state, uint32_t state_machine_id = 0);
   void setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState);
   void setTimeout(ros::Duration time_out) { time_out_ = time_out; }
   void setDeadLine(ros::Time begin_dead_line) { begin_dead_line_ = begin_dead_line; }
