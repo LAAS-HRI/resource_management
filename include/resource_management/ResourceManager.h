@@ -198,6 +198,10 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
         continue;
       }
     }
+    if(current_state)
+      _coordinationSignalBuffer->setData(current_state->getStateData(_StateMachine.getCurrentStateName()) );
+    else
+      _coordinationSignalBuffer->setData(nullptr);
 
     std::shared_ptr<ReactiveBuffer> buff = _reactiveBufferStorage->getMorePriority();
     if(buff)

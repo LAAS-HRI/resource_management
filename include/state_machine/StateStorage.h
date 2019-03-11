@@ -3,6 +3,7 @@
 
 #include "state_machine/CoordinationState.h"
 #include "message_storage/PriorityHolder.h"
+#include "message_storage/MessageAbstraction.h"
 
 #include <map>
 #include <string>
@@ -15,9 +16,11 @@ public:
 
   void addState(const std::string& id);
   void addTransition(const std::string& id, const std::string& id_next, CoordinationTransition& transition);
+  void addData(const std::string& id, std::shared_ptr<MessageAbstraction> data);
 
   void setInitialState(const std::string& id);
   CoordinationState* getInitialState();
+  std::shared_ptr<MessageAbstraction> getStateData(const std::string& id);
 
   ros::Duration getTimeout() { return  time_out_; }
   ros::Time getDeadLine() { return  begin_dead_line_; }
@@ -25,6 +28,7 @@ public:
   CoordinationState* operator[](std::string id);
 private:
   std::map<std::string, CoordinationState*> states_;
+  std::map<std::string, std::shared_ptr<MessageAbstraction>> datas_;
   std::string initial_state_;
 
   ros::Duration time_out_;

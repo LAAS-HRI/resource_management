@@ -49,8 +49,6 @@ void CoordinationSignals<T>::_subscriberCallback(T msg)
 {
     std::shared_ptr<StateStorage> states = std::make_shared<StateStorage>();
 
-    auto stateData = _getStateDataFromCoordinationSignalMsg(msg);
-    // TODO: store coordination signal state data
     auto transitions = _getTransitionsFromCoordinationSignalMsg(msg);
 
     for(auto &t : transitions){
@@ -58,6 +56,10 @@ void CoordinationSignals<T>::_subscriberCallback(T msg)
         CoordinationTransition transition(end_condition.duration,end_condition.timeout,end_condition.regex_end_condition);
         states->addTransition(std::get<0>(t),std::get<1>(t),transition);
     }
+
+    auto stateData = _getStateDataFromCoordinationSignalMsg(msg);
+    for(auto it : stateData)
+      states->addData(it.first, it.second);
 
     if(_storage)
       _storage->push(states);
