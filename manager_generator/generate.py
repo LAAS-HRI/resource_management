@@ -137,7 +137,7 @@ for x in args.target_types :
     name=x.split(':')[0]
     #data_type=x.split(':')[1]
     f_signal.write("{}[] states_{}\n".format('CoordinationState'+name,name))
-f_signal.write("---")
+f_signal.write("---\n")
 f_signal.write("uint32 id")
 createCatkinFiles(args,msg_files, srv_files)
 

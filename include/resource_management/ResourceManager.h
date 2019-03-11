@@ -49,6 +49,7 @@ protected:
     virtual std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const typename CoordinationSignalType::Request &msg) = 0;
     virtual std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
         transitionFromMsg(const typename CoordinationSignalType::Request &msg) = 0;
+    virtual typename CoordinationSignalType::Response generateResponseMsg(uint32_t id) = 0;
 
     std::shared_ptr<ArtificialLife> _artificialLife;
     std::shared_ptr<ReactiveBuffer> _artificialLifeBuffer;
@@ -96,6 +97,7 @@ ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::
                                               _nh,
                                               boost::bind(&ResourceManager<CoordinationSignalType,InputDataTypes...>::stateFromMsg,this,_1),
                                               boost::bind(&ResourceManager<CoordinationSignalType,InputDataTypes...>::transitionFromMsg,this,_1),
+                                              boost::bind(&ResourceManager<CoordinationSignalType,InputDataTypes...>::generateResponseMsg,this,_1),
                                               _coordinationSignalStorage
                                           );
     addBufferNames(reactiveInputNames);

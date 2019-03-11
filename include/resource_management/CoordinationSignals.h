@@ -24,8 +24,9 @@ class CoordinationSignals : public CoordinationSignalsBase
 public:
     using StateFromMsgFn = boost::function<std::map<std::string,std::shared_ptr<MessageAbstraction>>(const typename T::Request&)>;
     using TransitionFromMsgFn = boost::function<std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>(const typename T::Request&)>;
+    using GenerateResponseMsgFn = boost::function< typename T::Response(uint32_t)>;
 
-    CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, std::shared_ptr<CoordinationSignalsStorage> storage);
+    CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn, std::shared_ptr<CoordinationSignalsStorage> storage);
 
 private:
     bool _serviceCallback(typename T::Request &req, typename T::Response &res);
@@ -33,15 +34,18 @@ private:
     ros::ServiceServer _serviceServer;
     StateFromMsgFn _getStateDataFromCoordinationSignalMsg;
     TransitionFromMsgFn _getTransitionsFromCoordinationSignalMsg;
+    GenerateResponseMsgFn _generateResponseMsg;
     std::shared_ptr<CoordinationSignalsStorage> _storage;
+    uint32_t _coordinationSignalsId;
 };
 
 template<class T>
-CoordinationSignals<T>::CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, std::shared_ptr<CoordinationSignalsStorage> storage):
-    _nh(std::move(nh)), _getStateDataFromCoordinationSignalMsg(std::move(stateFromMsg)), _getTransitionsFromCoordinationSignalMsg(std::move(transitionFromMsg))
+CoordinationSignals<T>::CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn generateResponseMsg, std::shared_ptr<CoordinationSignalsStorage> storage):
+    _nh(std::move(nh)), _getStateDataFromCoordinationSignalMsg(std::move(stateFromMsg)), _getTransitionsFromCoordinationSignalMsg(std::move(transitionFromMsg)), _generateResponseMsg(std::move(generateResponseMsg))
 {
     _storage = storage;
-    _serviceServer = _nh->advertiseService("coordination_signals",&CoordinationSignals<T>::_serviceCallback,this);
+    _coordinationSignalsId = 0;
+    _serviceServer = _nh->advertiseService("coordination_signals_register",&CoordinationSignals<T>::_serviceCallback,this);
 }
 
 template<class T>
@@ -64,6 +68,9 @@ bool CoordinationSignals<T>::_serviceCallback(typename T::Request &req, typename
     if(_storage)
     {
       _storage->push(states);
+
+      res = _generateResponseMsg(_coordinationSignalsId);
+      _coordinationSignalsId++;
       return true;
     }
     else
