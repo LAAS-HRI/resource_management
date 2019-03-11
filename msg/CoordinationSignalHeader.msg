@@ -1,2 +1,3 @@
-EndCondition end_condition
+duration timeout
+time begin_dead_line
 MessagePriority priority

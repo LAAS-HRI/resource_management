@@ -11,7 +11,7 @@
 class StateStorage : public PriorityHolder<importance_priority_t>
 {
 public:
-  StateStorage(ros::Duration time_out = ros::Duration(-1), ros::Time begin_dead_line = ros::Time(0));
+  StateStorage(uint32_t id = -1, ros::Duration time_out = ros::Duration(-1), ros::Time begin_dead_line = ros::Time(0));
   ~StateStorage();
 
   void addState(const std::string& id);
@@ -24,9 +24,11 @@ public:
 
   ros::Duration getTimeout() { return  time_out_; }
   ros::Time getDeadLine() { return  begin_dead_line_; }
+  uint32_t getId() { return id_; }
 
   CoordinationState* operator[](std::string id);
 private:
+  uint32_t id_;
   std::map<std::string, CoordinationState*> states_;
   std::map<std::string, std::shared_ptr<MessageAbstraction>> datas_;
   std::string initial_state_;

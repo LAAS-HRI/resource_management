@@ -33,6 +33,7 @@ private:
     std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const ${project_name}::CoordinationSignal::Request &msg) override;
     std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
     transitionFromMsg(const ${project_name}::CoordinationSignal::Request &msg) override;
+    CoordinationHeader_t headerFromMsg(const ${project_name}::CoordinationSignal::Request &msg) override;
     ${project_name}::CoordinationSignal::Response generateResponseMsg(uint32_t id) override;
 
 !!for data_type in messages_types_zip
@@ -71,6 +72,16 @@ ${class_name}::transitionFromMsg(const ${project_name}::CoordinationSignal::Requ
     }}
 !!end
     return transitions;
+}
+
+CoordinationHeader_t ${class_name}::headerFromMsg(const ${project_name}::CoordinationSignal::Request &msg)
+{
+  CoordinationHeader_t header;
+  header.time_out = msg.header.timeout;
+  header.begin_dead_line = msg.header.begin_dead_line;
+  header.priority = msg.header.priority.value;
+
+  return header;
 }
 
 ${project_name}::CoordinationSignal::Response ${class_name}::generateResponseMsg(uint32_t id)

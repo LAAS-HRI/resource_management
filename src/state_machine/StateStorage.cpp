@@ -1,7 +1,8 @@
 #include "state_machine/StateStorage.h"
 
-StateStorage::StateStorage(ros::Duration time_out, ros::Time begin_dead_line)
+StateStorage::StateStorage(uint32_t id, ros::Duration time_out, ros::Time begin_dead_line)
 {
+  id_ = id;
   time_out_ = time_out;
   begin_dead_line_ = begin_dead_line;
 }

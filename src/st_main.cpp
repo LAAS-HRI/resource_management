@@ -41,7 +41,7 @@ int main(int argc, char** argv)
   CoordinationSignalsStorage coordination_signals;
 
   /**********************/
-  std::shared_ptr<StateStorage> states = std::make_shared<StateStorage>(ros::Duration(-1),ros::Time::now());
+  std::shared_ptr<StateStorage> states = std::make_shared<StateStorage>(0, ros::Duration(-1),ros::Time::now());
   states->setPriority(important);
 
   CoordinationTransition t1(ros::Duration(1), ros::Duration(-1), std::vector<std::string>());
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
   coordination_signals.push(states);
 
   /**********************/
-  std::shared_ptr<StateStorage> states_2 = std::make_shared<StateStorage>();
+  std::shared_ptr<StateStorage> states_2 = std::make_shared<StateStorage>(1);
   states_2->setPriority(urgent);
 
   CoordinationTransition t3(ros::Duration(1), ros::Duration(-1), std::vector<std::string>());
