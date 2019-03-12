@@ -20,6 +20,11 @@ add_message_files(
     PrioritiesSetter.msg
 )
 
+add_service_files(
+    FILES
+    CoordinationSignalsCancel.srv
+)
+
 generate_messages(DEPENDENCIES std_msgs)
 
 catkin_package(

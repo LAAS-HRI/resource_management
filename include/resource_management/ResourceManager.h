@@ -13,6 +13,7 @@
 #include "resource_management/CoordinationSignals.h"
 #include "resource_management/PrioritiesSetter.h"
 #include "resource_management/CoordinationSignalsStatus.h"
+#include "resource_management/CoordinationSignalsCancel.h"
 
 #include "message_storage/ReactiveBuffer.h"
 
@@ -66,6 +67,8 @@ private:
 
     void prioritiesCallback(const resource_management::PrioritiesSetter& msg);
     void publishState(CoordinationInternalState_t state);
+    bool coordinationSignalCancel(resource_management::CoordinationSignalsCancel::Request  &req,
+                                  resource_management::CoordinationSignalsCancel::Response &res);
 
     ros::NodeHandlePtr _nh;
 
@@ -81,10 +84,13 @@ private:
 
     ros::Subscriber _prioritiesSubscriber;
     ros::Publisher _activeBufferPublisher;
-    ros::Publisher _coordinationSignalStatusPublisher_;
+    ros::Publisher _coordinationSignalStatusPublisher;
+    ros::ServiceServer _coordinationSignalCancelService;
+
     double _hz;
-    std::string _active_buffer;
     CoordinationStateMachine _StateMachine;
+    std::shared_ptr<StateStorage> _activeCoordinationSignal;
+    std::mutex _coordinationMutex;
 };
 
 
@@ -107,9 +113,9 @@ ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::
     Impl<InputDataTypes...>::add(_reactiveInputs,_nh,reactiveInputNames,*_reactiveBufferStorage);
     _activeBufferPublisher = _nh->advertise<std_msgs::String>("active_buffer", 10, true);
     _prioritiesSubscriber = _nh->subscribe("set_priorities", 10, &ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback, this);
-    _coordinationSignalStatusPublisher_ = _nh->advertise<resource_management::CoordinationSignalsStatus>("coordination_signal_status", 10);
+    _coordinationSignalStatusPublisher = _nh->advertise<resource_management::CoordinationSignalsStatus>("coordination_signal_status", 10);
+    _coordinationSignalCancelService = _nh->advertiseService("coordination_signal_cancel", &ResourceManager<CoordinationSignalType,InputDataTypes...>::coordinationSignalCancel, this);
 
-    _active_buffer = "";
     if(!_nh->getParam("freq", _hz))
     {
       _nh->setParam("freq", 100);
@@ -168,11 +174,12 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallba
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
 {
-  std::shared_ptr<StateStorage> current_state;
   std::thread sm_th;
   bool coordination_running = false;
   std::thread al_th;
   bool artificial_life_running = false;
+
+  std::string active_buffer;
 
   // this in lambda is necessary for gcc <= 5.1
   _StateMachine.setPublicationFunction([this](auto state){ this->publishState(state); });
@@ -180,14 +187,16 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
   size_t param_update = 0;
   while (ros::ok())
   {
+
+    _coordinationMutex.lock();
     if(coordination_running == false)
     {
       if(_coordinationSignalStorage->empty() == false)
       {
-        current_state = _coordinationSignalStorage->pop();
-        _StateMachine.setInitialState(current_state->getInitialState());
-        _StateMachine.setTimeout(current_state->getTimeout());
-        _StateMachine.setDeadLine(current_state->getDeadLine());
+        _activeCoordinationSignal = _coordinationSignalStorage->pop();
+        _StateMachine.setInitialState(_activeCoordinationSignal->getInitialState());
+        _StateMachine.setTimeout(_activeCoordinationSignal->getTimeout());
+        _StateMachine.setDeadLine(_activeCoordinationSignal->getDeadLine());
 
         sm_th = std::thread(&CoordinationStateMachine::run, &_StateMachine);
         coordination_running = true;
@@ -200,28 +209,30 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
       {
         sm_th.join();
         coordination_running = false;
+        _activeCoordinationSignal = std::make_shared<StateStorage>();
         continue;
       }
     }
-    if(current_state)
-      _coordinationSignalBuffer->setData(current_state->getStateData(_StateMachine.getCurrentStateName()) );
+    if(_activeCoordinationSignal)
+      _coordinationSignalBuffer->setData(_activeCoordinationSignal->getStateData(_StateMachine.getCurrentStateName()) );
     else
       _coordinationSignalBuffer->setData(nullptr);
+    _coordinationMutex.unlock();
 
     std::shared_ptr<ReactiveBuffer> buff = _reactiveBufferStorage->getMorePriority();
     if(buff)
       if(buff->operator()())
       {
         buff->operator()()->publish();
-        if(buff->getName() != _active_buffer)
+        if(buff->getName() != active_buffer)
         {
-          _active_buffer = buff->getName();
+          active_buffer = buff->getName();
 
-          if((_active_buffer != "coordination_signals") && (coordination_running))
+          if((active_buffer != "coordination_signals") && (coordination_running))
             _StateMachine.addEvent("__preamted__");
-          if((_active_buffer!= "artificial_life") && (artificial_life_running))
+          if((active_buffer!= "artificial_life") && (artificial_life_running))
             _artificialLife->stop();
-          if(_active_buffer == "artificial_life")
+          if(active_buffer == "artificial_life")
           {
             if(!artificial_life_running)
             {
@@ -232,7 +243,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
           }
 
           std_msgs::String active_buffer_msg;
-          active_buffer_msg.data = _active_buffer;
+          active_buffer_msg.data = active_buffer;
           _activeBufferPublisher.publish(active_buffer_msg);
         }
       }
@@ -268,7 +279,33 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::publishState(Coo
   status.state_name = state.state_->getName();
   status.id = state.state_machine_id;
 
-  _coordinationSignalStatusPublisher_.publish(status);
+  _coordinationSignalStatusPublisher.publish(status);
+}
+
+template<typename CoordinationSignalType, typename ...InputDataTypes>
+bool ResourceManager<CoordinationSignalType,InputDataTypes...>::coordinationSignalCancel
+                          (resource_management::CoordinationSignalsCancel::Request  &req,
+                          resource_management::CoordinationSignalsCancel::Response &res)
+{
+  bool found = false;
+
+  _coordinationMutex.lock();
+  if(!_coordinationSignalStorage->remove(req.id))
+  {
+    if(_activeCoordinationSignal)
+      if(_activeCoordinationSignal->getId() == req.id)
+      {
+        _StateMachine.addEvent("__preamted__");
+        found = true;
+      }
+  }
+  else
+    found = true;
+  _coordinationMutex.unlock();
+
+  res.ack = found;
+
+  return true;
 }
 
 #endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_RESOURCE_MANAGER_H_
