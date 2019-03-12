@@ -1,4 +1,5 @@
 #include "${project_name}ArtificialLife.h"
+#include "message_storage/MessageWrapper.h"
 
 ${project_name}ArtificialLife::${project_name}ArtificialLife(std::shared_ptr<ReactiveBuffer> buffer) :
         ArtificialLife(100 /* you can change the artficial life frame rate here*/, buffer)

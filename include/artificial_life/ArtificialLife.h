@@ -38,9 +38,10 @@ protected:
   virtual void inLoop() = 0;
   virtual void init() = 0;
 
+  std::shared_ptr<ReactiveBuffer> _buffer;
+
 private:
   ros::Rate _rate;
-  std::shared_ptr<ReactiveBuffer> _buffer;
   bool _is_running;
 };
 
