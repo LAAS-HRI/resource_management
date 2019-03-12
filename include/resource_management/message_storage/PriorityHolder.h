@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+namespace resource_management {
+
 enum importance_priority_t
 {
   vital     = 4,
@@ -35,5 +37,7 @@ public:
 private:
   T priority_;
 };
+
+} // namespace resource_management
 
 #endif // PRIORITYHOLDER_H

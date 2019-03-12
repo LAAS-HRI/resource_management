@@ -6,6 +6,8 @@
 #include <vector>
 #include <mutex>
 
+namespace resource_management {
+
 class CoordinationSignalsStorage
 {
 public:
@@ -18,5 +20,7 @@ private:
   std::vector<std::shared_ptr<StateStorage> > states_storage_;
   std::mutex mutex_;
 };
+
+} // namespace resource_management
 
 #endif //COORDINATIONSIGNALSSTORAGE_H

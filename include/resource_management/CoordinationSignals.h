@@ -12,7 +12,9 @@
 #include "state_machine/CoordinationSignalsStorage.h"
 
 #include "message_storage/MessageWrapper.h"
-#include "resource_management/CoordinationTransition.h"
+#include "resource_management/CoordinationSignalsTransition.h"
+
+namespace resource_management {
 
 struct CoordinationHeader_t
 {
@@ -98,5 +100,7 @@ bool CoordinationSignals<T>::_serviceCallback(typename T::Request &req, typename
     else
       return false;
 }
+
+} // namespace resource_management
 
 #endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_COORDINATION_SIGNALS_H_

@@ -7,6 +7,8 @@
 #include <string>
 #include <map>
 
+namespace resource_management {
+
 class ReactiveBufferStorage
 {
 public:
@@ -22,5 +24,7 @@ private:
   std::map<std::string, std::shared_ptr<ReactiveBuffer>> buffers_;
   std::vector<std::vector<int8_t> > priorities_;
 };
+
+} // namespace resource_management
 
 #endif // REACTIVEBUFFERSTORAGE_H

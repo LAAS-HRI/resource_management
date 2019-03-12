@@ -8,7 +8,7 @@ namespace ${project_name} {
 class ArtificialLife : public ::ArtificialLife
 {
 public:
-  ArtificialLife(std::shared_ptr<ReactiveBuffer> buffer);
+  ArtificialLife(std::shared_ptr<resource_management::ReactiveBuffer> buffer);
 
 private:
   virtual void inLoop();

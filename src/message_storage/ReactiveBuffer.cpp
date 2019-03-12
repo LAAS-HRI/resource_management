@@ -1,5 +1,7 @@
 #include "resource_management/message_storage/ReactiveBuffer.h"
 
+namespace resource_management {
+
 ReactiveBuffer::ReactiveBuffer(std::string name)
 {
   name_ = name;
@@ -16,3 +18,5 @@ std::shared_ptr<MessageAbstraction> ReactiveBuffer::operator()()
 {
   return data_;
 }
+
+} // namespace resource_management

@@ -1,10 +1,11 @@
 #include "resource_management/state_machine/EventStorage.h"
 
+namespace resource_management {
+
 EventStorage::EventStorage()
 {
   queue_choice_ = true;
 }
-
 
 void EventStorage::addEvent(const std::string& event)
 {
@@ -37,3 +38,5 @@ std::queue<std::string> EventStorage::getEvents()
   mutex_.unlock();
   return tmp;
 }
+
+} // namespace resource_management

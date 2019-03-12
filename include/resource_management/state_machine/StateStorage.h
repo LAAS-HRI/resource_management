@@ -8,6 +8,8 @@
 #include <map>
 #include <string>
 
+namespace resource_management {
+
 class StateStorage : public PriorityHolder<importance_priority_t>
 {
 public:
@@ -36,5 +38,7 @@ private:
   ros::Duration time_out_;
   ros::Time begin_dead_line_;
 };
+
+} // namespace resource_management
 
 #endif // STATESTORAGE_H

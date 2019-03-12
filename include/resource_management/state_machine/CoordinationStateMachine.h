@@ -11,6 +11,8 @@
 #include <string>
 #include <mutex>
 
+namespace resource_management {
+
 struct CoordinationInternalState_t
 {
   uint32_t state_machine_id;
@@ -56,5 +58,7 @@ private:
   void runOnceNoEvent();
   void runOnceWithEvents(std::queue<std::string>& events);
 };
+
+} // namespace resource_management
 
 #endif // COORDINATIONSTATEMACHINE_H

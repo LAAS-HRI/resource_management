@@ -5,6 +5,8 @@
 #include <string>
 #include <queue>
 
+namespace resource_management {
+
 class EventStorage
 {
 public:
@@ -20,5 +22,7 @@ private:
   std::queue<std::string> fifo_1;
   std::queue<std::string> fifo_2;
 };
+
+} // namespace resource_management
 
 #endif // EVENTSTORAGE_H

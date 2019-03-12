@@ -5,6 +5,8 @@
 
 #include <functional>
 
+namespace resource_management {
+
 template<typename T>
 class MessageWrapper : public MessageAbstraction
 {
@@ -26,7 +28,6 @@ private:
 
 template<typename T>
 std::function<void(T)> MessageWrapper<T>::publish_ = {};
-
 
 template<typename T>
 MessageWrapper<T>::MessageWrapper()
@@ -75,5 +76,7 @@ void MessageWrapper<T>::publish()
   if(publish_)
     publish_(data_);
 }
+
+} // namespace resource_management
 
 #endif // MESSAGEWRAPPER_H

@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+namespace resource_management {
+
 CoordinationState::CoordinationState(std::string id)
 {
   id_ = id;
@@ -52,3 +54,5 @@ transtition_state_t CoordinationState::update(CoordinationState** current_state,
 
   return transtition_state;
 }
+
+} // namespace resource_management

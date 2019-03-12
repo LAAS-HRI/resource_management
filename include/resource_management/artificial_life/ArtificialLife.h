@@ -5,6 +5,8 @@
 
 #include "resource_management/message_storage/ReactiveBuffer.h"
 
+namespace resource_management {
+
 class ArtificialLife
 {
 public:
@@ -44,5 +46,7 @@ private:
   ros::Rate _rate;
   bool _is_running;
 };
+
+} // namespace resource_management
 
 #endif // ARTIFICIALLIFE_H

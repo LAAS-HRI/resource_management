@@ -1,5 +1,7 @@
 #include "resource_management/state_machine/StateStorage.h"
 
+namespace resource_management {
+
 StateStorage::StateStorage(uint32_t id, ros::Duration time_out, ros::Time begin_dead_line)
 {
   id_ = id;
@@ -66,3 +68,5 @@ CoordinationState* StateStorage::operator[](std::string id)
   else
     return nullptr;
 }
+
+} // namespace resource_management

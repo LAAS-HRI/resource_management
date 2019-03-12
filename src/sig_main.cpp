@@ -25,11 +25,11 @@ void publishTestMsg(test_t msg)
 int main(int argc, char** argv)
 {
   /******** MessageWrapper ******/
-  MessageWrapper<std::string>::registerPublishFunction(&publishStrMsg);
-  MessageWrapper<test_t>::registerPublishFunction(&publishTestMsg);
+  resource_management::MessageWrapper<std::string>::registerPublishFunction(&publishStrMsg);
+  resource_management::MessageWrapper<test_t>::registerPublishFunction(&publishTestMsg);
 
-  MessageWrapper<std::string> m1("m1");
-  MessageWrapper<std::string> m2;
+  resource_management::MessageWrapper<std::string> m1("m1");
+  resource_management::MessageWrapper<std::string> m2;
   m2 = "m2";
 
   m1.publish();
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 
   /******** MessageWrapper different type **********/
 
-  MessageWrapper<test_t> m3;
+  resource_management::MessageWrapper<test_t> m3;
   m3().msg = "m3";
   m3.publish();
 
@@ -51,22 +51,22 @@ int main(int argc, char** argv)
 
   std::cout << "*****" << std::endl;
 
-  ReactiveBuffer monitoring("monitoring");
-  ReactiveBuffer speaking("speaking");
+  resource_management::ReactiveBuffer monitoring("monitoring");
+  resource_management::ReactiveBuffer speaking("speaking");
 
-  monitoring.setPriority(prioritize);
-  speaking.setPriority(normal);
+  monitoring.setPriority(resource_management::prioritize);
+  speaking.setPriority(resource_management::normal);
 
   m1 = "m1";
-  monitoring.setData(std::make_shared<MessageWrapper<std::string>>(m1));
-  speaking.setData(std::make_shared<MessageWrapper<std::string>>(m2));
+  monitoring.setData(std::make_shared<resource_management::MessageWrapper<std::string>>(m1));
+  speaking.setData(std::make_shared<resource_management::MessageWrapper<std::string>>(m2));
 
   if(speaking.getPriority() > monitoring.getPriority())
     speaking()->publish();
   else
     monitoring()->publish();
 
-  monitoring.setData(std::make_shared<MessageWrapper<test_t>>(m3));
+  monitoring.setData(std::make_shared<resource_management::MessageWrapper<test_t>>(m3));
 
   if(speaking.getPriority() > monitoring.getPriority())
     speaking()->publish();
@@ -77,26 +77,26 @@ int main(int argc, char** argv)
 
   std::cout << "*****" << std::endl;
 
-  ReactiveBufferStorage buffers({"monitoring", "speaking"});
+  resource_management::ReactiveBufferStorage buffers({"monitoring", "speaking"});
 
-  buffers.setPriority("monitoring", prioritize);
-  buffers.setPriority("speaking", normal);
+  buffers.setPriority("monitoring", resource_management::prioritize);
+  buffers.setPriority("speaking", resource_management::normal);
 
-  m1.setPriority(helpful);
-  m2.setPriority(helpful);
+  m1.setPriority(resource_management::helpful);
+  m2.setPriority(resource_management::helpful);
 
-  buffers["monitoring"]->setData(std::make_shared<MessageWrapper<std::string>>(m1));
-  buffers["speaking"]->setData(std::make_shared<MessageWrapper<std::string>>(m2));
-
-  buffers.getMorePriorityData()->publish();
-
-  m2.setPriority(vital);
+  buffers["monitoring"]->setData(std::make_shared<resource_management::MessageWrapper<std::string>>(m1));
+  buffers["speaking"]->setData(std::make_shared<resource_management::MessageWrapper<std::string>>(m2));
 
   buffers.getMorePriorityData()->publish();
 
-  m2.setPriority(avoid);
-  m3.setPriority(helpful);
-  buffers["monitoring"]->setData(std::make_shared<MessageWrapper<test_t>>(m3));
+  m2.setPriority(resource_management::vital);
+
+  buffers.getMorePriorityData()->publish();
+
+  m2.setPriority(resource_management::avoid);
+  m3.setPriority(resource_management::helpful);
+  buffers["monitoring"]->setData(std::make_shared<resource_management::MessageWrapper<test_t>>(m3));
 
   buffers.getMorePriorityData()->publish();
 

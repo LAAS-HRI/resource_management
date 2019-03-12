@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
     FILES
     CoordinationStateHeader.msg
-    CoordinationTransition.msg
+    CoordinationSignalsTransition.msg
     EndCondition.msg
     MessagePriority.msg
     CoordinationSignalHeader.msg

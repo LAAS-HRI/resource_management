@@ -1,5 +1,7 @@
 #include "resource_management/message_storage/ReactiveBufferStorage.h"
 
+namespace resource_management {
+
 ReactiveBufferStorage::ReactiveBufferStorage(std::vector<std::string> names)
 {
   for(const auto& name : names){
@@ -61,3 +63,5 @@ std::shared_ptr<MessageAbstraction> ReactiveBufferStorage::getMorePriorityData()
     return (*max)();
   return {};
 }
+
+} // namespace resource_management

@@ -7,6 +7,8 @@
 #include <string>
 #include <memory>
 
+namespace resource_management {
+
 class ReactiveBuffer : public PriorityHolder<focus_priority_t>
 {
 public:
@@ -21,5 +23,7 @@ private:
   std::string name_;
   std::shared_ptr<MessageAbstraction> data_;
 };
+
+} // namespace resource_management
 
 #endif // REACTIVEBUFFER_H

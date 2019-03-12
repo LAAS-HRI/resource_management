@@ -19,6 +19,8 @@
 
 #include "resource_management/artificial_life/ArtificialLife.h"
 
+namespace resource_management {
+
 template<typename ...Types>
 struct Impl;
 
@@ -307,5 +309,7 @@ bool ResourceManager<CoordinationSignalType,InputDataTypes...>::coordinationSign
 
   return true;
 }
+
+} // namespace resource_management
 
 #endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_RESOURCE_MANAGER_H_

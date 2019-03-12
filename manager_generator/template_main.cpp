@@ -10,7 +10,7 @@
 
 #include <thread>
 
-class ${class_name} : public ResourceManager<${project_name}::CoordinationSignal
+class ${class_name} : public resource_management::ResourceManager<${project_name}::CoordinationSignal
 !!for data_type in message_types
       ,${{project_name}}::{data_type[0]}
 !!end
@@ -22,7 +22,7 @@ public:
     {
         // this in lambda is necessary for gcc <= 5.1
 !!for data_type in message_types
-        MessageWrapper<{data_type[2]}>::registerPublishFunction([this](auto data){{ this->publish{data_type[0]}Msg(data); }});
+        resource_management::MessageWrapper<{data_type[2]}>::registerPublishFunction([this](auto data){{ this->publish{data_type[0]}Msg(data); }});
 !!end
 
         // Remove if your do not need artificial life
@@ -30,7 +30,7 @@ public:
     }
 
 private:
-    std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const ${project_name}::CoordinationSignal::Request &msg) override;
+    std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> stateFromMsg(const ${project_name}::CoordinationSignal::Request &msg) override;
     std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
     transitionFromMsg(const ${project_name}::CoordinationSignal::Request &msg) override;
     ${project_name}::CoordinationSignal::Response generateResponseMsg(uint32_t id) override;
@@ -40,14 +40,14 @@ private:
 !!end
 };
 
-std::map<std::string,std::shared_ptr<MessageAbstraction>> ${class_name}::stateFromMsg(const ${project_name}::CoordinationSignal::Request &msg)
+std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> ${class_name}::stateFromMsg(const ${project_name}::CoordinationSignal::Request &msg)
 {
-    std::map<std::string,std::shared_ptr<MessageAbstraction>> states;
+    std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> states;
 !!for data_type in message_types
 
     for(auto x : msg.states_{data_type[0]}){{
-        auto wrap = states[x.header.id] = std::make_shared<MessageWrapper<{data_type[2]}>>(x.data);
-        wrap->setPriority(static_cast<importance_priority_t>(msg.header.priority.value));
+        auto wrap = states[x.header.id] = std::make_shared<resource_management::MessageWrapper<{data_type[2]}>>(x.data);
+        wrap->setPriority(static_cast<resource_management::importance_priority_t>(msg.header.priority.value));
     }}
 !!end
 

@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+namespace resource_management {
+
 class CoordinationState
 {
 public:
@@ -22,5 +24,7 @@ private:
   std::vector<CoordinationTransition> transitions_conditions_;
   std::vector<CoordinationState*> transitions_next_state_;
 };
+
+} // namespace resource_management
 
 #endif // COORDINATIONSTATE_H

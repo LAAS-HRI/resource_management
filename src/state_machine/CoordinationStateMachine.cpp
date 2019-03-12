@@ -2,6 +2,8 @@
 
 #include <unistd.h>
 
+namespace resource_management {
+
 CoordinationStateMachine::CoordinationStateMachine(float rate)
 {
   publishState_ = nullptr;
@@ -177,3 +179,5 @@ void CoordinationStateMachine::runOnceWithEvents(std::queue<std::string>& events
     }
   }
 }
+
+} // namespace resource_management

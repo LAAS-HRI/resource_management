@@ -1,5 +1,7 @@
 #include "resource_management/state_machine/CoordinationTransition.h"
 
+namespace resource_management {
+
 CoordinationTransition::CoordinationTransition(ros::Duration duration, ros::Duration time_out, std::vector<std::string> regexs)
 {
   duration_ = duration;
@@ -63,3 +65,5 @@ transtition_state_t CoordinationTransition::evaluate(const std::string& event)
       return transition_wait;
   }
 }
+
+} // namespace resource_management

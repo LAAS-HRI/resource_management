@@ -12,6 +12,8 @@
 #include "resource_management/message_storage/ReactiveBufferStorage.h"
 #include "resource_management/message_storage/MessageWrapper.h"
 
+namespace resource_management {
+
 class ReactiveInputsBase{
 };
 
@@ -71,5 +73,7 @@ void ReactiveInputs<T>::_subscriberCallback(size_t index, const boost::shared_pt
     wrap->setPriority(priority);
     _buffers[index]->setData(wrap);
 }
+
+} // namespace resource_management
 
 #endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_REACTIVE_INPUTS_H_

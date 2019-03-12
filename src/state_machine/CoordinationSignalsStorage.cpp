@@ -1,5 +1,7 @@
 #include "resource_management/state_machine/CoordinationSignalsStorage.h"
 
+namespace resource_management {
+
 bool CoordinationSignalsStorage::empty()
 {
   mutex_.lock();
@@ -61,3 +63,5 @@ bool CoordinationSignalsStorage::remove(uint32_t id)
 
   return found;
 }
+
+} // namespace resource_management

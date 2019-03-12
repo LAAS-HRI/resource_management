@@ -7,6 +7,8 @@
 #include <chrono>
 #include <string>
 
+namespace resource_management {
+
 enum transtition_state_t
 {
   transition_pass_on_event,
@@ -38,5 +40,7 @@ private:
 
   ros::Time start_;
 };
+
+} // namespace resource_management
 
 #endif // COORDINATIONTRANSITION_H
