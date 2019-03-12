@@ -4,14 +4,12 @@ import argparse
 import os
 import sys
 import string
+import collections
 
-def substitue_for_loop(tpl,for_var,the_list):
-    res=""
-    for x in the_list:
-        res+=eval('tpl.format({}=x)'.format(for_var))
-    return res
+Settings = collections.namedtuple('Settings',['project_name', 'class_name', 'message_types', 'reactive_input_names','reactive_input_names_cs'])
 
-def createCatkinFiles(args,msg_files,srv_files):
+
+def createCatkinFiles(args,msg_files,srv_files, settings):
     # CmakeLists.txt
     fcmake = open(os.path.join(args.package_name, "CMakeLists.txt"),"w")
     fcmake.write('cmake_minimum_required(VERSION 2.8.3)\n'
@@ -44,9 +42,9 @@ def createCatkinFiles(args,msg_files,srv_files):
     ')\n'
     '\n'
     'include_directories(include ${{catkin_INCLUDE_DIRS}})\n'
-    'add_executable(${{PROJECT_NAME}} src/${{PROJECT_NAME}}.cpp src/${{PROJECT_NAME}}ArtificialLife.cpp)\n'
+    'add_executable(${{PROJECT_NAME}} src/${{PROJECT_NAME}}.cpp src/ArtificialLife.cpp)\n'
     'add_dependencies(${{PROJECT_NAME}} ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}})\n'
-    'target_link_libraries(${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'.format(project_name,msgs=" ".join(msg_files),srvs=" ".join(srv_files))
+    'target_link_libraries(${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'.format(settings.project_name,msgs=" ".join(msg_files),srvs=" ".join(srv_files))
     )
     fcmake.close()
 
@@ -65,171 +63,159 @@ def createCatkinFiles(args,msg_files,srv_files):
     '<buildtool_depend>catkin</buildtool_depend>\n'
     '<build_depend>message_generation</build_depend>\n'
     '<exec_depend>message_runtime</exec_depend>\n'
-    '</package>\n'.format(args.package_name))
+    '</package>\n'.format(settings.project_name))
     fpackage.close()
 
 def underscore_to_CamelCase(word):
     return ''.join(x.capitalize() or '_' for x in word.split('_'))
 
+def create_folders(settings):
+    os.makedirs(os.path.join(settings.project_name,"src"),exist_ok=True)
+    os.makedirs(os.path.join(settings.project_name,"msg"),exist_ok=True)
+    os.makedirs(os.path.join(settings.project_name,"srv"),exist_ok=True)
+    os.makedirs(os.path.join(settings.project_name,os.path.join("include",settings.project_name)),exist_ok=True)
 
-parser = argparse.ArgumentParser(description="generate a resource manager node")
-parser.add_argument("--package-name",metavar="PKG", type=str, required=True,
-        help="name of the project/package")
-parser.add_argument("--target-types", type=str, metavar="name:ros_data_type:cpp_type", nargs='+', help="", required=True)
-parser.add_argument("--reactive-topics", type=str, metavar="topic_name", nargs='+', help="")
+def substitue_for_loop(tpl,for_var,the_list):
+    res=""
+    for x in the_list:
+        res+=eval('tpl.format({}=x)'.format(for_var))
+    return res
 
-args=parser.parse_args()
-generator_dir=os.path.dirname(sys.argv[0])
-in_msg_dir = os.path.join(generator_dir,"cmake","gen","msg")
-
-message_names=[x.split(':')[0] for x in args.target_types]
-ros_data_types=[x.split(':')[1] for x in args.target_types]
-cpp_types=[x.split(':')[2] for x in args.target_types]
-messages_types_zip=[]
-for x in zip(message_names,ros_data_types,cpp_types):
-    messages_types_zip.append(x)
-project_name=args.package_name
-class_name=underscore_to_CamelCase(project_name)
-reactive_input_names=args.reactive_topics
-reactive_input_names_cs = ', '.join(['"'+x+'"' for x in reactive_input_names])
-
-
-#package architecture
-os.makedirs(os.path.join(project_name,"src"),exist_ok=True)
-os.makedirs(os.path.join(project_name,"msg"),exist_ok=True)
-os.makedirs(os.path.join(project_name,"srv"),exist_ok=True)
-os.makedirs(os.path.join(project_name,"include"),exist_ok=True)
-
-# .msg files
-
-msg_files=[]
-srv_files=[]
-
-#   CoordinationState
-for x in args.target_types :
-    name=x.split(':')[0]
-    data_type=x.split(':')[1]
-    filename='CoordinationState'+name+'.msg'
-    msg_files.append(filename)
-    f = open(os.path.join(args.package_name,'msg',filename),'w+')
-    f.write("resource_management/CoordinationStateHeader header\n")
-    f.write("{} data\n".format(data_type))
-    f.close()
-
-#   PriorityTarget
-for x in args.target_types :
-    name=x.split(':')[0]
-    data_type=x.split(':')[1]
-    filename = ''+name+'.msg'
-    msg_files.append(filename)
-    f = open(os.path.join(args.package_name,'msg',filename),'w+')
-    f.write("resource_management/MessagePriority priority\n")
-    f.write("{} data\n".format(data_type))
-    f.close()
+def configure_template(template_path, output_path,settings):
+    f_in = open(template_path,'r')
+    tpl = ""
+    tpl_inside=""
+    for_var=""
+    inside=False
+    for line in f_in:
+        if line.startswith('!!for '):
+            inside=True
+            command=line[2:-1]
+            for_var=command[command.find(' ')+1:]
+            for_var=for_var[0:for_var.find(' ')]
+            for_list=command[command.find(' in ')+4:]
+            tpl_inside=""
+        elif line.startswith('!!end'):
+            inside=False
+            tpl+=eval('substitue_for_loop(tpl_inside,for_var,settings.{})'.format(for_list))
+        elif inside:
+            tpl_inside+=line
+        else:
+            tpl+=line
+    f_in.close()
 
 
-#   CoordinationSignal
-filename='CoordinationSignal.srv'
-srv_files.append(filename)
-f_signal=open(os.path.join(args.package_name,'srv',filename),'w+')
-f_signal.write("resource_management/CoordinationSignalHeader header\n")
-for x in args.target_types :
-    name=x.split(':')[0]
-    #data_type=x.split(':')[1]
-    f_signal.write("{}[] states_{}\n".format('CoordinationState'+name,name))
-f_signal.write("---\n")
-f_signal.write("uint32 id")
-createCatkinFiles(args,msg_files, srv_files)
+    # write main cpp file
+
+    fo = open(output_path,"w+")
+    fo.write(string.Template(tpl).substitute(**settings._asdict()))
+    fo.close()
 
 
-f_in = open(os.path.join(generator_dir,'template_main.cpp'),'r')
-tpl = ""
-tpl_inside=""
-for_var=""
-inside=False
-for line in f_in:
-    if line.startswith('!!for '):
-        inside=True
-        command=line[2:-1]
-        for_var=command[command.find(' ')+1:]
-        for_var=for_var[0:for_var.find(' ')]
-        for_list=command[command.find(' in ')+4:]
-        tpl_inside=""
-    elif line.startswith('!!end'):
-        inside=False
-        tpl+=eval('substitue_for_loop(tpl_inside,for_var,{})'.format(for_list))
-    elif inside:
-        tpl_inside+=line
-    else:
-        tpl+=line
-f_in.close()
+def main():
+
+    parser = argparse.ArgumentParser(description="generate a resource manager node")
+    parser.add_argument("--package-name",metavar="PKG", type=str, required=True,
+            help="name of the project/package")
+    parser.add_argument("--target-types", type=str, metavar="name,ros_data_type,cpp_type", nargs='+', help="", required=True)
+    parser.add_argument("--reactive-topics", type=str, metavar="topic_name", nargs='+', help="")
+
+    args=parser.parse_args()
+    generator_dir=os.path.dirname(sys.argv[0])
+    in_msg_dir = os.path.join(generator_dir,"cmake","gen","msg")
+
+    message_types = [x.split(',') for x in args.target_types]
+    project_name=args.package_name
+    class_name=underscore_to_CamelCase(project_name)
+
+    reactive_input_names=args.reactive_topics
+    reactive_input_names_cs = ', '.join(['"'+x+'"' for x in reactive_input_names])
+
+    settings = Settings(project_name, class_name, message_types, reactive_input_names,reactive_input_names_cs)
+
+    #package architecture
+    create_folders(settings)
+
+    # .msg files
+    msg_files=[]
+    srv_files=[]
+
+    #   CoordinationState
+    for x in message_types :
+        name=x[0]
+        data_type=x[1]
+        filename='CoordinationState'+name+'.msg'
+        msg_files.append(filename)
+        f = open(os.path.join(args.package_name,'msg',filename),'w+')
+        f.write("resource_management/CoordinationStateHeader header\n")
+        f.write("{} data\n".format(data_type))
+        f.close()
+
+    #   PriorityTarget
+    for x in message_types :
+        name=x[0]
+        data_type=x[1]
+        filename = ''+name+'.msg'
+        msg_files.append(filename)
+        f = open(os.path.join(args.package_name,'msg',filename),'w+')
+        f.write("resource_management/MessagePriority priority\n")
+        f.write("{} data\n".format(data_type))
+        f.close()
 
 
-# write main cpp file
-mainfile=os.path.join(project_name, "src", project_name +".cpp")
-
-fo = open(mainfile,"w+")
-fo.write(string.Template(tpl).substitute(**locals()))
-fo.close()
-
-#################
-f_in = open(os.path.join(generator_dir,'template_artificialLife.cpp'),'r')
-tpl = ""
-tpl_inside=""
-for_var=""
-inside=False
-for line in f_in:
-    if line.startswith('!!for '):
-        inside=True
-        command=line[2:-1]
-        for_var=command[command.find(' ')+1:]
-        for_var=for_var[0:for_var.find(' ')]
-        for_list=command[command.find(' in ')+4:]
-        tpl_inside=""
-    elif line.startswith('!!end'):
-        inside=False
-        tpl+=eval('substitue_for_loop(tpl_inside,for_var,{})'.format(for_list))
-    elif inside:
-        tpl_inside+=line
-    else:
-        tpl+=line
-f_in.close()
+    #   CoordinationSignal
+    filename='CoordinationSignal.srv'
+    srv_files.append(filename)
+    f_signal=open(os.path.join(args.package_name,'srv',filename),'w+')
+    f_signal.write("resource_management/CoordinationSignalHeader header\n")
+    for x in message_types :
+        name=x[0]
+        #data_type=x[1]
+        f_signal.write("{}[] states_{}\n".format('CoordinationState'+name,name))
+    f_signal.write("---\n")
+    f_signal.write("uint32 id")
+    createCatkinFiles(args,msg_files, srv_files, settings)
 
 
-# write main cpp file
-artificial_cpp_file=os.path.join(project_name, "src", project_name +"ArtificialLife.cpp")
+    # led_manager.cpp
+    configure_template(os.path.join(generator_dir,'template_main.cpp'),os.path.join(project_name, "src", project_name +".cpp"),settings)
+    
+    # ArtificialLife.cpp
+    configure_template(os.path.join(generator_dir,'template_artificialLife.cpp'),os.path.join(project_name, "src", "ArtificialLife.cpp"),settings)
+    # ArtificialLife.h
+    configure_template(os.path.join(generator_dir,'template_artificialLife.h'),os.path.join(project_name, "include", project_name, "ArtificialLife.h"),settings)
 
-fo = open(artificial_cpp_file,"w+")
-fo.write(string.Template(tpl).substitute(**locals()))
-fo.close()
-
-#################
-f_in = open(os.path.join(generator_dir,'template_artificialLife.h'),'r')
-tpl = ""
-tpl_inside=""
-for_var=""
-inside=False
-for line in f_in:
-    if line.startswith('!!for '):
-        inside=True
-        command=line[2:-1]
-        for_var=command[command.find(' ')+1:]
-        for_var=for_var[0:for_var.find(' ')]
-        for_list=command[command.find(' in ')+4:]
-        tpl_inside=""
-    elif line.startswith('!!end'):
-        inside=False
-        tpl+=eval('substitue_for_loop(tpl_inside,for_var,{})'.format(for_list))
-    elif inside:
-        tpl_inside+=line
-    else:
-        tpl+=line
-f_in.close()
+    #################
+    f_in = open(os.path.join(generator_dir,'template_artificialLife.h'),'r')
+    tpl = ""
+    tpl_inside=""
+    for_var=""
+    inside=False
+    for line in f_in:
+        if line.startswith('!!for '):
+            inside=True
+            command=line[2:-1]
+            for_var=command[command.find(' ')+1:]
+            for_var=for_var[0:for_var.find(' ')]
+            for_list=command[command.find(' in ')+4:]
+            tpl_inside=""
+        elif line.startswith('!!end'):
+            inside=False
+            tpl+=eval('substitue_for_loop(tpl_inside,for_var,{})'.format(for_list))
+        elif inside:
+            tpl_inside+=line
+        else:
+            tpl+=line
+    f_in.close()
 
 
-# write main cpp file
-artificial_h_file=os.path.join(project_name, "include", project_name +"ArtificialLife.h")
+    # write main cpp file
+    artificial_h_file=os.path.join(project_name, "include", project_name +"ArtificialLife.h")
 
-fo = open(artificial_h_file,"w+")
-fo.write(string.Template(tpl).substitute(**locals()))
-fo.close()
+    fo = open(artificial_h_file,"w+")
+    fo.write(string.Template(tpl).substitute(**locals()))
+    fo.close()
+
+if __name__ == '__main__':
+    main()
+

@@ -1,8 +1,8 @@
 #include "${project_name}/CoordinationSignal.h"
-!!for msg_name in message_names
-#include "${{project_name}}/{msg_name}.h"
+!!for data_type in message_types
+#include "${{project_name}}/{data_type[0]}.h"
 !!end
-#include "${project_name}ArtificialLife.h"
+#include "${project_name}/ArtificialLife.h"
 
 #include <resource_management/CoordinationSignals.h>
 #include <resource_management/ReactiveInputs.h>
@@ -11,8 +11,8 @@
 #include <thread>
 
 class ${class_name} : public ResourceManager<${project_name}::CoordinationSignal
-!!for msg_name in message_names
-      ,${{project_name}}::{msg_name}
+!!for data_type in message_types
+      ,${{project_name}}::{data_type[0]}
 !!end
 >
 {
@@ -21,12 +21,12 @@ public:
         ResourceManager (std::move(nh),{${reactive_input_names_cs}})
     {
         // this in lambda is necessary for gcc <= 5.1
-!!for data_type in messages_types_zip
+!!for data_type in message_types
         MessageWrapper<{data_type[2]}>::registerPublishFunction([this](auto data){{ this->publish{data_type[0]}Msg(data); }});
 !!end
 
         // Remove if your do not need artificial life
-        _artificialLife = (std::make_shared<${project_name}ArtificialLife>(_artificialLifeBuffer));
+        _artificialLife = (std::make_shared<${project_name}::ArtificialLife>(_artificialLifeBuffer));
     }
 
 private:
@@ -35,7 +35,7 @@ private:
     transitionFromMsg(const ${project_name}::CoordinationSignal::Request &msg) override;
     ${project_name}::CoordinationSignal::Response generateResponseMsg(uint32_t id) override;
 
-!!for data_type in messages_types_zip
+!!for data_type in message_types
     void publish{data_type[0]}Msg({data_type[2]} msg);
 !!end
 };
@@ -43,7 +43,7 @@ private:
 std::map<std::string,std::shared_ptr<MessageAbstraction>> ${class_name}::stateFromMsg(const ${project_name}::CoordinationSignal::Request &msg)
 {
     std::map<std::string,std::shared_ptr<MessageAbstraction>> states;
-!!for data_type in messages_types_zip
+!!for data_type in message_types
 
     for(auto x : msg.states_{data_type[0]}){{
         auto wrap = states[x.header.id] = std::make_shared<MessageWrapper<{data_type[2]}>>(x.data);
@@ -58,9 +58,9 @@ std::vector<std::tuple<std::string,std::string,resource_management::EndCondition
 ${class_name}::transitionFromMsg(const ${project_name}::CoordinationSignal::Request &msg)
 {
     std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>> transitions;
-!!for data_type in message_names
+!!for data_type in message_types
 
-    for(auto x : msg.states_{data_type}){{
+    for(auto x : msg.states_{data_type[0]}){{
         for(auto t : x.header.transitions){{
             transitions.push_back(
                         std::make_tuple<std::string,std::string,resource_management::EndCondition>(
@@ -80,7 +80,7 @@ ${project_name}::CoordinationSignal::Response ${class_name}::generateResponseMsg
   return res;
 }
 
-!!for data_type in messages_types_zip
+!!for data_type in message_types
 void ${{class_name}}::publish{data_type[0]}Msg({data_type[2]} msg)
 {{
   // Put you own publishing function here

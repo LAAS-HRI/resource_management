@@ -3,14 +3,18 @@
 
 #include "artificial_life/ArtificialLife.h"
 
-class ${project_name}ArtificialLife : public ArtificialLife
+namespace ${project_name} {
+
+class ArtificialLife : public ::ArtificialLife
 {
 public:
-  ${project_name}ArtificialLife(std::shared_ptr<ReactiveBuffer> buffer);
+  ArtificialLife(std::shared_ptr<ReactiveBuffer> buffer);
 
 private:
   virtual void inLoop();
   virtual void init();
 };
+
+} // namespace ${project_name}
 
 #endif // ${project_name}_ARTIFICIALLIFE_H
