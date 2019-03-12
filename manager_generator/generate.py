@@ -179,43 +179,11 @@ def main():
 
     # led_manager.cpp
     configure_template(os.path.join(generator_dir,'template_main.cpp'),os.path.join(project_name, "src", project_name +".cpp"),settings)
-    
+
     # ArtificialLife.cpp
     configure_template(os.path.join(generator_dir,'template_artificialLife.cpp'),os.path.join(project_name, "src", "ArtificialLife.cpp"),settings)
     # ArtificialLife.h
     configure_template(os.path.join(generator_dir,'template_artificialLife.h'),os.path.join(project_name, "include", project_name, "ArtificialLife.h"),settings)
 
-    #################
-    f_in = open(os.path.join(generator_dir,'template_artificialLife.h'),'r')
-    tpl = ""
-    tpl_inside=""
-    for_var=""
-    inside=False
-    for line in f_in:
-        if line.startswith('!!for '):
-            inside=True
-            command=line[2:-1]
-            for_var=command[command.find(' ')+1:]
-            for_var=for_var[0:for_var.find(' ')]
-            for_list=command[command.find(' in ')+4:]
-            tpl_inside=""
-        elif line.startswith('!!end'):
-            inside=False
-            tpl+=eval('substitue_for_loop(tpl_inside,for_var,{})'.format(for_list))
-        elif inside:
-            tpl_inside+=line
-        else:
-            tpl+=line
-    f_in.close()
-
-
-    # write main cpp file
-    artificial_h_file=os.path.join(project_name, "include", project_name +"ArtificialLife.h")
-
-    fo = open(artificial_h_file,"w+")
-    fo.write(string.Template(tpl).substitute(**locals()))
-    fo.close()
-
 if __name__ == '__main__':
     main()
-
