@@ -1,4 +1,4 @@
-#include "state_machine/CoordinationTransition.h"
+#include "resource_management/state_machine/CoordinationTransition.h"
 
 CoordinationTransition::CoordinationTransition(ros::Duration duration, ros::Duration time_out, std::vector<std::string> regexs)
 {

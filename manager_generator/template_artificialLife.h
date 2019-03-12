@@ -1,7 +1,7 @@
 #ifndef ${project_name}_ARTIFICIALLIFE_H
 #define ${project_name}_ARTIFICIALLIFE_H
 
-#include "artificial_life/ArtificialLife.h"
+#include "resource_management/artificial_life/ArtificialLife.h"
 
 namespace ${project_name} {
 

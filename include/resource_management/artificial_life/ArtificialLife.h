@@ -3,7 +3,7 @@
 
 #include "ros/ros.h"
 
-#include "message_storage/ReactiveBuffer.h"
+#include "resource_management/message_storage/ReactiveBuffer.h"
 
 class ArtificialLife
 {

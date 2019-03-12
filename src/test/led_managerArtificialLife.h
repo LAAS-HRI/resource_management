@@ -1,7 +1,7 @@
 #ifndef led_manager_ARTIFICIALLIFE_H
 #define led_manager_ARTIFICIALLIFE_H
 
-#include "artificial_life/ArtificialLife.h"
+#include "resource_management/artificial_life/ArtificialLife.h"
 
 class led_managerArtificialLife : public ArtificialLife
 {

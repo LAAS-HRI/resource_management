@@ -1,5 +1,5 @@
 #include "${project_name}/ArtificialLife.h"
-#include "message_storage/MessageWrapper.h"
+#include "resource_management/message_storage/MessageWrapper.h"
 
 namespace ${project_name} {
 

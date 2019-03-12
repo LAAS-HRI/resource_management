@@ -1,4 +1,4 @@
-#include "message_storage/ReactiveBufferStorage.h"
+#include "resource_management/message_storage/ReactiveBufferStorage.h"
 
 ReactiveBufferStorage::ReactiveBufferStorage(std::vector<std::string> names)
 {

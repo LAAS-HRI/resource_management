@@ -1,5 +1,5 @@
 #include "led_managerArtificialLife.h"
-#include "message_storage/MessageWrapper.h"
+#include "resource_management/message_storage/MessageWrapper.h"
 
 #include "led_manager/Color.h"
 #include "led_manager/OnOff.h"

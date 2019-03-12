@@ -1,10 +1,10 @@
 #ifndef COORDINATIONSTATEMACHINE_H
 #define COORDINATIONSTATEMACHINE_H
 
-#include "state_machine/EventStorage.h"
+#include "resource_management/state_machine/EventStorage.h"
 
-#include "state_machine/CoordinationTransition.h"
-#include "state_machine/CoordinationState.h"
+#include "resource_management/state_machine/CoordinationTransition.h"
+#include "resource_management/state_machine/CoordinationState.h"
 
 #include <ros/ros.h>
 

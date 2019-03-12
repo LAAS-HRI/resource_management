@@ -15,9 +15,9 @@
 #include "resource_management/CoordinationSignalsStatus.h"
 #include "resource_management/CoordinationSignalsCancel.h"
 
-#include "message_storage/ReactiveBuffer.h"
+#include "resource_management/message_storage/ReactiveBuffer.h"
 
-#include "artificial_life/ArtificialLife.h"
+#include "resource_management/artificial_life/ArtificialLife.h"
 
 template<typename ...Types>
 struct Impl;

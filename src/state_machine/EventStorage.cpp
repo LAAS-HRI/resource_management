@@ -1,4 +1,4 @@
-#include "state_machine/EventStorage.h"
+#include "resource_management/state_machine/EventStorage.h"
 
 EventStorage::EventStorage()
 {

@@ -1,6 +1,6 @@
-#include "message_storage/MessageWrapper.h"
-#include "message_storage/ReactiveBuffer.h"
-#include "message_storage/ReactiveBufferStorage.h"
+#include "resource_management/message_storage/MessageWrapper.h"
+#include "resource_management/message_storage/ReactiveBuffer.h"
+#include "resource_management/message_storage/ReactiveBufferStorage.h"
 
 #include <iostream>
 #include <thread>

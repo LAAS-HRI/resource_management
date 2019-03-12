@@ -1,4 +1,4 @@
-#include "state_machine/CoordinationState.h"
+#include "resource_management/state_machine/CoordinationState.h"
 
 #include <iostream>
 

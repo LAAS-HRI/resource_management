@@ -1,9 +1,9 @@
 #ifndef STATESTORAGE_H
 #define STATESTORAGE_H
 
-#include "state_machine/CoordinationState.h"
-#include "message_storage/PriorityHolder.h"
-#include "message_storage/MessageAbstraction.h"
+#include "resource_management/state_machine/CoordinationState.h"
+#include "resource_management/message_storage/PriorityHolder.h"
+#include "resource_management/message_storage/MessageAbstraction.h"
 
 #include <map>
 #include <string>

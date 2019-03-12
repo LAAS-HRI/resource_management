@@ -1,7 +1,7 @@
 #ifndef MESSAGEWRAPPER_H
 #define MESSAGEWRAPPER_H
 
-#include "message_storage/MessageAbstraction.h"
+#include "resource_management/message_storage/MessageAbstraction.h"
 
 #include <functional>
 

@@ -1,7 +1,7 @@
 #ifndef COORDINATIONSTATE_H
 #define COORDINATIONSTATE_H
 
-#include "state_machine/CoordinationTransition.h"
+#include "resource_management/state_machine/CoordinationTransition.h"
 
 #include <string>
 #include <vector>

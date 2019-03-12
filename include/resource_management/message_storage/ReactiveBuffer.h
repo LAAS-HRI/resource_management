@@ -1,8 +1,8 @@
 #ifndef REACTIVEBUFFER_H
 #define REACTIVEBUFFER_H
 
-#include "message_storage/PriorityHolder.h"
-#include "message_storage/MessageAbstraction.h"
+#include "resource_management/message_storage/PriorityHolder.h"
+#include "resource_management/message_storage/MessageAbstraction.h"
 
 #include <string>
 #include <memory>

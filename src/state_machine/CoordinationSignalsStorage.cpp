@@ -1,11 +1,11 @@
-#include "state_machine/CoordinationSignalsStorage.h"
+#include "resource_management/state_machine/CoordinationSignalsStorage.h"
 
 bool CoordinationSignalsStorage::empty()
 {
   mutex_.lock();
   size_t nb_states = states_storage_.size();
   mutex_.unlock();
-  
+
   if(nb_states == 0)
     return true;
   else

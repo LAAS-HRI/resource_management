@@ -1,7 +1,7 @@
 #ifndef REACTIVEBUFFERSTORAGE_H
 #define REACTIVEBUFFERSTORAGE_H
 
-#include "message_storage/ReactiveBuffer.h"
+#include "resource_management/message_storage/ReactiveBuffer.h"
 
 #include <vector>
 #include <string>

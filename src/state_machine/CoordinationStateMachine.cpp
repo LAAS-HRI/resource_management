@@ -1,4 +1,4 @@
-#include "state_machine/CoordinationStateMachine.h"
+#include "resource_management/state_machine/CoordinationStateMachine.h"
 
 #include <unistd.h>
 

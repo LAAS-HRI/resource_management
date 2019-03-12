@@ -1,6 +1,6 @@
-#include "state_machine/CoordinationStateMachine.h"
-#include "state_machine/StateStorage.h"
-#include "state_machine/CoordinationSignalsStorage.h"
+#include "resource_management/state_machine/CoordinationStateMachine.h"
+#include "resource_management/state_machine/StateStorage.h"
+#include "resource_management/state_machine/CoordinationSignalsStorage.h"
 
 #include <ros/ros.h>
 

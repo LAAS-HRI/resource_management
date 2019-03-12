@@ -1,7 +1,7 @@
 #ifndef COORDINATIONSIGNALSSTORAGE_H
 #define COORDINATIONSIGNALSSTORAGE_H
 
-#include "state_machine/StateStorage.h"
+#include "resource_management/state_machine/StateStorage.h"
 
 #include <vector>
 #include <mutex>
