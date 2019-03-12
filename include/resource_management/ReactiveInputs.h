@@ -33,6 +33,7 @@ template<class T>
 ReactiveInputs<T>::ReactiveInputs(ros::NodeHandlePtr nh, const std::vector<std::string> &prio_buffer_names, const ReactiveBufferStorage &bufferStorage):
     _nh(std::move(nh))
 {
+  //TODO
     for(size_t index = 0 ; index < prio_buffer_names.size(); ++index){
         _buffers.push_back(bufferStorage[prio_buffer_names[index]]);
         auto sub=_nh->subscribe<T>(prio_buffer_names[index]+ros::message_traits::md5sum<T>(),1,boost::bind(&ReactiveInputs<T>::_subscriberCallback,this,index,_1));
@@ -44,7 +45,19 @@ template<class T>
 void ReactiveInputs<T>::_subscriberCallback(size_t index, const boost::shared_ptr<T const> &msg)
 {
     auto wrap = std::make_shared<MessageWrapper<typename T::_data_type>>(msg->data);
-    wrap->setPriority(static_cast<importance_priority_t>(msg->priority.value));
+
+    importance_priority_t priority = avoid;
+    switch (msg->priority.value) {
+      case 4: priority = vital; break;
+      case 3: priority = urgent; break;
+      case 2: priority = important; break;
+      case 1: priority = helpful; break;
+      case 0: priority = weak; break;
+      case -1: priority = useless; break;
+      default: priority = avoid; break;
+    }
+
+    wrap->setPriority(priority);
     _buffers[index]->setData(wrap);
 }
 
