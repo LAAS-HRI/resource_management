@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <regex>
 
 #include <ros/ros.h>
 
@@ -33,10 +34,20 @@ template<class T>
 ReactiveInputs<T>::ReactiveInputs(ros::NodeHandlePtr nh, const std::vector<std::string> &prio_buffer_names, const ReactiveBufferStorage &bufferStorage):
     _nh(std::move(nh))
 {
+  std::regex regex_name("^N\\d+(.*)\\d+(.*)_ISaIvEEE$");
+  std::smatch match;
   //TODO
     for(size_t index = 0 ; index < prio_buffer_names.size(); ++index){
         _buffers.push_back(bufferStorage[prio_buffer_names[index]]);
-        auto sub=_nh->subscribe<T>(prio_buffer_names[index]+ros::message_traits::md5sum<T>(),1,boost::bind(&ReactiveInputs<T>::_subscriberCallback,this,index,_1));
+
+        std::string sub_name = prio_buffer_names[index] + "_";
+        std::string type_id = typeid(T).name();
+        if(std::regex_match(type_id, match, regex_name))
+          sub_name += match[1].str() + "_" + match[2].str();
+        else
+          sub_name += typeid(T).name();
+
+        auto sub=_nh->subscribe<T>(sub_name,1,boost::bind(&ReactiveInputs<T>::_subscriberCallback,this,index,_1));
         _subscribers.push_back(sub);
     }
 }
