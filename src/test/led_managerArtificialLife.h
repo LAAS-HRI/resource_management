@@ -3,10 +3,12 @@
 
 #include "resource_management/artificial_life/ArtificialLife.h"
 
-class led_managerArtificialLife : public ArtificialLife
+namespace led_manager {
+
+class ArtificialLife : public ::ArtificialLife
 {
 public:
-  led_managerArtificialLife(std::shared_ptr<ReactiveBuffer> buffer);
+  ArtificialLife(std::shared_ptr<ReactiveBuffer> buffer);
 
 private:
   virtual void inLoop();
@@ -15,5 +17,7 @@ private:
   bool on;
   int cpt;
 };
+
+} // namespace led_manager
 
 #endif // led_manager_ARTIFICIALLIFE_H

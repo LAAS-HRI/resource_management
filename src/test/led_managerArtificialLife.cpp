@@ -1,11 +1,10 @@
-#include "led_managerArtificialLife.h"
+#include "led_manager/ArtificialLife.h"
 #include "resource_management/message_storage/MessageWrapper.h"
 
-#include "led_manager/Color.h"
-#include "led_manager/OnOff.h"
+namespace led_manager {
 
-led_managerArtificialLife::led_managerArtificialLife(std::shared_ptr<ReactiveBuffer> buffer) :
-        ArtificialLife(100, buffer)
+ArtificialLife::ArtificialLife(std::shared_ptr<ReactiveBuffer> buffer) :
+        ::ArtificialLife(100, buffer)
 {
   on = false;
   cpt = 0;
@@ -17,7 +16,7 @@ led_managerArtificialLife::led_managerArtificialLife(std::shared_ptr<ReactiveBuf
   _buffer->setData(wrapped_OnOff_data);
 }
 
-void led_managerArtificialLife::init()
+void ArtificialLife::init()
 {
   on = false;
   cpt = 0;
@@ -29,7 +28,7 @@ void led_managerArtificialLife::init()
   _buffer->setData(wrapped_OnOff_data);
 }
 
-void led_managerArtificialLife::inLoop()
+void ArtificialLife::inLoop()
 {
   cpt++;
   if(cpt >= 100)
@@ -38,11 +37,11 @@ void led_managerArtificialLife::inLoop()
     on = !on;
   }
 
-  led_manager::OnOff data;
-
   auto wrapped_OnOff_data = std::make_shared<MessageWrapper<bool>>(on);
 
   wrapped_OnOff_data->setPriority(useless);
 
   _buffer->setData(wrapped_OnOff_data);
 }
+
+} // namespace led_manager
