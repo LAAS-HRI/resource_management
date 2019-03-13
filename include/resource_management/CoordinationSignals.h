@@ -2,6 +2,7 @@
 #define _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_COORDINATION_SIGNALS_H_
 
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <vector>
 #include <map>
 #include <tuple>
@@ -64,6 +65,14 @@ template<class T>
 bool CoordinationSignals<T>::_serviceCallback(typename T::Request &req, typename T::Response &res)
 {
     std::shared_ptr<StateStorage> states = std::make_shared<StateStorage>(_coordinationSignalsId, req.header.timeout, req.header.begin_dead_line);
+
+    assert(req.header.priority.value <= 4);
+    assert(req.header.priority.value >= -2);
+    if((req.header.priority.value > 4) || (req.header.priority.value < -2))
+    {
+      ROS_ERROR_STREAM("Coordination signal priority out of range");
+      return false;
+    }
 
     importance_priority_t priority = avoid;
     switch (req.header.priority.value) {

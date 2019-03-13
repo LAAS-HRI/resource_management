@@ -7,6 +7,7 @@
 #include <regex>
 
 #include <ros/ros.h>
+#include <ros/console.h>
 
 #include "resource_management/message_storage/ReactiveBuffer.h"
 #include "resource_management/message_storage/ReactiveBufferStorage.h"
@@ -58,6 +59,14 @@ template<class T>
 void ReactiveInputs<T>::_subscriberCallback(size_t index, const boost::shared_ptr<T const> &msg)
 {
     auto wrap = std::make_shared<MessageWrapper<typename T::_data_type>>(msg->data);
+
+    assert(msg->priority.value <= 4);
+    assert(msg->priority.value >= -2);
+    if((msg->priority.value > 4) || (msg->priority.value < -2))
+    {
+      ROS_ERROR_STREAM("Reactive message priority out of range");
+      return;
+    }
 
     importance_priority_t priority = avoid;
     switch (msg->priority.value) {

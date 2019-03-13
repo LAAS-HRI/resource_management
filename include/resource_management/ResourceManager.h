@@ -156,8 +156,19 @@ template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback(const resource_management::PrioritiesSetter& msg)
 {
   size_t min = (msg.values.size() < msg.buffers.size()) ? msg.values.size() : msg.buffers.size();
-  focus_priority_t priority = ignore;
 
+  for(size_t i = 0; i < min; i++)
+  {
+    assert(msg.values[i] <= 4);
+    assert(msg.values[i] >= 0);
+    if((msg.values[i] > 4) || (msg.values[i] < 0))
+    {
+      ROS_ERROR_STREAM("Buffer priority out of range");
+      return;
+    }
+  }
+
+  focus_priority_t priority = ignore;
   for(size_t i = 0; i < min; i++)
   {
     switch (msg.values[i]) {
