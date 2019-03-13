@@ -76,6 +76,7 @@ private:
                                   resource_management::CoordinationSignalsCancel::Response &res);
 
     void loadEventsPlugins(const std::vector<std::string>& pluginsNames);
+    void insertEvent(const std::string& event);
 
     ros::NodeHandlePtr _nh;
 
@@ -296,6 +297,16 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::loadEventsPlugin
       ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
     }
   }
+
+  for(auto plugin : _plugins)
+    plugin->registerSpreading([this](auto event){ this->insertEvent(event); });
+}
+
+
+template<typename CoordinationSignalType, typename ...InputDataTypes>
+void ResourceManager<CoordinationSignalType,InputDataTypes...>::insertEvent(const std::string& event)
+{
+  _StateMachine.addEvent(event);
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>

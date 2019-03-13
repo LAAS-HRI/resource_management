@@ -9,7 +9,7 @@ namespace resource_management
 class EventsInterface
 {
 public:
-  void registerSpreading(std::function<void(std::string)> SpreadEvent)
+  void registerSpreading(std::function<void(const std::string&)> SpreadEvent)
   {
     _SpreadEvent = SpreadEvent;
   }
