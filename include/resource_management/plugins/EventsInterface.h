@@ -14,7 +14,7 @@ public:
     _SpreadEvent = SpreadEvent;
   }
 
-private:
+protected:
   std::function<void(std::string)> _SpreadEvent;
 };
 

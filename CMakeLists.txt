@@ -58,6 +58,11 @@ add_library(message_lib
   src/message_storage/ReactiveBufferStorage.cpp
 )
 
+add_library(resource_management_plugin
+  src/plugins/EventsPluginTest.cpp
+  )
+target_link_libraries(resource_management_plugin state_machine_lib message_lib)
+
 add_executable(state_machine src/st_main.cpp)
 add_dependencies(state_machine ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(state_machine ${catkin_LIBRARIES} state_machine_lib)
