@@ -9,6 +9,7 @@
 
   <depend>roscpp</depend>
   <depend>std_msgs</depend>
+  <depend>pluginlib</depend>
   <buildtool_depend>catkin</buildtool_depend>
   <buildtool_depend>message_generation</buildtool_depend>
   <exec_depend>message_runtime</exec_depend>

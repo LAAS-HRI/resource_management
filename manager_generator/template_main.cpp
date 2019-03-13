@@ -17,8 +17,8 @@ class ${class_name} : public resource_management::ResourceManager<${project_name
 >
 {
 public:
-    ${class_name}(const ros::NodeHandlePtr &nh):
-        ResourceManager (std::move(nh),{${reactive_input_names_cs}})
+    ${class_name}(const ros::NodeHandlePtr &nh, std::vector<std::string>& plugins):
+        ResourceManager (std::move(nh),{${reactive_input_names_cs}}, plugins)
     {
         // this in lambda is necessary for gcc <= 5.1
 !!for data_type in message_types
@@ -91,7 +91,11 @@ int main(int argc, char *argv[]){
     ros::init(argc,argv,"${project_name}");
     ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
 
-    ${class_name} mgr(nh);
+    std::vector<std::string> plugins;
+    for(int i = 1; i < argc; i++)
+      plugins.push_back(std::string(argv[i]));
+
+    ${class_name} mgr(nh, plugins);
 
     std::thread th(&${class_name}::run, &mgr);
 

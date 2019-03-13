@@ -7,6 +7,7 @@
 #include <thread>
 
 #include <ros/ros.h>
+#include <pluginlib/class_loader.h>
 
 #include "std_msgs/String.h"
 #include "resource_management/ReactiveInputs.h"
@@ -18,6 +19,8 @@
 #include "resource_management/message_storage/ReactiveBuffer.h"
 
 #include "resource_management/artificial_life/ArtificialLife.h"
+
+#include "resource_management/plugins/EventsInterface.h"
 
 namespace resource_management {
 
@@ -45,7 +48,7 @@ class ResourceManager
 {
 public:
     /// also creates 2 buffers for artificial life and coordination signals
-    ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames);
+    ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames, const std::vector<std::string>& pluginsNames);
 
     void run();
 
@@ -72,6 +75,8 @@ private:
     bool coordinationSignalCancel(resource_management::CoordinationSignalsCancel::Request  &req,
                                   resource_management::CoordinationSignalsCancel::Response &res);
 
+    void loadEventsPlugins(const std::vector<std::string>& pluginsNames);
+
     ros::NodeHandlePtr _nh;
 
     std::shared_ptr<CoordinationSignalsStorage> _coordinationSignalStorage;
@@ -83,6 +88,8 @@ private:
 
     std::vector<std::string> _reactiveBuffersNames;
     std::vector<std::string> _bufferNames;
+
+    std::vector<boost::shared_ptr<resource_management::EventsInterface>> _plugins;
 
     ros::Subscriber _prioritiesSubscriber;
     ros::Publisher _activeBufferPublisher;
@@ -97,9 +104,10 @@ private:
 
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
-ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames):
+ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames, const std::vector<std::string>& pluginsNames):
     _nh(std::move(nh)), _bufferNames({"artificial_life","coordination_signals"})
 {
+    loadEventsPlugins(pluginsNames);
     _coordinationSignalStorage = std::make_shared<CoordinationSignalsStorage>();
     this->_coordinationSignalService =
             std::make_shared<CoordinationSignals<CoordinationSignalType>>
@@ -269,6 +277,24 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
 
     ros::Rate r(_hz);
     r.sleep();
+  }
+}
+
+template<typename CoordinationSignalType, typename ...InputDataTypes>
+void ResourceManager<CoordinationSignalType,InputDataTypes...>::loadEventsPlugins(const std::vector<std::string>& pluginsNames)
+{
+  pluginlib::ClassLoader<resource_management::EventsInterface> loader("resource_management", "resource_management::EventsInterface");
+
+  for(auto name : pluginsNames)
+  {
+    try
+    {
+      _plugins.push_back(loader.createInstance(name));
+    }
+    catch(pluginlib::PluginlibException& ex)
+    {
+      ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
+    }
   }
 }
 

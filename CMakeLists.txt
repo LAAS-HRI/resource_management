@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
     message_generation
     std_msgs
+    pluginlib
     )
 
 add_message_files(
