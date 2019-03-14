@@ -55,7 +55,7 @@ CoordinationState* StateStorage::getInitialState()
 
 std::shared_ptr<MessageAbstraction> StateStorage::getStateData(const std::string& id)
 {
-  if(datas_.find(id) == datas_.end())
+  if(datas_.find(id) != datas_.end())
     return datas_[id];
   else
     return nullptr;
