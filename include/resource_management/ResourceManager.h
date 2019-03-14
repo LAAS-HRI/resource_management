@@ -252,7 +252,11 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
           if((active_buffer != "coordination_signals") && (coordination_running))
             _StateMachine.addEvent("__preamted__");
           if((active_buffer!= "artificial_life") && (artificial_life_running))
+          {
             _artificialLife->stop();
+            artificial_life_running = false;
+            al_th.join();
+          }
           if(active_buffer == "artificial_life")
           {
             if(!artificial_life_running)
