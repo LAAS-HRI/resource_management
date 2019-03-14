@@ -16,6 +16,6 @@ void EventsPluginTest::callback(const std_msgs::String::ConstPtr& msg)
     _SpreadEvent(msg->data);
 }
 
-PLUGINLIB_EXPORT_CLASS(EventsPluginTest, EventsInterface)
-
 } //  namespace resource_management
+
+PLUGINLIB_EXPORT_CLASS(resource_management::EventsPluginTest, resource_management::EventsInterface)

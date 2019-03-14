@@ -303,6 +303,9 @@ template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::loadEventsPlugins(const std::vector<std::string>& pluginsNames)
 {
   pluginlib::ClassLoader<resource_management::EventsInterface> loader("resource_management", "resource_management::EventsInterface");
+  std::vector<std::string> reasoners = loader.getDeclaredClasses();
+  for(auto r : reasoners)
+    std::cout << r << std::endl;
 
   for(auto name : pluginsNames)
   {

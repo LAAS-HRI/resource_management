@@ -14,4 +14,8 @@
   <buildtool_depend>message_generation</buildtool_depend>
   <exec_depend>message_runtime</exec_depend>
 
+  <export>
+    <resource_management plugin="${prefix}/plugins.xml" />
+  </export>
+
 </package>
