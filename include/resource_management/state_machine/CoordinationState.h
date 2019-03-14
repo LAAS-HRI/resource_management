@@ -18,6 +18,7 @@ public:
 
   void startState();
   transtition_state_t update(CoordinationState** current_state, const std::string& event = "");
+  bool endState();
 
 private:
   std::string id_;

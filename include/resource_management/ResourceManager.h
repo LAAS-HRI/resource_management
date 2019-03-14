@@ -230,7 +230,6 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
       if(!_StateMachine.runing())
         if (sm_th.joinable())
         {
-          std::cout << "---" << std::endl;
           sm_th.join();
           coordination_running = false;
           _activeCoordinationSignal = std::make_shared<StateStorage>();
