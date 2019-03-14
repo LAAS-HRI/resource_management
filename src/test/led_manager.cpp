@@ -1,16 +1,118 @@
-//TODO: includes
+#include "led_manager/CoordinationSignal.h"
+#include "led_manager/Color.h"
+#include "led_manager/OnOff.h"
+#include "led_manager/ArtificialLife.h"
 
-int main(int argc, char *argv[])
+#include <resource_management/CoordinationSignals.h>
+#include <resource_management/ReactiveInputs.h>
+#include <resource_management/ResourceManager.h>
+
+#include <thread>
+
+class LedManager : public resource_management::ResourceManager<led_manager::CoordinationSignal
+      ,led_manager::Color
+      ,led_manager::OnOff
+>
 {
-    CoordinationSignals<BoolCoordMsg>  coordSwitch("on_off_coordination");
-    CoordinationSignals<ColorCoordMsg> coordColor("color_coordination");
+public:
+    LedManager(const ros::NodeHandlePtr &nh, std::vector<std::string>& plugins):
+        ResourceManager (std::move(nh),{"emotion", "tagada", "switch"}, plugins)
+    {
+        // this in lambda is necessary for gcc <= 5.1
+        resource_management::MessageWrapper<float>::registerPublishFunction([this](auto data){ this->publishColorMsg(data); });
+        resource_management::MessageWrapper<bool>::registerPublishFunction([this](auto data){ this->publishOnOffMsg(data); });
 
-    ReactiveInputs<BoolMsg> switchOnOff("onoff");
-    ReactiveInputs<ColorMsg> emotion("emotion");
-    
-    ResourceManager mgr({coordSwitch,coordColor},{switchOnOff,emotion});
+        // Remove if your do not need artificial life
+        _artificialLife = (std::make_shared<led_manager::ArtificialLife>(_artificialLifeBuffer));
+    }
 
-    mgr.loadControllerPlugin(/*TODO: this is a parameter of the node*/"/path/to/plugin");
+private:
+    std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> stateFromMsg(const led_manager::CoordinationSignal::Request &msg) override;
+    std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
+    transitionFromMsg(const led_manager::CoordinationSignal::Request &msg) override;
+    led_manager::CoordinationSignal::Response generateResponseMsg(uint32_t id) override;
 
-    mgr.run();
+    void publishColorMsg(float msg);
+    void publishOnOffMsg(bool msg);
+};
+
+std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> LedManager::stateFromMsg(const led_manager::CoordinationSignal::Request &msg)
+{
+    std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> states;
+
+    for(auto x : msg.states_Color){
+        auto wrap = states[x.header.id] = std::make_shared<resource_management::MessageWrapper<float>>(x.data);
+        wrap->setPriority(static_cast<resource_management::importance_priority_t>(msg.header.priority.value));
+    }
+
+    for(auto x : msg.states_OnOff){
+        auto wrap = states[x.header.id] = std::make_shared<resource_management::MessageWrapper<bool>>(x.data);
+        wrap->setPriority(static_cast<resource_management::importance_priority_t>(msg.header.priority.value));
+    }
+
+    return states;
+}
+
+std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
+LedManager::transitionFromMsg(const led_manager::CoordinationSignal::Request &msg)
+{
+    std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>> transitions;
+
+    for(auto x : msg.states_Color){
+        for(auto t : x.header.transitions){
+            transitions.push_back(
+                        std::make_tuple<std::string,std::string,resource_management::EndCondition>(
+                            std::string(x.header.id),
+                            std::string(t.next_state),
+                            resource_management::EndCondition(t.end_condition)));
+        }
+    }
+
+    for(auto x : msg.states_OnOff){
+        for(auto t : x.header.transitions){
+            transitions.push_back(
+                        std::make_tuple<std::string,std::string,resource_management::EndCondition>(
+                            std::string(x.header.id),
+                            std::string(t.next_state),
+                            resource_management::EndCondition(t.end_condition)));
+        }
+    }
+    return transitions;
+}
+
+led_manager::CoordinationSignal::Response LedManager::generateResponseMsg(uint32_t id)
+{
+  led_manager::CoordinationSignal::Response res;
+  res.id = id;
+  return res;
+}
+
+void LedManager::publishColorMsg(float msg)
+{
+  std::cout << std::fixed << std::setprecision(3) << int(msg) << "\r" << std::flush;
+}
+
+void LedManager::publishOnOffMsg(bool msg)
+{
+  if(msg)
+    std::cout << std::fixed << std::setprecision(3) << ' ' << "\r" << std::flush;
+  else
+    std::cout << std::fixed << std::setprecision(3) << '@' << "\r" << std::flush;
+}
+
+int main(int argc, char *argv[]){
+    ros::init(argc,argv,"led_manager");
+    ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
+
+    std::vector<std::string> plugins;
+    for(int i = 1; i < argc; i++)
+      plugins.push_back(std::string(argv[i]));
+
+    LedManager mgr(nh, plugins);
+
+    std::thread th(&LedManager::run, &mgr);
+
+    ros::spin();
+
+    th.join();
 }
