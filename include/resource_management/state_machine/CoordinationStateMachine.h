@@ -40,6 +40,7 @@ public:
   void run();
   CoordinationInternalState_t getInternalState();
   std::string getCurrentStateName();
+  bool runing();
 
   void setInitialState(CoordinationState* state, uint32_t state_machine_id = 0);
   void setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState);

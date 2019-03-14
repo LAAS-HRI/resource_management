@@ -12,9 +12,18 @@ CoordinationStateMachine::CoordinationStateMachine(float rate)
   us_sleep_time_ = (uint32_t)(1000000.0 / rate);
 }
 
+bool CoordinationStateMachine::runing()
+{
+  bool res = false;
+  internal_state_mutex_.lock();
+  res = (internal_state_.state_ != nullptr);
+  internal_state_mutex_.unlock();
+  return res;
+}
+
 void CoordinationStateMachine::run()
 {
-  //state_machine_id.state_machine.id;
+  std::cout << "in run" << std::endl;
   if(internal_state_.state_ != nullptr)
     internal_state_.state_->startState();
 
@@ -33,7 +42,7 @@ void CoordinationStateMachine::run()
       return;
     }
 
-  while(internal_state_.state_ != nullptr)
+  while((internal_state_.state_ != nullptr) && (ros::ok()))
   {
     internal_state_mutex_.lock();
 
@@ -87,6 +96,7 @@ void CoordinationStateMachine::run()
   internal_state_.state_ = nullptr;
   internal_state_.transition_state_ = transition_none;
   internal_state_mutex_.unlock();
+  std::cout << "out run" << std::endl;
 }
 
 CoordinationInternalState_t CoordinationStateMachine::getInternalState()

@@ -212,7 +212,6 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
     _coordinationMutex.lock();
     if(coordination_running == false)
     {
-      //std::cout << "0" << std::endl;
       if(_coordinationSignalStorage->empty() == false)
       {
         _activeCoordinationSignal = _coordinationSignalStorage->pop();
@@ -228,14 +227,15 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
     }
     else
     {
-      if (sm_th.joinable())
-      {
-        sm_th.join();
-        coordination_running = false;
-        _activeCoordinationSignal = std::make_shared<StateStorage>();
-        _coordinationMutex.unlock();
-        continue;
-      }
+      if(!_StateMachine.runing())
+        if (sm_th.joinable())
+        {
+          sm_th.join();
+          coordination_running = false;
+          _activeCoordinationSignal = std::make_shared<StateStorage>();
+          _coordinationMutex.unlock();
+          continue;
+        }
     }
     if(_activeCoordinationSignal)
       _coordinationSignalBuffer->setData(_activeCoordinationSignal->getStateData(_StateMachine.getCurrentStateName()) );
@@ -344,7 +344,10 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::publishState(Coo
 
   resource_management::CoordinationSignalsStatus status;
   status.state_event = state_event;
-  status.state_name = state.state_->getName();
+  if(state.state_ != nullptr)
+    status.state_name = state.state_->getName();
+  else
+    status.state_name = "";
   status.id = state.state_machine_id;
 
   _coordinationSignalStatusPublisher.publish(status);
