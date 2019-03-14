@@ -209,7 +209,6 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
   size_t param_update = 0;
   while (ros::ok())
   {
-
     _coordinationMutex.lock();
     if(coordination_running == false)
     {
@@ -278,6 +277,18 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
 
     ros::Rate r(_hz);
     r.sleep();
+  }
+
+  if(artificial_life_running)
+  {
+    _artificialLife->stop();
+    al_th.join();
+  }
+
+  if(coordination_running)
+  {
+    _StateMachine.addEvent("__preamted__");
+    sm_th.join();
   }
 }
 

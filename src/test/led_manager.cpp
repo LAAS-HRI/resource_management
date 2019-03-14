@@ -89,15 +89,28 @@ led_manager::CoordinationSignal::Response LedManager::generateResponseMsg(uint32
 
 void LedManager::publishColorMsg(float msg)
 {
-  std::cout << std::fixed << std::setprecision(3) << int(msg) << "\r" << std::flush;
+  if(msg < 10)
+    std::cout << ' ' << "\r" << std::flush;
+  else if(msg > 244)
+    std::cout << '@' << "\r" << std::flush;
+  else if(msg < 50)
+    std::cout << '.' << "\r" << std::flush;
+  else if(msg < 100)
+    std::cout << '_' << "\r" << std::flush;
+  else if(msg < 150)
+    std::cout << 'i' << "\r" << std::flush;
+  else if(msg < 200)
+    std::cout << 'I' << "\r" << std::flush;
+  else if(msg < 245)
+    std::cout << '0' << "\r" << std::flush;
 }
 
 void LedManager::publishOnOffMsg(bool msg)
 {
   if(msg)
-    std::cout << std::fixed << std::setprecision(3) << ' ' << "\r" << std::flush;
+    std::cout << ' ' << "\r" << std::flush;
   else
-    std::cout << std::fixed << std::setprecision(3) << '@' << "\r" << std::flush;
+    std::cout << '@' << "\r" << std::flush;
 }
 
 int main(int argc, char *argv[]){
@@ -115,4 +128,6 @@ int main(int argc, char *argv[]){
     ros::spin();
 
     th.join();
+
+    return 0;
 }
