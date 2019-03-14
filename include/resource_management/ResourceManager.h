@@ -212,6 +212,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
     _coordinationMutex.lock();
     if(coordination_running == false)
     {
+      //std::cout << "0" << std::endl;
       if(_coordinationSignalStorage->empty() == false)
       {
         _activeCoordinationSignal = _coordinationSignalStorage->pop();
@@ -221,6 +222,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
 
         sm_th = std::thread(&CoordinationStateMachine::run, &_StateMachine);
         coordination_running = true;
+        _coordinationMutex.unlock();
         continue;
       }
     }
@@ -231,6 +233,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
         sm_th.join();
         coordination_running = false;
         _activeCoordinationSignal = std::make_shared<StateStorage>();
+        _coordinationMutex.unlock();
         continue;
       }
     }
