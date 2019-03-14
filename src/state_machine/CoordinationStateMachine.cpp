@@ -23,7 +23,6 @@ bool CoordinationStateMachine::runing()
 
 void CoordinationStateMachine::run()
 {
-  std::cout << "in run" << std::endl;
   if(internal_state_.state_ != nullptr)
     internal_state_.state_->startState();
 
@@ -96,7 +95,6 @@ void CoordinationStateMachine::run()
   internal_state_.state_ = nullptr;
   internal_state_.transition_state_ = transition_none;
   internal_state_mutex_.unlock();
-  std::cout << "out run" << std::endl;
 }
 
 CoordinationInternalState_t CoordinationStateMachine::getInternalState()
