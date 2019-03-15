@@ -1,0 +1,5 @@
+cd ..
+cp -r ./led_manager_test/ ../led_manager_test/
+mv ../led_manager_test/_package.xml ../led_manager_test/package.xml
+mv ../led_manager_test/_CMakeLists.txt ../led_manager_test/CMakeLists.txt
+rm ../led_manager_test/deploy

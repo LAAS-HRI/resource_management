@@ -1,0 +1,17 @@
+<package format="2">
+<name>led_manager_test</name>
+<version>0.0.0</version>
+  <description>
+  led_manager_test package to test resource_manager generator.
+  </description>
+
+  <maintainer email="todo@todo.org">TBD</maintainer>
+  <license>TBD</license>
+
+  <depend>roscpp</depend>
+  <depend>resource_management</depend>
+  <depend>pluginlib</depend>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+</package>

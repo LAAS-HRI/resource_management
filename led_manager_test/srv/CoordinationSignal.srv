@@ -1,0 +1,5 @@
+resource_management/CoordinationSignalHeader header
+CoordinationStateColor[] states_Color
+CoordinationStateOnOff[] states_OnOff
+---
+uint32 id
