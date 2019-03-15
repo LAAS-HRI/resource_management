@@ -1,3 +1,3 @@
-time expiration
+duration timeout
 duration duration
-string regex_end_condition
+string[] regex_end_condition
