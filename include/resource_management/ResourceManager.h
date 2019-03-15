@@ -49,6 +49,7 @@ class ResourceManager
 public:
     /// also creates 2 buffers for artificial life and coordination signals
     ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames, const std::vector<std::string>& pluginsNames);
+    ~ResourceManager();
 
     void run();
 
@@ -101,12 +102,14 @@ private:
     CoordinationStateMachine _StateMachine;
     std::shared_ptr<StateStorage> _activeCoordinationSignal;
     std::mutex _coordinationMutex;
-};
 
+    pluginlib::ClassLoader<resource_management::EventsInterface> _loader;
+
+};
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames, const std::vector<std::string>& pluginsNames):
-    _nh(std::move(nh)), _bufferNames({"artificial_life","coordination_signals"})
+    _nh(std::move(nh)), _bufferNames({"artificial_life","coordination_signals"}), _loader("resource_management", "resource_management::EventsInterface")
 {
     loadEventsPlugins(pluginsNames);
     _coordinationSignalStorage = std::make_shared<CoordinationSignalsStorage>();
@@ -132,6 +135,12 @@ ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::
       _nh->setParam("freq", 100);
       _hz = 100;
     }
+}
+
+template<typename CoordinationSignalType, typename ...InputDataTypes>
+ResourceManager<CoordinationSignalType,InputDataTypes...>::~ResourceManager()
+{
+  _plugins.clear();
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
@@ -302,16 +311,13 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::loadEventsPlugins(const std::vector<std::string>& pluginsNames)
 {
-  pluginlib::ClassLoader<resource_management::EventsInterface> loader("resource_management", "resource_management::EventsInterface");
-  std::vector<std::string> reasoners = loader.getDeclaredClasses();
-  for(auto r : reasoners)
-    std::cout << r << std::endl;
+  std::vector<std::string> reasoners = _loader.getDeclaredClasses();
 
   for(auto name : pluginsNames)
   {
     try
     {
-      _plugins.push_back(loader.createInstance(name));
+      _plugins.push_back(_loader.createInstance(name));
     }
     catch(pluginlib::PluginlibException& ex)
     {
