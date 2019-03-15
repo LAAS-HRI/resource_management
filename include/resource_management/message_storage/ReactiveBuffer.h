@@ -17,6 +17,7 @@ public:
   std::string getName() { return name_; }
 
   void setData(std::shared_ptr<MessageAbstraction> data);
+  std::shared_ptr<MessageAbstraction> getData();
   std::shared_ptr<MessageAbstraction> operator()();
 
 private:

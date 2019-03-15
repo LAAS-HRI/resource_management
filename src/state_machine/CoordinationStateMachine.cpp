@@ -115,6 +115,20 @@ std::string CoordinationStateMachine::getCurrentStateName()
   return name;
 }
 
+bool CoordinationStateMachine::isWildcardState()
+{
+  bool res = false;
+  internal_state_mutex_.lock();
+  if(internal_state_.state_ != nullptr)
+  {
+    std::string name = internal_state_.state_->getName();
+    if((name.size()) && (name[0] == '_'))
+      res = true;
+  }
+  internal_state_mutex_.unlock();
+  return res;
+}
+
 void CoordinationStateMachine::setInitialState(CoordinationState* state, uint32_t state_machine_id)
 {
   internal_state_mutex_.lock();

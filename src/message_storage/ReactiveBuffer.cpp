@@ -14,6 +14,11 @@ void ReactiveBuffer::setData(std::shared_ptr<MessageAbstraction> data)
   data_ = std::move(data);
 }
 
+std::shared_ptr<MessageAbstraction> ReactiveBuffer::getData()
+{
+  return data_;
+}
+
 std::shared_ptr<MessageAbstraction> ReactiveBuffer::operator()()
 {
   return data_;

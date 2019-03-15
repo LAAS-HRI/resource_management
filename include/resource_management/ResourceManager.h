@@ -79,6 +79,8 @@ private:
     void loadEventsPlugins(const std::vector<std::string>& pluginsNames);
     void insertEvent(const std::string& event);
 
+    void setCoordinationSignalData();
+
     ros::NodeHandlePtr _nh;
 
     std::shared_ptr<CoordinationSignalsStorage> _coordinationSignalStorage;
@@ -234,6 +236,19 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
     }
     else
     {
+      if((_StateMachine.isWildcardState()) && (!artificial_life_running))
+      {
+        artificial_life_running = true;
+        _artificialLife->start();
+        al_th = std::thread(&ArtificialLife::run, _artificialLife);
+      }
+      else if((!_StateMachine.isWildcardState()) && artificial_life_running)
+      {
+        _artificialLife->stop();
+        artificial_life_running = false;
+        al_th.join();
+      }
+
       if(!_StateMachine.runing())
         if (sm_th.joinable())
         {
@@ -244,10 +259,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
           continue;
         }
     }
-    if(_activeCoordinationSignal)
-      _coordinationSignalBuffer->setData(_activeCoordinationSignal->getStateData(_StateMachine.getCurrentStateName()) );
-    else
-      _coordinationSignalBuffer->setData(nullptr);
+    setCoordinationSignalData();
     _coordinationMutex.unlock();
 
     std::shared_ptr<ReactiveBuffer> buff = _reactiveBufferStorage->getMorePriority();
@@ -260,7 +272,10 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
           active_buffer = buff->getName();
 
           if((active_buffer != "coordination_signals") && (coordination_running))
+          {
+            std::cout << "P2 " << active_buffer << std::endl;
             _StateMachine.addEvent("__preamted__");
+          }
           if((active_buffer!= "artificial_life") && (artificial_life_running))
           {
             _artificialLife->stop();
@@ -331,6 +346,24 @@ template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::insertEvent(const std::string& event)
 {
   _StateMachine.addEvent(event);
+}
+
+template<typename CoordinationSignalType, typename ...InputDataTypes>
+void ResourceManager<CoordinationSignalType,InputDataTypes...>::setCoordinationSignalData()
+{
+  if(_activeCoordinationSignal)
+  {
+    if(_StateMachine.isWildcardState())
+    {
+      std::shared_ptr<MessageAbstraction> tmp = _artificialLifeBuffer->getData()->clone();
+      tmp->setPriority(_activeCoordinationSignal->getStateData(_StateMachine.getCurrentStateName())->getPriority() );
+      _coordinationSignalBuffer->setData(tmp);
+    }
+    else
+      _coordinationSignalBuffer->setData(_activeCoordinationSignal->getStateData(_StateMachine.getCurrentStateName()) );
+  }
+  else
+    _coordinationSignalBuffer->setData(nullptr);
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>

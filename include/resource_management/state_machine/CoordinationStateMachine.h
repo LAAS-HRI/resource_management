@@ -40,6 +40,7 @@ public:
   void run();
   CoordinationInternalState_t getInternalState();
   std::string getCurrentStateName();
+  bool isWildcardState();
   bool runing();
 
   void setInitialState(CoordinationState* state, uint32_t state_machine_id = 0);

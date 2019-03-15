@@ -20,6 +20,7 @@ public:
 
   static void registerPublishFunction(std::function<void(T)> publish);
   void publish();
+  std::shared_ptr<MessageAbstraction> clone();
 
 private:
   T data_;
@@ -75,6 +76,13 @@ void MessageWrapper<T>::publish()
 {
   if(publish_)
     publish_(data_);
+}
+
+template<typename T>
+std::shared_ptr<MessageAbstraction> MessageWrapper<T>::clone()
+{
+  std::shared_ptr<MessageWrapper<T>> tmp = std::make_shared<MessageWrapper<T>>(data_);
+  return tmp;
 }
 
 } // namespace resource_management

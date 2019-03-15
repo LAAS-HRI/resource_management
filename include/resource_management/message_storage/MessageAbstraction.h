@@ -1,6 +1,8 @@
 #ifndef MESSAGEABSTRACTION_H
 #define MESSAGEABSTRACTION_H
 
+#include <memory>
+
 #include "resource_management/message_storage/PriorityHolder.h"
 
 namespace resource_management {
@@ -11,6 +13,7 @@ public:
   virtual ~MessageAbstraction() {}
 
   virtual void publish() = 0;
+  virtual std::shared_ptr<MessageAbstraction> clone() = 0;
 };
 
 } // namespace resource_management
