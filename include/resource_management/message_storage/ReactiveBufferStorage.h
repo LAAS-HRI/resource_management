@@ -12,10 +12,10 @@ namespace resource_management {
 class ReactiveBufferStorage
 {
 public:
-  ReactiveBufferStorage(std::vector<std::string> names);
+  ReactiveBufferStorage(const std::vector<std::string>& names);
   ~ReactiveBufferStorage() = default;
 
-  void setPriority(std::string name, focus_priority_t priority);
+  void setPriority(const std::string& name, focus_priority_t priority);
   std::shared_ptr<ReactiveBuffer> operator[](const std::string& name) const;
   std::shared_ptr<ReactiveBuffer> getMorePriority();
   std::shared_ptr<MessageAbstraction> getMorePriorityData();

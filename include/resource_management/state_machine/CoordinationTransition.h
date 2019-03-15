@@ -24,7 +24,7 @@ enum transtition_state_t
 class CoordinationTransition
 {
 public:
-  CoordinationTransition(ros::Duration duration, ros::Duration time_out, std::vector<std::string> regexs);
+  CoordinationTransition(ros::Duration duration, ros::Duration time_out, const std::vector<std::string>& regexs);
 
   void start();
   void reset();

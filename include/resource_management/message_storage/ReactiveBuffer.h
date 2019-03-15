@@ -12,7 +12,7 @@ namespace resource_management {
 class ReactiveBuffer : public PriorityHolder<focus_priority_t>
 {
 public:
-  ReactiveBuffer(std::string name);
+  ReactiveBuffer(const std::string& name);
 
   std::string getName() { return name_; }
 

@@ -2,7 +2,7 @@
 
 namespace resource_management {
 
-ReactiveBuffer::ReactiveBuffer(std::string name)
+ReactiveBuffer::ReactiveBuffer(const std::string& name)
 {
   name_ = name;
   data_ = nullptr;

@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (resource_management)
 
-add_compile_options(-std=c++14 -Wall -pthread)
+add_compile_options(-std=c++14 -Wall -Wextra -pthread)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -71,9 +71,3 @@ target_link_libraries(state_machine ${CMAKE_THREAD_LIBS_INIT})
 add_executable(signals src/sig_main.cpp)
 target_link_libraries(signals message_lib)
 target_link_libraries(signals ${CMAKE_THREAD_LIBS_INIT})
-
-#add_executable(ros_demo src/ros_main.cpp)
-
-#add_dependencies(ros_demo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-#target_link_libraries(ros_demo ${catkin_LIBRARIES} message_lib state_machine_lib)

@@ -28,7 +28,7 @@ public:
   ros::Time getDeadLine() { return  begin_dead_line_; }
   uint32_t getId() { return id_; }
 
-  CoordinationState* operator[](std::string id);
+  CoordinationState* operator[](const std::string& id);
 private:
   uint32_t id_;
   std::map<std::string, CoordinationState*> states_;

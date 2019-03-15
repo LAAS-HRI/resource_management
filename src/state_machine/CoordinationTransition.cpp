@@ -2,7 +2,7 @@
 
 namespace resource_management {
 
-CoordinationTransition::CoordinationTransition(ros::Duration duration, ros::Duration time_out, std::vector<std::string> regexs)
+CoordinationTransition::CoordinationTransition(ros::Duration duration, ros::Duration time_out, const std::vector<std::string>& regexs)
 {
   duration_ = duration;
   time_out_ = time_out;

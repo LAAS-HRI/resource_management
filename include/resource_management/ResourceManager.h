@@ -91,6 +91,7 @@ private:
     std::vector<std::string> _reactiveBuffersNames;
     std::vector<std::string> _bufferNames;
 
+    pluginlib::ClassLoader<resource_management::EventsInterface> _loader;
     std::vector<boost::shared_ptr<resource_management::EventsInterface>> _plugins;
 
     ros::Subscriber _prioritiesSubscriber;
@@ -102,9 +103,6 @@ private:
     CoordinationStateMachine _StateMachine;
     std::shared_ptr<StateStorage> _activeCoordinationSignal;
     std::mutex _coordinationMutex;
-
-    pluginlib::ClassLoader<resource_management::EventsInterface> _loader;
-
 };
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
@@ -328,7 +326,6 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::loadEventsPlugin
   for(auto plugin : _plugins)
     plugin->registerSpreading([this](auto event){ this->insertEvent(event); });
 }
-
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::insertEvent(const std::string& event)

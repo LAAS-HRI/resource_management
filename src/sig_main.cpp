@@ -22,7 +22,7 @@ void publishTestMsg(test_t msg)
   std::cout << "[TestMsg] "  << msg.msg << std::endl;
 }
 
-int main(int argc, char** argv)
+int main()
 {
   /******** MessageWrapper ******/
   resource_management::MessageWrapper<std::string>::registerPublishFunction(&publishStrMsg);

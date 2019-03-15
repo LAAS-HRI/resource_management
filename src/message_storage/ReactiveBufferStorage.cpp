@@ -2,7 +2,7 @@
 
 namespace resource_management {
 
-ReactiveBufferStorage::ReactiveBufferStorage(std::vector<std::string> names)
+ReactiveBufferStorage::ReactiveBufferStorage(const std::vector<std::string>& names)
 {
   for(const auto& name : names){
     buffers_[name] = std::make_shared<ReactiveBuffer>(name);
@@ -21,7 +21,7 @@ ReactiveBufferStorage::ReactiveBufferStorage(std::vector<std::string> names)
   );
 }
 
-void ReactiveBufferStorage::setPriority(std::string name, focus_priority_t priority)
+void ReactiveBufferStorage::setPriority(const std::string& name, focus_priority_t priority)
 {
   if(buffers_.find(name) != buffers_.end())
     buffers_[name]->setPriority(priority);

@@ -37,10 +37,11 @@ template<class T>
 ReactiveInputs<T>::ReactiveInputs(ros::NodeHandlePtr nh, const std::vector<std::string> &prio_buffer_names, const ReactiveBufferStorage &bufferStorage):
     _nh(std::move(nh))
 {
-  std::regex regex_name("^N\\d+(.*)\\d+(.*)_ISaIvEEE$");
-  std::smatch match;
-  //TODO
-    for(size_t index = 0 ; index < prio_buffer_names.size(); ++index){
+    std::regex regex_name("^N\\d+(.*)\\d+(.*)_ISaIvEEE$");
+    std::smatch match;
+
+    for(size_t index = 0; index < prio_buffer_names.size(); ++index)
+    {
         _buffers.push_back(bufferStorage[prio_buffer_names[index]]);
 
         std::string sub_name = prio_buffer_names[index] + "_";

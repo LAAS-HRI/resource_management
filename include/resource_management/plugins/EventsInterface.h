@@ -15,7 +15,7 @@ public:
   }
 
 protected:
-  std::function<void(std::string)> _SpreadEvent;
+  std::function<void(const std::string&)> _SpreadEvent;
 };
 
 } //  namespace resource_management

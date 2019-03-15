@@ -1,7 +1,5 @@
 #include "resource_management/state_machine/CoordinationState.h"
 
-#include <iostream>
-
 namespace resource_management {
 
 CoordinationState::CoordinationState(std::string id)

@@ -61,7 +61,7 @@ std::shared_ptr<MessageAbstraction> StateStorage::getStateData(const std::string
     return nullptr;
 }
 
-CoordinationState* StateStorage::operator[](std::string id)
+CoordinationState* StateStorage::operator[](const std::string& id)
 {
   if(states_.find(id) != states_.end())
     return states_[id];
