@@ -160,7 +160,6 @@ template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::createReactiveBufferStorage()
 {
     _reactiveInputs.clear();
-    _reactiveBuffersNames.clear();
     _reactiveBufferStorage=std::make_shared<ReactiveBufferStorage>(getBufferNames());
 
     _reactiveBufferStorage->setPriority("artificial_life", fullfocus);
