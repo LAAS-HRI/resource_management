@@ -109,7 +109,7 @@ private:
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames, const std::vector<std::string>& pluginsNames):
-    _nh(std::move(nh)), _bufferNames({"artificial_life","coordination_signals"}), _loader("resource_management", "resource_management::EventsInterface")
+    _nh(std::move(nh)), _loader("resource_management", "resource_management::EventsInterface")
 {
     loadEventsPlugins(pluginsNames);
     _coordinationSignalStorage = std::make_shared<CoordinationSignalsStorage>();
@@ -152,8 +152,10 @@ const std::vector<std::string> &ResourceManager<CoordinationSignalType,InputData
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 void ResourceManager<CoordinationSignalType,InputDataTypes...>::addBufferNames(const std::vector<std::string> &bufferNames)
 {
-    _reactiveBuffersNames.insert(_reactiveBuffersNames.end(),bufferNames.begin(),bufferNames.end());
+    _reactiveBuffersNames = bufferNames;
+    _bufferNames.emplace_back("coordination_signals");
     _bufferNames.insert(_bufferNames.end(),bufferNames.begin(),bufferNames.end());
+    _bufferNames.emplace_back("artificial_life");
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>

@@ -4,7 +4,8 @@ namespace resource_management {
 
 ReactiveBufferStorage::ReactiveBufferStorage(const std::vector<std::string>& names)
 {
-  for(const auto& name : names){
+  buffers_names_ = names;
+  for(const auto& name : buffers_names_){
     buffers_[name] = std::make_shared<ReactiveBuffer>(name);
   }
 
@@ -40,15 +41,15 @@ std::shared_ptr<ReactiveBuffer> ReactiveBufferStorage::getMorePriority()
   std::shared_ptr<ReactiveBuffer> found;
   int16_t max_priority = -100;
 
-  for(const auto& it : buffers_)
+  for(const auto& it : buffers_names_)
   {
-    if((*it.second)())
+    if((*buffers_[it])())
     {
-      int16_t tmp = (int)priorities_[(int)(*it.second)()->getPriority() + 2][(int)it.second->getPriority()];
+      int16_t tmp = (int)priorities_[(int)(*buffers_[it])()->getPriority() + 2][(int)buffers_[it]->getPriority()];
       if(tmp > max_priority)
       {
         max_priority = tmp;
-        found = it.second;
+        found = buffers_[it];
       }
     }
   }
