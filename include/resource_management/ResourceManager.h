@@ -59,6 +59,8 @@ protected:
         transitionFromMsg(const typename CoordinationSignalType::Request &msg) = 0;
     virtual typename CoordinationSignalType::Response generateResponseMsg(uint32_t id) = 0;
 
+    void done();
+
     std::shared_ptr<ArtificialLife> _artificialLife;
     std::shared_ptr<ReactiveBuffer> _artificialLifeBuffer;
 
@@ -273,10 +275,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
           active_buffer = buff->getName();
 
           if((active_buffer != "coordination_signals") && (coordination_running))
-          {
-            std::cout << "P2 " << active_buffer << std::endl;
             _StateMachine.addEvent("__preamted__");
-          }
           if((active_buffer!= "artificial_life") && (artificial_life_running))
           {
             _artificialLife->stop();
@@ -341,6 +340,12 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::loadEventsPlugin
 
   for(auto plugin : _plugins)
     plugin->registerSpreading([this](auto event){ this->insertEvent(event); });
+}
+
+template<typename CoordinationSignalType, typename ...InputDataTypes>
+void ResourceManager<CoordinationSignalType,InputDataTypes...>::done()
+{
+  insertEvent("__done__");
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
