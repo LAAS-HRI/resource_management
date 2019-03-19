@@ -225,7 +225,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
       if(_coordinationSignalStorage->empty() == false)
       {
         _activeCoordinationSignal = _coordinationSignalStorage->pop();
-        _StateMachine.setInitialState(_activeCoordinationSignal->getInitialState());
+        _StateMachine.setInitialState(_activeCoordinationSignal->getInitialState(), _activeCoordinationSignal->getId());
         _StateMachine.setTimeout(_activeCoordinationSignal->getTimeout());
         _StateMachine.setDeadLine(_activeCoordinationSignal->getDeadLine());
 
