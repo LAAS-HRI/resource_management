@@ -35,13 +35,11 @@ void ArtificialLife::inLoop()
   {
     cpt = 0;
     on = !on;
+
+    auto wrapped_OnOff_data = std::make_shared<resource_management::MessageWrapper<bool>>(on);
+    wrapped_OnOff_data->setPriority(resource_management::useless);
+    _buffer->setData(wrapped_OnOff_data);
   }
-
-  auto wrapped_OnOff_data = std::make_shared<resource_management::MessageWrapper<bool>>(on);
-
-  wrapped_OnOff_data->setPriority(resource_management::useless);
-
-  _buffer->setData(wrapped_OnOff_data);
 }
 
 } // namespace led_manager_test

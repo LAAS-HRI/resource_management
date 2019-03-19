@@ -269,7 +269,12 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
     if(buff)
       if(buff->operator()())
       {
-        buff->operator()()->publish();
+        if((buff->getName() != active_buffer) || (buff->hasItBeenPublished() == false))
+          buff->operator()()->publish(true);
+        else
+          buff->operator()()->publish(false);
+        buff->published();
+
         if(buff->getName() != active_buffer)
         {
           active_buffer = buff->getName();
