@@ -162,7 +162,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::createReactiveBu
     _reactiveInputs.clear();
     _reactiveBufferStorage=std::make_shared<ReactiveBufferStorage>(getBufferNames());
 
-    _reactiveBufferStorage->setPriority("artificial_life", fullfocus);
+    _reactiveBufferStorage->setPriority("artificial_life", secondary);
     _artificialLifeBuffer=_reactiveBufferStorage->operator[]("artificial_life");
 
     _reactiveBufferStorage->setPriority("coordination_signals", fullfocus);
