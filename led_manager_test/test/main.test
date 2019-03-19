@@ -1,0 +1,4 @@
+<launch>
+    <node name="led_manager_test" pkg="led_manager_test" type="led_manager_test"/>
+    <test test-name="tests_led_manager_test" pkg="led_manager_test" type="tests_led_manager_test"/>
+</launch>
