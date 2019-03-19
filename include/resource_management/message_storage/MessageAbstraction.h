@@ -12,7 +12,7 @@ class MessageAbstraction : public PriorityHolder<importance_priority_t>
 public:
   virtual ~MessageAbstraction() {}
 
-  virtual void publish() = 0;
+  virtual void publish(bool is_new = true) = 0;
   virtual std::shared_ptr<MessageAbstraction> clone() = 0;
 };
 

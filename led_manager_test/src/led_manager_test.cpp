@@ -19,8 +19,8 @@ public:
         ResourceManager (std::move(nh),{"emotion", "tagada", "switch"}, plugins)
     {
         // this in lambda is necessary for gcc <= 5.1
-        resource_management::MessageWrapper<float>::registerPublishFunction([this](auto data){ this->publishColorMsg(data); });
-        resource_management::MessageWrapper<bool>::registerPublishFunction([this](auto data){ this->publishOnOffMsg(data); });
+        resource_management::MessageWrapper<float>::registerPublishFunction([this](auto data, auto is_new){ this->publishColorMsg(data, is_new); });
+        resource_management::MessageWrapper<bool>::registerPublishFunction([this](auto data, auto is_new){ this->publishOnOffMsg(data, is_new); });
 
         // Remove if your do not need artificial life
         _artificialLife = (std::make_shared<led_manager_test::ArtificialLife>(_artificialLifeBuffer));
@@ -32,8 +32,8 @@ private:
     transitionFromMsg(const led_manager_test::CoordinationSignal::Request &msg) override;
     led_manager_test::CoordinationSignal::Response generateResponseMsg(uint32_t id) override;
 
-    void publishColorMsg(float msg);
-    void publishOnOffMsg(bool msg);
+    void publishColorMsg(float msg, bool is_new);
+    void publishOnOffMsg(bool msg, bool is_new);
 };
 
 std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> LedManager::stateFromMsg(const led_manager_test::CoordinationSignal::Request &msg)
@@ -87,8 +87,11 @@ led_manager_test::CoordinationSignal::Response LedManager::generateResponseMsg(u
   return res;
 }
 
-void LedManager::publishColorMsg(float msg)
+void LedManager::publishColorMsg(float msg, bool is_new)
 {
+  if(!is_new)
+    return;
+
   if(msg < 10)
     std::cout << ' ' << "\r" << std::flush;
   else if(msg > 244)
@@ -105,8 +108,11 @@ void LedManager::publishColorMsg(float msg)
     std::cout << '0' << "\r" << std::flush;
 }
 
-void LedManager::publishOnOffMsg(bool msg)
+void LedManager::publishOnOffMsg(bool msg, bool is_new)
 {
+  if(!is_new)
+    return;
+
   if(msg)
     std::cout << ' ' << "\r" << std::flush;
   else

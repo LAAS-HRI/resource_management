@@ -12,14 +12,14 @@ struct test_t
   std::string msg;
 };
 
-void publishStrMsg(std::string msg)
+void publishStrMsg(std::string msg, bool is_new)
 {
-  std::cout << "[StrMsg] " << msg << std::endl;
+  std::cout << "[StrMsg] " << msg << " " << is_new << std::endl;
 }
 
-void publishTestMsg(test_t msg)
+void publishTestMsg(test_t msg, bool is_new)
 {
-  std::cout << "[TestMsg] "  << msg.msg << std::endl;
+  std::cout << "[TestMsg] "  << msg.msg << " " << is_new << std::endl;
 }
 
 int main()

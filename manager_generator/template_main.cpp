@@ -22,7 +22,7 @@ public:
     {
         // this in lambda is necessary for gcc <= 5.1
 !!for data_type in message_types
-        resource_management::MessageWrapper<{data_type[2]}>::registerPublishFunction([this](auto data){{ this->publish{data_type[0]}Msg(data); }});
+        resource_management::MessageWrapper<{data_type[2]}>::registerPublishFunction([this](auto data, auto is_new){{ this->publish{data_type[0]}Msg(data, is_new); }});
 !!end
 
         // Remove if your do not need artificial life
@@ -36,7 +36,7 @@ private:
     ${project_name}::CoordinationSignal::Response generateResponseMsg(uint32_t id) override;
 
 !!for data_type in message_types
-    void publish{data_type[0]}Msg({data_type[2]} msg);
+    void publish{data_type[0]}Msg({data_type[2]} msg, bool is_new);
 !!end
 };
 
@@ -81,7 +81,7 @@ ${project_name}::CoordinationSignal::Response ${class_name}::generateResponseMsg
 }
 
 !!for data_type in message_types
-void ${{class_name}}::publish{data_type[0]}Msg({data_type[2]} msg)
+void ${{class_name}}::publish{data_type[0]}Msg({data_type[2]} msg, bool is_new)
 {{
   // Put you own publishing function here
 }}

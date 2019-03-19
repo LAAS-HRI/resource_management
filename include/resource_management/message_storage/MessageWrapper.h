@@ -18,17 +18,17 @@ public:
   MessageWrapper& operator=(const MessageWrapper& other);
   T& operator()();
 
-  static void registerPublishFunction(std::function<void(T)> publish);
-  void publish();
+  static void registerPublishFunction(std::function<void(T, bool)> publish);
+  void publish(bool is_new = true);
   std::shared_ptr<MessageAbstraction> clone();
 
 private:
   T data_;
-  static std::function<void(T)> publish_;
+  static std::function<void(T, bool)> publish_;
 };
 
 template<typename T>
-std::function<void(T)> MessageWrapper<T>::publish_ = {};
+std::function<void(T, bool)> MessageWrapper<T>::publish_ = {};
 
 template<typename T>
 MessageWrapper<T>::MessageWrapper()
@@ -66,16 +66,16 @@ T& MessageWrapper<T>::operator()()
 }
 
 template<typename T>
-void MessageWrapper<T>::registerPublishFunction(std::function<void(T)> publish)
+void MessageWrapper<T>::registerPublishFunction(std::function<void(T,bool)> publish)
 {
   publish_ = publish;
 }
 
 template<typename T>
-void MessageWrapper<T>::publish()
+void MessageWrapper<T>::publish(bool is_new)
 {
   if(publish_)
-    publish_(data_);
+    publish_(data_, is_new);
 }
 
 template<typename T>
