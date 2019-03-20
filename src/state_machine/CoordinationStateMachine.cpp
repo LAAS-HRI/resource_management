@@ -10,6 +10,7 @@ CoordinationStateMachine::CoordinationStateMachine(float rate)
   time_out_ = ros::Duration(-1);
   begin_dead_line_ = ros::Time(0);
   us_sleep_time_ = (uint32_t)(1000000.0 / rate);
+  new_state_ = false;
 }
 
 bool CoordinationStateMachine::runing()
@@ -33,6 +34,7 @@ void CoordinationStateMachine::run()
       internal_state_mutex_.lock();
       internal_state_.state_ = nullptr;
       internal_state_.transition_state_ = transition_dead_line;
+      new_state_ = true;
 
       if(publishState_ != nullptr)
         publishState_(internal_state_);
@@ -51,6 +53,7 @@ void CoordinationStateMachine::run()
     {
       internal_state_.state_ = nullptr;
       internal_state_.transition_state_ = transition_global_timeout;
+      new_state_ = true;
 
       if(publishState_ != nullptr)
         publishState_(internal_state_);
@@ -73,6 +76,7 @@ void CoordinationStateMachine::run()
     {
       internal_state_.state_ = nullptr;
       internal_state_.transition_state_ = transition_preampt;
+      new_state_ = true;
 
       if(publishState_ != nullptr)
         publishState_(internal_state_);
@@ -94,6 +98,7 @@ void CoordinationStateMachine::run()
   internal_state_mutex_.lock();
   internal_state_.state_ = nullptr;
   internal_state_.transition_state_ = transition_none;
+  new_state_ = true;
   internal_state_mutex_.unlock();
 }
 
@@ -113,6 +118,13 @@ std::string CoordinationStateMachine::getCurrentStateName()
     name = internal_state_.state_->getName();
   internal_state_mutex_.unlock();
   return name;
+}
+
+bool CoordinationStateMachine::isNewState()
+{
+  bool res = new_state_;
+  new_state_= false;
+  return res;
 }
 
 bool CoordinationStateMachine::isWildcardState()
@@ -135,6 +147,7 @@ void CoordinationStateMachine::setInitialState(CoordinationState* state, uint32_
   internal_state_.state_machine_id = state_machine_id;
   internal_state_.state_ = state;
   internal_state_.transition_state_ = transition_none;
+  new_state_ = true;
   internal_state_mutex_.unlock();
 }
 
@@ -152,6 +165,7 @@ void CoordinationStateMachine::runOnceNoEvent()
   {
     internal_state_.state_ = tmp_state;
     internal_state_.transition_state_ = tmp_transition;
+    new_state_ = true;
 
     if(publishState_)
       publishState_(internal_state_);
@@ -185,6 +199,7 @@ void CoordinationStateMachine::runOnceWithEvents(std::queue<std::string>& events
     {
       internal_state_.state_ = tmp_state;
       internal_state_.transition_state_ = tmp_transition;
+      new_state_ = true;
 
       if(publishState_)
         publishState_(internal_state_);

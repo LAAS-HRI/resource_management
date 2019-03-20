@@ -81,7 +81,7 @@ private:
     void loadEventsPlugins(const std::vector<std::string>& pluginsNames);
     void insertEvent(const std::string& event);
 
-    void setCoordinationSignalData();
+    void setCoordinationSignalData(bool newState);
 
     ros::NodeHandlePtr _nh;
 
@@ -262,7 +262,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
           continue;
         }
     }
-    setCoordinationSignalData();
+    setCoordinationSignalData(_StateMachine.isNewState());
     _coordinationMutex.unlock();
 
     std::shared_ptr<ReactiveBuffer> buff = _reactiveBufferStorage->getMorePriority();
@@ -360,17 +360,21 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::insertEvent(cons
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
-void ResourceManager<CoordinationSignalType,InputDataTypes...>::setCoordinationSignalData()
+void ResourceManager<CoordinationSignalType,InputDataTypes...>::setCoordinationSignalData(bool newState)
 {
   if(_activeCoordinationSignal)
   {
     if(_StateMachine.isWildcardState())
     {
-      std::shared_ptr<MessageAbstraction> tmp = _artificialLifeBuffer->getData()->clone();
-      tmp->setPriority(_activeCoordinationSignal->getStateData(_StateMachine.getCurrentStateName())->getPriority() );
-      _coordinationSignalBuffer->setData(tmp);
+      if(_artificialLifeBuffer->hasItBeenPublished() == false)
+      {
+        std::shared_ptr<MessageAbstraction> tmp = _artificialLifeBuffer->getData()->clone();
+        tmp->setPriority(_activeCoordinationSignal->getStateData(_StateMachine.getCurrentStateName())->getPriority() );
+        _coordinationSignalBuffer->setData(tmp);
+        _artificialLifeBuffer->published();
+      }
     }
-    else
+    else if(newState)
       _coordinationSignalBuffer->setData(_activeCoordinationSignal->getStateData(_StateMachine.getCurrentStateName()) );
   }
   else

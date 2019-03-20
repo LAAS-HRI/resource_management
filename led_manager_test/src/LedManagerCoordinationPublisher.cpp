@@ -10,7 +10,7 @@ target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES})
 
 int main(int argc, char *argv[])
 {
-  ros::init(argc,argv,"led_manager_test");
+  ros::init(argc,argv,"led_manager_test_pub");
   ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
 
   led_manager_test::CoordinationSignal::Request signal;
