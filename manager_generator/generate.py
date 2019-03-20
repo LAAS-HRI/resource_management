@@ -6,10 +6,11 @@ import sys
 import string
 import collections
 
-Settings = collections.namedtuple('Settings',['project_name', 'class_name', 'message_types', 'reactive_input_names','reactive_input_names_cs'])
+Settings = collections.namedtuple('Settings',['project_name', 'class_name', 'message_types', 'message_dependencies', 'reactive_input_names','reactive_input_names_cs'])
 
 
 def createCatkinFiles(args,msg_files,srv_files, settings):
+    cmake_msg_deps = ' '.join(settings.message_dependencies)
     # CmakeLists.txt
     fcmake = open(os.path.join(args.package_name, "CMakeLists.txt"),"w")
     fcmake.write('cmake_minimum_required(VERSION 2.8.3)\n'
@@ -19,6 +20,7 @@ def createCatkinFiles(args,msg_files,srv_files, settings):
     'roscpp\n'
     'message_generation\n'
     'resource_management\n'
+    '{catkin_msgs_deps}\n'
     'pluginlib\n'
     ')\n'
     '\n'
@@ -34,7 +36,7 @@ def createCatkinFiles(args,msg_files,srv_files, settings):
     '{srvs}\n'
     ')\n'
     '\n'
-    'generate_messages(DEPENDENCIES resource_management)\n'
+    'generate_messages(DEPENDENCIES resource_management {catkin_msgs_deps})\n'
     'catkin_package(\n'
     '#INCLUDE_DIRS include\n'
     '#LIBRARIES ${{PROJECT_NAME}}\n'
@@ -45,10 +47,18 @@ def createCatkinFiles(args,msg_files,srv_files, settings):
     'include_directories(include ${{catkin_INCLUDE_DIRS}})\n'
     'add_executable(${{PROJECT_NAME}} src/${{PROJECT_NAME}}.cpp src/ArtificialLife.cpp)\n'
     'add_dependencies(${{PROJECT_NAME}} ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}})\n'
-    'target_link_libraries(${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'.format(settings.project_name,msgs=" ".join(msg_files),srvs=" ".join(srv_files))
+    'target_link_libraries(${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'
+    '\n'
+    'if(CATKIN_ENABLE_TESTING)\n'
+    '    find_package(rostest REQUIRED)\n'
+    '    add_rostest_gtest(tests_${{PROJECT_NAME}} test/main.test test/test.cpp)\n'
+    '    target_link_libraries(tests_${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'
+    'endif()\n'
+    .format(settings.project_name,catkin_msgs_deps=cmake_msg_deps,msgs=" ".join(msg_files),srvs=" ".join(srv_files))
     )
     fcmake.close()
 
+    pack_deps = ['<depend>'+x+'</depend>\n' for x in settings.message_dependencies]
     # package.xml
     fpackage = open(os.path.join(args.package_name, "package.xml"),"w")
     fpackage.write('<package format="2">\n'
@@ -61,11 +71,12 @@ def createCatkinFiles(args,msg_files,srv_files, settings):
     '<license>TBD</license>\n'
     '<depend>roscpp</depend>\n'
     '<depend>resource_management</depend>\n'
+    '{depends}'
     '<depend>pluginlib</depend>\n'
     '<buildtool_depend>catkin</buildtool_depend>\n'
     '<build_depend>message_generation</build_depend>\n'
     '<exec_depend>message_runtime</exec_depend>\n'
-    '</package>\n'.format(settings.project_name))
+    '</package>\n'.format(settings.project_name,depends=''.join(pack_deps)))
     fpackage.close()
 
 def underscore_to_CamelCase(word):
@@ -75,6 +86,7 @@ def create_folders(settings):
     os.makedirs(os.path.join(settings.project_name,"src"),exist_ok=True)
     os.makedirs(os.path.join(settings.project_name,"msg"),exist_ok=True)
     os.makedirs(os.path.join(settings.project_name,"srv"),exist_ok=True)
+    os.makedirs(os.path.join(settings.project_name,"test"),exist_ok=True)
     os.makedirs(os.path.join(settings.project_name,os.path.join("include",settings.project_name)),exist_ok=True)
 
 def substitue_for_loop(tpl,for_var,the_list):
@@ -82,6 +94,10 @@ def substitue_for_loop(tpl,for_var,the_list):
     for x in the_list:
         res+=eval('tpl.format({}=x)'.format(for_var))
     return res
+
+def substitue_fmt(tpl,unused0,the_var):
+    return tpl.format(the_var)
+
 
 def configure_template(template_path, output_path,settings):
     f_in = open(template_path,'r')
@@ -91,15 +107,20 @@ def configure_template(template_path, output_path,settings):
     inside=False
     for line in f_in:
         if line.startswith('!!for '):
-            inside=True
+            inside='for_loop'
             command=line[2:-1]
             for_var=command[command.find(' ')+1:]
             for_var=for_var[0:for_var.find(' ')]
             for_list=command[command.find(' in ')+4:]
             tpl_inside=""
+        elif line.startswith('!!fmt '):
+            inside='fmt'
+            command=line[2:-1]
+            for_list=command[command.find(' ')+1:]
+            tpl_inside=""
         elif line.startswith('!!end'):
-            inside=False
-            tpl+=eval('substitue_for_loop(tpl_inside,for_var,settings.{})'.format(for_list))
+            tpl+=eval('substitue_{}(tpl_inside,for_var,settings.{})'.format(inside,for_list))
+            inside=None
         elif inside:
             tpl_inside+=line
         else:
@@ -133,7 +154,15 @@ def main():
     reactive_input_names=args.reactive_topics
     reactive_input_names_cs = ', '.join(['"'+x+'"' for x in reactive_input_names])
 
-    settings = Settings(project_name, class_name, message_types, reactive_input_names,reactive_input_names_cs)
+    # try to infer dependencies for the message types from the input messages
+    message_dependencies=set()
+    for data_type in message_types :
+        if '/' in data_type[1]:
+            message_dependencies.add(data_type[1].split('/',1)[0])
+
+    settings = Settings(project_name, class_name, message_types, message_dependencies, reactive_input_names,reactive_input_names_cs)
+
+
 
     #package architecture
     create_folders(settings)
@@ -186,6 +215,11 @@ def main():
     configure_template(os.path.join(generator_dir,'template_artificialLife.cpp'),os.path.join(project_name, "src", "ArtificialLife.cpp"),settings)
     # ArtificialLife.h
     configure_template(os.path.join(generator_dir,'template_artificialLife.h'),os.path.join(project_name, "include", project_name, "ArtificialLife.h"),settings)
+
+    # test.cpp
+    configure_template(os.path.join(generator_dir,'test','template_test.cpp'),os.path.join(project_name, "test", "test.cpp"),settings)
+    # main.test
+    configure_template(os.path.join(generator_dir,'test','template_main.test'),os.path.join(project_name, "test", "main.test"),settings)
 
 if __name__ == '__main__':
     main()
