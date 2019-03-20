@@ -21,7 +21,7 @@
     - python3 ./resource_management/manager_generator/generate.py --package-name led_manager --target-types Color,float32,float OnOff,bool,bool --reactive-topics emotion tagada switch
     - cd ..
     - catkin_make
-    - bash ./src/resource_management/led_manager_test/deploy ./src && cd ..
+    - bash ./src/resource_management/led_manager_test/deploy ./src
     - catkin_make
     - source devel/setup.bash
     - catkin_make run_tests_led_manager_test_rostest && catkin_make test
