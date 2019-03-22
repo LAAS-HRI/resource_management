@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(led_manager_test)
 add_compile_options(-std=c++14 -Wall -pthread)
-
 find_package(catkin REQUIRED
 roscpp
 message_generation
 resource_management
+
 pluginlib
 )
 
@@ -21,7 +21,7 @@ FILES
 CoordinationSignal.srv
 )
 
-generate_messages(DEPENDENCIES resource_management)
+generate_messages(DEPENDENCIES resource_management )
 catkin_package(
 #INCLUDE_DIRS include
 #LIBRARIES ${PROJECT_NAME}
@@ -41,5 +41,6 @@ target_link_libraries(${PROJECT_NAME}_pub ${catkin_LIBRARIES})
 if(CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
     add_rostest_gtest(tests_${PROJECT_NAME} test/main.test test/test.cpp)
+    add_dependencies(tests_${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS})
     target_link_libraries(tests_${PROJECT_NAME} ${catkin_LIBRARIES})
 endif()

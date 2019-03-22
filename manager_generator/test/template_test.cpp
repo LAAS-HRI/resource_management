@@ -10,11 +10,12 @@
 #include <resource_management/tools/topic_name.h>
 #include <resource_management/PrioritiesSetter.h>
 
-#include "led_manager_test/Color.h"
-#include "led_manager_test/OnOff.h"
-#include "led_manager_test/CoordinationSignal.h"
+!!for data_type in message_types
+#include "${{project_name}}/{data_type[0]}.h"
+!!end
+#include "${project_name}/CoordinationSignal.h"
 
-std::vector<std::string> reactive_input_names = {"emotion", "tagada", "switch"};
+std::vector<std::string> reactive_input_names = {${reactive_input_names_cs}};
 
 double skip_rate=0.7; // for long exaustive tests, randomly drop that proportion of tests (must be in 0,1)
 
@@ -76,16 +77,17 @@ public:
     RosNodeFixture(){
         ROS_DEBUG("RosNodeFixture::RosNodeFixture()");
         for(auto &n : reactive_input_names){
-            reactive_input_publishers.emplace_back(new MessageGenerator<::led_manager_test::Color>(nh,"/led_manager_test",n));
-            reactive_input_publishers.emplace_back(new MessageGenerator<::led_manager_test::OnOff>(nh,"/led_manager_test",n));
+!!for data_type in message_types
+            reactive_input_publishers.emplace_back(new MessageGenerator<::${{project_name}}::{data_type[0]}>(nh,"/${{project_name}}",n));
+!!end
         }
-        set_priorities = nh.advertise<resource_management::PrioritiesSetter>("/led_manager_test/set_priorities",10,/*latch=*/true);
+        set_priorities = nh.advertise<resource_management::PrioritiesSetter>("/${project_name}/set_priorities",10,/*latch=*/true);
 
         boost::function<void(std_msgs::String)> cb=[this](auto msg){
                 std::lock_guard<std::mutex> lock(active_buffer_mutex);
                 this->active_buffer_value = msg.data;
                 };
-        active_buffer = nh.subscribe<std_msgs::String>("/led_manager_test/active_buffer",10,cb);
+        active_buffer = nh.subscribe<std_msgs::String>("/${project_name}/active_buffer",10,cb);
 
         //while(set_priorities.getNumSubscribers()<=0){
         //    std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -194,22 +196,26 @@ public:
 
     CoordinationSignalFixture(): RosNodeFixture()
     {
-        coord_sig_client = nh.serviceClient<led_manager_test::CoordinationSignal>("/led_manager_test/coordination_signals_register");
+        coord_sig_client = nh.serviceClient<${project_name}::CoordinationSignal>("/${project_name}/coordination_signals_register");
     }
     
-    led_manager_test::CoordinationSignal makeCoordinationSignal(std::string initial, double timeout, double dl_in_secs_from_now, int prio){
-        led_manager_test::CoordinationSignal sig;
+    ${project_name}::CoordinationSignal makeCoordinationSignal(std::string initial, double timeout, double dl_in_secs_from_now, int prio){
+        ${project_name}::CoordinationSignal sig;
         sig.request.header.initial_state=std::move(initial);
         sig.request.header.timeout=ros::Duration(timeout);
         sig.request.header.begin_dead_line = ros::Time::now() + ros::Duration(dl_in_secs_from_now);
         sig.request.header.priority.value=prio;
         return sig;
     }
-    void addState(led_manager_test::CoordinationSignal::Request &request, const std::string &id, const std::vector<::resource_management::CoordinationSignalsTransition> & transitions = {}){
-        led_manager_test::CoordinationStateColor state;
+    void addState(${project_name}::CoordinationSignal::Request &request, const std::string &id, const std::vector<::resource_management::CoordinationSignalsTransition> & transitions = {}){
+!!fmt message_types
+        ${{project_name}}::CoordinationState{0[0][0]} state;
+!!end
         state.header.id=id;
         state.header.transitions = transitions;
-        request.states_Color.push_back(state);
+!!fmt message_types
+        request.states_{0[0][0]}.push_back(state);
+!!end
     }
 
     ::resource_management::CoordinationSignalsTransition makeTransition(std::string next_state, double timeout, double duration, std::vector<std::string> regexs){
@@ -221,7 +227,7 @@ public:
         return trans;
     }
 
-    led_manager_test::CoordinationSignal makeSimpleCoordinationSignal(int prio){
+    ${project_name}::CoordinationSignal makeSimpleCoordinationSignal(int prio){
         auto sig = makeCoordinationSignal("0",.5,.5,prio);
         addState(sig.request, "0", {makeTransition("final",0.2,0.2,{})});
         return sig;
@@ -443,7 +449,7 @@ TEST_F(CoordinationSignalFixture,uniqueIds){
 
 int main(int argc, char *argv[]){
     testing::InitGoogleTest(&argc, argv);
-    ros::init(argc,argv,"tests_led_manager_test");
+    ros::init(argc,argv,"tests_${project_name}");
     ros::NodeHandle nh;
     auto res= RUN_ALL_TESTS();
 
