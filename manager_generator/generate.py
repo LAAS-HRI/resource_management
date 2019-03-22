@@ -52,6 +52,7 @@ def createCatkinFiles(args,msg_files,srv_files, settings):
     'if(CATKIN_ENABLE_TESTING)\n'
     '    find_package(rostest REQUIRED)\n'
     '    add_rostest_gtest(tests_${{PROJECT_NAME}} test/main.test test/test.cpp)\n'
+    '    add_dependencies(tests_${{PROJECT_NAME}} ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}})\n'
     '    target_link_libraries(tests_${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'
     'endif()\n'
     .format(settings.project_name,catkin_msgs_deps=cmake_msg_deps,msgs=" ".join(msg_files),srvs=" ".join(srv_files))

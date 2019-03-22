@@ -1,5 +1,9 @@
 <launch>
     <node name="${project_name}" pkg="${project_name}" type="${project_name}"/>
-    <arg name='TESTDURATION' value='60' />
-    <test test-name="tests_${project_name}" pkg="${project_name}" type="tests_${project_name}" time-limit="$$(arg TESTDURATION)" retry="10"/>
+    <arg name='TESTDURATION' value='120' />
+    <test test-name="tests_${project_name}" pkg="${project_name}" type="tests_${project_name}"
+        time-limit="$$(arg TESTDURATION)"
+        retry="10"
+        args="--gtest_shuffle"
+    />
 </launch>
