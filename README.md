@@ -1,5 +1,7 @@
 # resource_management
 
+[![Release][Release-Image]][Release-Url]
+
 Matser : [![Build Status](https://gitlab.com/laas-hri/resource_management/badges/master/pipeline.svg)](https://gitlab.com/laas-hri/resource_management/commits/master) Dev : [![Build Status](https://gitlab.com/laas-hri/resource_management/badges/dev/pipeline.svg)](https://gitlab.com/laas-hri/resource_management/commits/dev)
 
 A basic library for implementing robot part resource management.
@@ -17,3 +19,6 @@ A basic library for implementing robot part resource management.
 | **0**    |**WEAK**      | 20           | 6            | 5           | 4           | 3           | :x:         |
 | **-1**   |**USELESS**   | 19           | 2            | 1           | 0           | -1          | :x:         |
 | **-2**   |**AVOID**     | -2           | -3           | -4          | -5          | -6          | :x:         |
+
+[Release-Url]: https://gitlab.com/laas-hri/resource_management
+[Release-image]: http://img.shields.io/badge/release-v0.1.0-1eb0fc.svg
