@@ -1,0 +1,5 @@
+<library path="lib/libresource_management_plugin">
+  <class type="resource_management::EventsPluginTest" base_class_type="resource_management::EventsInterface">
+    <description>This is a reasoner test plugin.</description>
+  </class>
+</library>

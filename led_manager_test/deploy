@@ -1,0 +1,22 @@
+#!/bin/bash
+
+MY_PATH="`dirname \"$0\"`"
+SRCDIR=$1
+
+if [[ $# -ne 1 ]]; then
+    echo "usage is:"
+    echo "$ ./deploy <path/to/ros_ws/src>"
+    exit 1
+fi
+if [[ -d $SRCDIR ]]; then
+    if [[ -d $SRCDIR/led_manager_test ]]; then
+        echo "${SRCDIR}/led_manager_test directory exists, delete it before calling this script. Exiting now"
+        exit 1
+    fi
+    cp -r $MY_PATH $SRCDIR/led_manager_test/
+    mv ${SRCDIR}/led_manager_test/_package.xml ${SRCDIR}/led_manager_test/package.xml
+    mv ${SRCDIR}/led_manager_test/_CMakeLists.txt ${SRCDIR}/led_manager_test/CMakeLists.txt
+    rm ${SRCDIR}/led_manager_test/deploy
+else
+    echo "directory `readlink -f ${SRCDIR}` does not exist"
+fi
