@@ -22,7 +22,8 @@ enum focus_priority_t
   prioritize  = 3,
   normal      = 2,
   secondary   = 1,
-  ignore      = 0
+  ignore      = 0,
+  inhibit     = -1
 };
 
 template<typename T>
