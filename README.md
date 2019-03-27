@@ -20,5 +20,5 @@ A basic library for implementing robot part resource management.
 | **-1**   |**USELESS**   | 19           | 2            | 1           | 0           | -1          | :x:         |
 | **-2**   |**AVOID**     | -2           | -3           | -4          | -5          | -6          | :x:         |
 
-[Release-Url]: https://gitlab.com/laas-hri/resource_management
+[Release-Url]: https://github.com/LAAS-HRI/resource_management/releases
 [Release-image]: http://img.shields.io/badge/release-v0.1.0-1eb0fc.svg
