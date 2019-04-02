@@ -1,2 +1,0 @@
-resource_management/MessagePriority priority
-float32 data

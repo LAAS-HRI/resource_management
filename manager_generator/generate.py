@@ -9,7 +9,7 @@ import collections
 Settings = collections.namedtuple('Settings',['project_name', 'class_name', 'message_types', 'message_dependencies', 'reactive_input_names','reactive_input_names_cs'])
 
 
-def createCatkinFiles(args,msg_files,srv_files, settings):
+def createCatkinFiles(args, settings):
     cmake_msg_deps = ' '.join(settings.message_dependencies)
     # CmakeLists.txt
     fcmake = open(os.path.join(args.package_name, "CMakeLists.txt"),"w")
@@ -33,16 +33,16 @@ def createCatkinFiles(args,msg_files,srv_files, settings):
     '\n'
     'include_directories(include ${{catkin_INCLUDE_DIRS}})\n'
     'add_executable(${{PROJECT_NAME}} src/${{PROJECT_NAME}}.cpp src/ArtificialLife.cpp)\n'
-    'add_dependencies(${{PROJECT_NAME}} ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}})\n'
+    'add_dependencies(${{PROJECT_NAME}} ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}} ${{catkin_EXPORTED_TARGETS}})\n'
     'target_link_libraries(${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'
     '\n'
     'if(CATKIN_ENABLE_TESTING)\n'
     '    find_package(rostest REQUIRED)\n'
     '    add_rostest_gtest(tests_${{PROJECT_NAME}} test/main.test test/test.cpp)\n'
-    '    add_dependencies(tests_${{PROJECT_NAME}} ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}})\n'
+    '    add_dependencies(tests_${{PROJECT_NAME}} ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}} ${{catkin_EXPORTED_TARGETS}})\n'
     '    target_link_libraries(tests_${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'
     'endif()\n'
-    .format(settings.project_name,catkin_msgs_deps=cmake_msg_deps,msgs=" ".join(msg_files),srvs=" ".join(srv_files))
+    .format(settings.project_name,catkin_msgs_deps=cmake_msg_deps)
     )
     fcmake.close()
 
@@ -150,6 +150,8 @@ def main():
 
     #package architecture
     create_folders(settings)
+
+    createCatkinFiles(args, settings)
 
     # led_manager.cpp
     configure_template(os.path.join(generator_dir,'template_main.cpp'),os.path.join(project_name, "src", project_name +".cpp"),settings)

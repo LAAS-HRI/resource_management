@@ -12,9 +12,9 @@
 #include "std_msgs/String.h"
 #include "resource_management/ReactiveInputs.h"
 #include "resource_management/CoordinationSignals.h"
-#include "resource_management/PrioritiesSetter.h"
-#include "resource_management/CoordinationSignalsStatus.h"
-#include "resource_management/CoordinationSignalsCancel.h"
+#include "resource_management_msgs/PrioritiesSetter.h"
+#include "resource_management_msgs/CoordinationSignalsStatus.h"
+#include "resource_management_msgs/CoordinationSignalsCancel.h"
 
 #include "resource_management/message_storage/ReactiveBuffer.h"
 
@@ -55,7 +55,7 @@ public:
 
 protected:
     virtual std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const typename CoordinationSignalType::Request &msg) = 0;
-    virtual std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
+    virtual std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
         transitionFromMsg(const typename CoordinationSignalType::Request &msg) = 0;
     virtual typename CoordinationSignalType::Response generateResponseMsg(uint32_t id) = 0;
 
@@ -73,10 +73,10 @@ private:
     /// also clear _reactiveInputs and _reactiveBuffers
     void createReactiveBufferStorage();
 
-    void prioritiesCallback(const resource_management::PrioritiesSetter& msg);
+    void prioritiesCallback(const resource_management_msgs::PrioritiesSetter& msg);
     void publishState(CoordinationInternalState_t state);
-    bool coordinationSignalCancel(resource_management::CoordinationSignalsCancel::Request  &req,
-                                  resource_management::CoordinationSignalsCancel::Response &res);
+    bool coordinationSignalCancel(resource_management_msgs::CoordinationSignalsCancel::Request  &req,
+                                  resource_management_msgs::CoordinationSignalsCancel::Response &res);
 
     void loadEventsPlugins(const std::vector<std::string>& pluginsNames);
     void insertEvent(const std::string& event);
@@ -129,7 +129,7 @@ ResourceManager<CoordinationSignalType,InputDataTypes...>::ResourceManager(ros::
     Impl<InputDataTypes...>::add(_reactiveInputs,_nh,reactiveInputNames,*_reactiveBufferStorage);
     _activeBufferPublisher = _nh->advertise<std_msgs::String>("active_buffer", 10, true);
     _prioritiesSubscriber = _nh->subscribe("set_priorities", 10, &ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback, this);
-    _coordinationSignalStatusPublisher = _nh->advertise<resource_management::CoordinationSignalsStatus>("coordination_signal_status", 10);
+    _coordinationSignalStatusPublisher = _nh->advertise<resource_management_msgs::CoordinationSignalsStatus>("coordination_signal_status", 10);
     _coordinationSignalCancelService = _nh->advertiseService("coordination_signal_cancel", &ResourceManager<CoordinationSignalType,InputDataTypes...>::coordinationSignalCancel, this);
 
     if(!_nh->getParam("freq", _hz))
@@ -174,7 +174,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::createReactiveBu
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
-void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback(const resource_management::PrioritiesSetter& msg)
+void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallback(const resource_management_msgs::PrioritiesSetter& msg)
 {
   size_t min = (msg.values.size() < msg.buffers.size()) ? msg.values.size() : msg.buffers.size();
 
@@ -396,7 +396,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::publishState(Coo
     case transition_none : state_event = "none"; break;
   }
 
-  resource_management::CoordinationSignalsStatus status;
+  resource_management_msgs::CoordinationSignalsStatus status;
   status.state_event = state_event;
   if(state.state_ != nullptr)
     status.state_name = state.state_->getName();
@@ -409,8 +409,8 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::publishState(Coo
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
 bool ResourceManager<CoordinationSignalType,InputDataTypes...>::coordinationSignalCancel
-                          (resource_management::CoordinationSignalsCancel::Request  &req,
-                          resource_management::CoordinationSignalsCancel::Response &res)
+                          (resource_management_msgs::CoordinationSignalsCancel::Request  &req,
+                          resource_management_msgs::CoordinationSignalsCancel::Response &res)
 {
   bool found = false;
 

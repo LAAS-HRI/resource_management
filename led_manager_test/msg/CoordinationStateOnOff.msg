@@ -1,2 +1,0 @@
-resource_management/CoordinationStateHeader header
-bool data

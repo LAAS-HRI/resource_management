@@ -3,25 +3,12 @@ project(led_manager_test)
 add_compile_options(-std=c++14 -Wall -pthread)
 find_package(catkin REQUIRED
 roscpp
-message_generation
+led_manager_msgs
 resource_management
 
 pluginlib
 )
 
-## Generate messages in the 'msg' folder
-add_message_files(
-FILES
-CoordinationStateColor.msg CoordinationStateOnOff.msg Color.msg OnOff.msg
-)
-
-## Generate services in the 'srv' folder
-add_service_files(
-FILES
-CoordinationSignal.srv
-)
-
-generate_messages(DEPENDENCIES resource_management )
 catkin_package(
 #INCLUDE_DIRS include
 #LIBRARIES ${PROJECT_NAME}

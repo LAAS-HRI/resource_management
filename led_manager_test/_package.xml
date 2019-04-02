@@ -9,6 +9,7 @@
   <license>TBD</license>
 
   <depend>roscpp</depend>
+  <depend>led_manager_msgs</depend>
   <depend>resource_management</depend>
   <depend>pluginlib</depend>
   <buildtool_depend>catkin</buildtool_depend>

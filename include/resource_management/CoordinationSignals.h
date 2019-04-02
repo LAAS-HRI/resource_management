@@ -13,7 +13,7 @@
 #include "state_machine/CoordinationSignalsStorage.h"
 
 #include "message_storage/MessageWrapper.h"
-#include "resource_management/CoordinationSignalsTransition.h"
+#include "resource_management_msgs/CoordinationSignalsTransition.h"
 
 namespace resource_management {
 
@@ -33,7 +33,7 @@ class CoordinationSignals : public CoordinationSignalsBase
 {
 public:
     using StateFromMsgFn = boost::function<std::map<std::string,std::shared_ptr<MessageAbstraction>>(const typename T::Request&)>;
-    using TransitionFromMsgFn = boost::function<std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>(const typename T::Request&)>;
+    using TransitionFromMsgFn = boost::function<std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>(const typename T::Request&)>;
     using GenerateResponseMsgFn = boost::function< typename T::Response(uint32_t)>;
 
     CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn, std::shared_ptr<CoordinationSignalsStorage> storage);
@@ -66,7 +66,7 @@ bool CoordinationSignals<T>::_serviceCallback(typename T::Request &req, typename
 {
     std::shared_ptr<StateStorage> states = std::make_shared<StateStorage>(_coordinationSignalsId, req.header.timeout, req.header.begin_dead_line);
     states->setInitialState(req.header.initial_state);
-    
+
     assert(req.header.priority.value <= 4);
     assert(req.header.priority.value >= -2);
     if((req.header.priority.value > 4) || (req.header.priority.value < -2))
@@ -90,7 +90,7 @@ bool CoordinationSignals<T>::_serviceCallback(typename T::Request &req, typename
     auto transitions = _getTransitionsFromCoordinationSignalMsg(req);
 
     for(auto &t : transitions){
-        resource_management::EndCondition &end_condition = std::get<2>(t);
+        resource_management_msgs::EndCondition &end_condition = std::get<2>(t);
         CoordinationTransition transition(end_condition.duration,end_condition.timeout,end_condition.regex_end_condition);
         states->addTransition(std::get<0>(t),std::get<1>(t),transition);
     }

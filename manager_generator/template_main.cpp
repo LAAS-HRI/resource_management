@@ -10,9 +10,9 @@
 
 #include <thread>
 
-class ${class_name} : public resource_management::ResourceManager<${project_name}::CoordinationSignal
+class ${class_name} : public resource_management::ResourceManager<${project_name}_msgs::CoordinationSignal
 !!for data_type in message_types
-      ,${{project_name}}::{data_type[0]}
+      ,${{project_name}}_msgs::{data_type[0]}
 !!end
 >
 {
@@ -30,17 +30,17 @@ public:
     }
 
 private:
-    std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> stateFromMsg(const ${project_name}::CoordinationSignal::Request &msg) override;
-    std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
-    transitionFromMsg(const ${project_name}::CoordinationSignal::Request &msg) override;
-    ${project_name}::CoordinationSignal::Response generateResponseMsg(uint32_t id) override;
+    std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> stateFromMsg(const ${project_name}_msgs::CoordinationSignal::Request &msg) override;
+    std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
+    transitionFromMsg(const ${project_name}_msgs::CoordinationSignal::Request &msg) override;
+    ${project_name}_msgs::CoordinationSignal::Response generateResponseMsg(uint32_t id) override;
 
 !!for data_type in message_types
     void publish{data_type[0]}Msg({data_type[2]} msg, bool is_new);
 !!end
 };
 
-std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> ${class_name}::stateFromMsg(const ${project_name}::CoordinationSignal::Request &msg)
+std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> ${class_name}::stateFromMsg(const ${project_name}_msgs::CoordinationSignal::Request &msg)
 {
     std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> states;
 !!for data_type in message_types
@@ -54,28 +54,28 @@ std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> $
     return states;
 }
 
-std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
-${class_name}::transitionFromMsg(const ${project_name}::CoordinationSignal::Request &msg)
+std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
+${class_name}::transitionFromMsg(const ${project_name}_msgs::CoordinationSignal::Request &msg)
 {
-    std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>> transitions;
+    std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>> transitions;
 !!for data_type in message_types
 
     for(auto x : msg.states_{data_type[0]}){{
         for(auto t : x.header.transitions){{
             transitions.push_back(
-                        std::make_tuple<std::string,std::string,resource_management::EndCondition>(
+                        std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
                             std::string(x.header.id),
                             std::string(t.next_state),
-                            resource_management::EndCondition(t.end_condition)));
+                            resource_management_msgs::EndCondition(t.end_condition)));
         }}
     }}
 !!end
     return transitions;
 }
 
-${project_name}::CoordinationSignal::Response ${class_name}::generateResponseMsg(uint32_t id)
+${project_name}_msgs::CoordinationSignal::Response ${class_name}::generateResponseMsg(uint32_t id)
 {
-  ${project_name}::CoordinationSignal::Response res;
+  ${project_name}_msgs::CoordinationSignal::Response res;
   res.id = id;
   return res;
 }
