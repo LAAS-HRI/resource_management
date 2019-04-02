@@ -1,6 +1,7 @@
 example usage:
 
     roscd resource_management; cd ..
+    python3 ./resource_management/manager_generator/generate_msgs.py --package-name led_manager_msgs --target-types Color,float32,float OnOff,bool,bool --reactive-topics emotion tagada switch
     python3 ./resource_management/manager_generator/generate.py --package-name led_manager --target-types Color,float32,float OnOff,bool,bool --reactive-topics emotion tagada switch
 
 will create a ros package containing a manager which takes as input 2 types of data:

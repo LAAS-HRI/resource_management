@@ -1,4 +1,0 @@
-string initial_state
-duration timeout
-time begin_dead_line
-MessagePriority priority

@@ -1,6 +1,6 @@
-#include "${project_name}/CoordinationSignal.h"
+#include "${project_name}_msgs/CoordinationSignal.h"
 !!for data_type in message_types
-#include "${{project_name}}/{data_type[0]}.h"
+#include "${{project_name}}_msgs/{data_type[0]}.h"
 !!end
 #include "${project_name}/ArtificialLife.h"
 

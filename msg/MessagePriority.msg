@@ -1,9 +1,0 @@
-int8 VITAL=4
-int8 URGENT=3
-int8 IMPORTANT=2
-int8 HELPFUL=1
-int8 WEAK=0
-int8 USELESS=-1
-int8 AVOID=-2
-
-int8 value

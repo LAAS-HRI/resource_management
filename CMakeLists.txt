@@ -5,34 +5,16 @@ add_compile_options(-std=c++14 -Wall -Wextra -pthread)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
-    message_generation
-    std_msgs
+    resource_management_msgs
     pluginlib
     )
-
-add_message_files(
-    FILES
-    CoordinationStateHeader.msg
-    CoordinationSignalsTransition.msg
-    EndCondition.msg
-    MessagePriority.msg
-    CoordinationSignalHeader.msg
-    CoordinationSignalsStatus.msg
-    PrioritiesSetter.msg
-)
-
-add_service_files(
-    FILES
-    CoordinationSignalsCancel.srv
-)
 
 generate_messages(DEPENDENCIES std_msgs)
 
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES message_lib state_machine_lib
-    CATKIN_DEPENDS roscpp message_runtime std_msgs
-    # DEPENDS
+    CATKIN_DEPENDS roscpp resource_management_msgs
     )
 
 find_package (Threads)
