@@ -1,4 +1,4 @@
-#include "led_manager_test/CoordinationSignal.h"
+#include "led_manager_msgs/CoordinationSignal.h"
 
 #include <ros/ros.h>
 
