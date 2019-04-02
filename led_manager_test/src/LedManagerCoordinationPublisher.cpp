@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
   led_manager_msgs::CoordinationSignal::Request signal;
   signal.header.timeout = ros::Duration(-1);
   signal.header.begin_dead_line = ros::Time(0);
-  signal.header.priority.value = resource_management::MessagePriority::URGENT;
+  signal.header.priority.value = resource_management_msgs::MessagePriority::URGENT;
   signal.header.initial_state = "state_0";
 
   led_manager_msgs::CoordinationStateColor color_state;
