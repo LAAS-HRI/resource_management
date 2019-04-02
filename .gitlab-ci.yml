@@ -5,6 +5,7 @@
     - catkin_make
     - cd src
     - cp -r /builds/laas-hri/resource_management .
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/laas-hri/resource_management
     - cd ..
     - catkin_make
 
@@ -15,9 +16,11 @@
     - catkin_make
     - cd src
     - cp -r /builds/laas-hri/resource_management .
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/laas-hri/resource_management
     - cd ..
     - source devel/setup.bash
     - roscd resource_management; cd ..
+    - python3 ./resource_management/manager_generator/generate_msgs.py --package-name led_manager_msgs --target-types Color,float32,float OnOff,bool,bool --reactive-topics emotion tagada switch
     - python3 ./resource_management/manager_generator/generate.py --package-name led_manager --target-types Color,float32,float OnOff,bool,bool --reactive-topics emotion tagada switch
     - cd ..
     - catkin_make
