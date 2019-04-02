@@ -1,7 +1,7 @@
 #include "led_manager_msgs/CoordinationSignal.h"
 #include "led_manager_msgs/Color.h"
 #include "led_manager_msgs/OnOff.h"
-#include "led_manager_msgs/ArtificialLife.h"
+#include "led_manager_test/ArtificialLife.h"
 
 #include <resource_management/CoordinationSignals.h>
 #include <resource_management/ReactiveInputs.h>
@@ -28,7 +28,7 @@ public:
 
 private:
     std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> stateFromMsg(const led_manager_msgs::CoordinationSignal::Request &msg) override;
-    std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
+    std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
     transitionFromMsg(const led_manager_msgs::CoordinationSignal::Request &msg) override;
     led_manager_msgs::CoordinationSignal::Response generateResponseMsg(uint32_t id) override;
 
@@ -36,7 +36,7 @@ private:
     void publishOnOffMsg(bool msg, bool is_new);
 };
 
-std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> LedManager::stateFromMsg(const led_manager_test::CoordinationSignal::Request &msg)
+std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> LedManager::stateFromMsg(const led_manager_msgs::CoordinationSignal::Request &msg)
 {
     std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> states;
 
@@ -53,28 +53,28 @@ std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> L
     return states;
 }
 
-std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>>
+std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
 LedManager::transitionFromMsg(const led_manager_msgs::CoordinationSignal::Request &msg)
 {
-    std::vector<std::tuple<std::string,std::string,resource_management::EndCondition>> transitions;
+    std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>> transitions;
 
     for(auto x : msg.states_Color){
         for(auto t : x.header.transitions){
             transitions.push_back(
-                        std::make_tuple<std::string,std::string,resource_management::EndCondition>(
+                        std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
                             std::string(x.header.id),
                             std::string(t.next_state),
-                            resource_management::EndCondition(t.end_condition)));
+                            resource_management_msgs::EndCondition(t.end_condition)));
         }
     }
 
     for(auto x : msg.states_OnOff){
         for(auto t : x.header.transitions){
             transitions.push_back(
-                        std::make_tuple<std::string,std::string,resource_management::EndCondition>(
+                        std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
                             std::string(x.header.id),
                             std::string(t.next_state),
-                            resource_management::EndCondition(t.end_condition)));
+                            resource_management_msgs::EndCondition(t.end_condition)));
         }
     }
     return transitions;
