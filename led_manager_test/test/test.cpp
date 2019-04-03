@@ -43,7 +43,7 @@ class MessageGenerator: public MessageGeneratorBase
 {
     public:
     MessageGenerator(ros::NodeHandle &nh, const std::string &ns, const std::string &input_name){
-        topic_name = resource_management_msgs::tools::topic_name<T>(input_name,ns);
+        topic_name = resource_management::tools::topic_name<T>(input_name,ns);
         reactive_input_name = input_name;
         publisher = nh.advertise<T>(topic_name,1,/*latch=*/true);
     }
