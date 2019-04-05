@@ -21,7 +21,7 @@ void CoordinationSignalsStorage::push(std::shared_ptr<StateStorage>& state_stora
   mutex_.unlock();
 }
 
-std::shared_ptr<StateStorage> CoordinationSignalsStorage::pop()
+std::shared_ptr<StateStorage> CoordinationSignalsStorage::pop(double priority)
 {
   int max_index = -1;
   int max_priority = -100;
@@ -35,7 +35,7 @@ std::shared_ptr<StateStorage> CoordinationSignalsStorage::pop()
       max_index = i;
     }
 
-  if(max_index >= 0)
+  if((max_index >= 0) && (max_priority >= priority))
   {
     std::shared_ptr<StateStorage> tmp = states_storage_[max_index];
     states_storage_.erase(states_storage_.begin() + max_index);

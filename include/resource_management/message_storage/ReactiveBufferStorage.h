@@ -17,6 +17,7 @@ public:
 
   void setPriority(const std::string& name, focus_priority_t priority);
   std::shared_ptr<ReactiveBuffer> operator[](const std::string& name) const;
+  double getHighestPriority();
   std::shared_ptr<ReactiveBuffer> getMorePriority();
   std::shared_ptr<MessageAbstraction> getMorePriorityData();
 
