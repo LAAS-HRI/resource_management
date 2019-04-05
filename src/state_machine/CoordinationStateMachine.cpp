@@ -27,6 +27,8 @@ void CoordinationStateMachine::run()
   if(internal_state_.state_ != nullptr)
     internal_state_.state_->startState();
 
+  getEvents();
+
   ros::Time start_time = ros::Time::now();
   if(begin_dead_line_ != ros::Time(0))
     if(begin_dead_line_ < start_time)
@@ -58,6 +60,7 @@ void CoordinationStateMachine::run()
       if(publishState_ != nullptr)
         publishState_(internal_state_);
 
+      internal_state_mutex_.unlock();
       break;
     }
 
@@ -81,6 +84,7 @@ void CoordinationStateMachine::run()
       if(publishState_ != nullptr)
         publishState_(internal_state_);
 
+      internal_state_mutex_.unlock();
       break;
     }
 
