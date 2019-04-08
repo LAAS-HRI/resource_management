@@ -35,8 +35,6 @@ std::shared_ptr<StateStorage> CoordinationSignalsStorage::pop(double priority)
       max_index = i;
     }
 
-
-
   if(max_index >= 0)
   {
     max_priority = states_storage_[max_index]->operator*(fullfocus);

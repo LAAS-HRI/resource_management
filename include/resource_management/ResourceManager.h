@@ -227,19 +227,17 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
       if(_coordinationSignalStorage->empty() == false)
       {
         _activeCoordinationSignal = _coordinationSignalStorage->pop(_reactiveBufferStorage->getHighestPriority());
-        if(!_activeCoordinationSignal)
+        if(_activeCoordinationSignal)
         {
+          _StateMachine.setInitialState(_activeCoordinationSignal->getInitialState(), _activeCoordinationSignal->getId());
+          _StateMachine.setTimeout(_activeCoordinationSignal->getTimeout());
+          _StateMachine.setDeadLine(_activeCoordinationSignal->getDeadLine());
+
+          sm_th = std::thread(&CoordinationStateMachine::run, &_StateMachine);
+          coordination_running = true;
           _coordinationMutex.unlock();
           continue;
         }
-        _StateMachine.setInitialState(_activeCoordinationSignal->getInitialState(), _activeCoordinationSignal->getId());
-        _StateMachine.setTimeout(_activeCoordinationSignal->getTimeout());
-        _StateMachine.setDeadLine(_activeCoordinationSignal->getDeadLine());
-
-        sm_th = std::thread(&CoordinationStateMachine::run, &_StateMachine);
-        coordination_running = true;
-        _coordinationMutex.unlock();
-        continue;
       }
     }
     else
@@ -257,7 +255,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
         al_th.join();
       }
 
-      if(!_StateMachine.runing())
+      if(!_StateMachine.runing() && coordination_running)
         if (sm_th.joinable())
         {
           sm_th.join();
