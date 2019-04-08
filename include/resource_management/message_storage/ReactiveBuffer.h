@@ -1,7 +1,7 @@
 #ifndef REACTIVEBUFFER_H
 #define REACTIVEBUFFER_H
 
-#include "resource_management/message_storage/PriorityHolder.h"
+#include "resource_management/message_storage/BufferPriority.h"
 #include "resource_management/message_storage/MessageAbstraction.h"
 
 #include <string>
@@ -9,7 +9,7 @@
 
 namespace resource_management {
 
-class ReactiveBuffer : public PriorityHolder<focus_priority_t>
+class ReactiveBuffer : public BufferPriority
 {
 public:
   ReactiveBuffer(const std::string& name);

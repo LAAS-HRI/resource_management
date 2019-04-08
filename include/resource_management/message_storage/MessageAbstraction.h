@@ -3,11 +3,11 @@
 
 #include <memory>
 
-#include "resource_management/message_storage/PriorityHolder.h"
+#include "resource_management/message_storage/MessagePriority.h"
 
 namespace resource_management {
 
-class MessageAbstraction : public PriorityHolder<importance_priority_t>
+class MessageAbstraction : public MessagePriority
 {
 public:
   virtual ~MessageAbstraction() {}

@@ -2,7 +2,7 @@
 #define STATESTORAGE_H
 
 #include "resource_management/state_machine/CoordinationState.h"
-#include "resource_management/message_storage/PriorityHolder.h"
+#include "resource_management/message_storage/MessagePriority.h"
 #include "resource_management/message_storage/MessageAbstraction.h"
 
 #include <map>
@@ -10,7 +10,7 @@
 
 namespace resource_management {
 
-class StateStorage : public PriorityHolder<importance_priority_t>
+class StateStorage : public MessagePriority
 {
 public:
   StateStorage(uint32_t id = -1, ros::Duration time_out = ros::Duration(-1), ros::Time begin_dead_line = ros::Time(0));

@@ -24,7 +24,6 @@ public:
 private:
   std::map<std::string, std::shared_ptr<ReactiveBuffer>> buffers_;
   std::vector<std::string> buffers_names_;
-  std::vector<std::vector<int8_t> > priorities_;
 };
 
 } // namespace resource_management
