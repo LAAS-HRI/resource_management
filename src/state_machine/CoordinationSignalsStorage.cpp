@@ -25,7 +25,7 @@ std::shared_ptr<StateStorage> CoordinationSignalsStorage::pop(double priority)
 {
   int max_index = -1;
   int max_priority = -100;
-  std::shared_ptr<StateStorage> res = std::make_shared<StateStorage>();
+  std::shared_ptr<StateStorage> res = nullptr;
 
   mutex_.lock();
   for(size_t i = 0; i < states_storage_.size(); i++)
