@@ -197,7 +197,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallba
       case 3: priority = prioritize; break;
       case 2: priority = normal; break;
       case 1: priority = secondary; break;
-      case 0: priority = secondary; break;
+      case 0: priority = ignore; break;
       case -1: priority = inhibit; break;
       default: priority = ignore; break;
     }
