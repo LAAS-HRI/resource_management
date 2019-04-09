@@ -14,6 +14,7 @@ public:
   bool empty();
   void push(std::shared_ptr<StateStorage>& state_storage);
   std::shared_ptr<StateStorage> pop(double priority = -100);
+  bool poppable(double priority = -100);
   bool remove(uint32_t id);
 
 private:
