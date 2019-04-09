@@ -262,7 +262,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
         {
           sm_th.join();
           coordination_running = false;
-          _activeCoordinationSignal = std::make_shared<StateStorage>();
+          _activeCoordinationSignal.reset();
           _coordinationMutex.unlock();
           continue;
         }
