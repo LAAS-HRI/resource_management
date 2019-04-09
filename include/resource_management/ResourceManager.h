@@ -266,6 +266,15 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
           _coordinationMutex.unlock();
           continue;
         }
+
+
+      // for coordination signal preamption by other coordination signal
+      if(_coordinationSignalStorage->poppable(_reactiveBufferStorage->getHighestPriority()))
+      {
+        _StateMachine.addEvent("__preamted__");
+        _coordinationMutex.unlock();
+        continue;
+      }
     }
     setCoordinationSignalData(_StateMachine.isNewState());
     _coordinationMutex.unlock();
