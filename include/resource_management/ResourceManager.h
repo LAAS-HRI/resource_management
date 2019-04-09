@@ -181,8 +181,8 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallba
   for(size_t i = 0; i < min; i++)
   {
     assert(msg.values[i] <= 4);
-    assert(msg.values[i] >= 0);
-    if((msg.values[i] > 4) || (msg.values[i] < 0))
+    assert(msg.values[i] >= -1);
+    if((msg.values[i] > 4) || (msg.values[i] < -1))
     {
       ROS_ERROR_STREAM("Buffer priority out of range");
       return;
@@ -197,6 +197,8 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallba
       case 3: priority = prioritize; break;
       case 2: priority = normal; break;
       case 1: priority = secondary; break;
+      case 0: priority = secondary; break;
+      case -1: priority = inhibit; break;
       default: priority = ignore; break;
     }
 
