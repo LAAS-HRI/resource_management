@@ -53,9 +53,10 @@ std::shared_ptr<StateStorage> CoordinationSignalsStorage::pop(double priority)
 
 bool CoordinationSignalsStorage::poppable(double priority)
 {
-  if(unpoppable_)
+  if(unpoppable_) {
+    unpoppable_ = false;
     return false;
-  unpoppable_ = false;
+  }
 
   int max_index = -1;
   int max_priority = -100;
