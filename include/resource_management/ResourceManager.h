@@ -231,6 +231,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
         _activeCoordinationSignal = _coordinationSignalStorage->pop(_reactiveBufferStorage->getHighestPriority());
         if(_activeCoordinationSignal)
         {
+          _coordinationSignalStorage->setUnpoppable();
           _StateMachine.setInitialState(_activeCoordinationSignal->getInitialState(), _activeCoordinationSignal->getId());
           _StateMachine.setTimeout(_activeCoordinationSignal->getTimeout());
           _StateMachine.setDeadLine(_activeCoordinationSignal->getDeadLine());
