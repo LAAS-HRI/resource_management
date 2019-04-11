@@ -219,6 +219,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
 
   // this in lambda is necessary for gcc <= 5.1
   _StateMachine.setPublicationFunction([this](auto state){ this->publishState(state); });
+  _coordinationSignalStorage->setPublicationFunction([this](auto state){ this->publishState(state); });
 
   size_t param_update = 0;
   while (ros::ok())
@@ -321,6 +322,10 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
     {
       _nh->getParam("freq", _hz);
       param_update = 0;
+
+      // Remove coordination signals that will not be executed as soon
+      // as possible at low frequency
+      _coordinationSignalStorage->clean();
     }
 
     ros::Rate r(_hz);

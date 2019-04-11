@@ -17,9 +17,14 @@ public:
   bool poppable(double priority = -100);
   bool remove(uint32_t id);
 
+  void setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState);
+  void clean();
+
 private:
   std::vector<std::shared_ptr<StateStorage> > states_storage_;
   std::mutex mutex_;
+
+  std::function<void(CoordinationInternalState_t)> publishState_;
 };
 
 } // namespace resource_management

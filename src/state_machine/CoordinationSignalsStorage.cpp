@@ -95,4 +95,29 @@ bool CoordinationSignalsStorage::remove(uint32_t id)
   return found;
 }
 
+void CoordinationSignalsStorage::setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState)
+{
+  publishState_ = publishState;
+}
+
+void CoordinationSignalsStorage::clean()
+{
+  for(size_t i = 0; i < states_storage_.size(); )
+  {
+    if(states_storage_[i]->isTooLate())
+    {
+      CoordinationInternalState_t internal_state;
+      internal_state.state_machine_id = states_storage_[i]->getId();
+      internal_state.state_ = nullptr;
+      internal_state.transition_state_ = transition_dead_line;
+      // inform that the coordination signal will be removed
+      if(publishState_)
+        publishState_(internal_state);
+      states_storage_.erase(states_storage_.begin() + i);
+    }
+    else
+      i++;
+  }
+}
+
 } // namespace resource_management

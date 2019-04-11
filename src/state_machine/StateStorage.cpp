@@ -69,4 +69,13 @@ CoordinationState* StateStorage::operator[](const std::string& id)
     return nullptr;
 }
 
+
+bool StateStorage::isTooLate()
+{
+  if((begin_dead_line_ != ros::Time(0)) && (begin_dead_line_ < ros::Time::now()))
+    return true;
+  else
+    return false;
+}
+
 } // namespace resource_management

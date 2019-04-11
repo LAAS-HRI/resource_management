@@ -13,25 +13,6 @@
 
 namespace resource_management {
 
-struct CoordinationInternalState_t
-{
-  uint32_t state_machine_id;
-  CoordinationState* state_;
-  transtition_state_t transition_state_;
-
-  CoordinationInternalState_t()
-  {
-    state_ = nullptr;
-    transition_state_ = transition_none;
-  }
-
-  CoordinationInternalState_t(CoordinationState* state, transtition_state_t transition_state)
-  {
-    state_ = state;
-    transition_state_ = transition_state;
-  }
-};
-
 class CoordinationStateMachine : public EventStorage
 {
 public:

@@ -27,6 +27,7 @@ public:
   ros::Duration getTimeout() { return  time_out_; }
   ros::Time getDeadLine() { return  begin_dead_line_; }
   uint32_t getId() { return id_; }
+  bool isTooLate();
 
   CoordinationState* operator[](const std::string& id);
 private:
