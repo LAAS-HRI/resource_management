@@ -197,7 +197,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallba
       case 3: priority = prioritize; break;
       case 2: priority = normal; break;
       case 1: priority = secondary; break;
-      case 0: priority = secondary; break;
+      case 0: priority = ignore; break;
       case -1: priority = inhibit; break;
       default: priority = ignore; break;
     }
@@ -232,6 +232,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
         _activeCoordinationSignal = _coordinationSignalStorage->pop(_reactiveBufferStorage->getHighestPriority());
         if(_activeCoordinationSignal)
         {
+          _coordinationSignalStorage->setUnpoppable();
           _StateMachine.setInitialState(_activeCoordinationSignal->getInitialState(), _activeCoordinationSignal->getId());
           _StateMachine.setTimeout(_activeCoordinationSignal->getTimeout());
           _StateMachine.setDeadLine(_activeCoordinationSignal->getDeadLine());
@@ -263,7 +264,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::run()
         {
           sm_th.join();
           coordination_running = false;
-          _activeCoordinationSignal = std::make_shared<StateStorage>();
+          _activeCoordinationSignal.reset();
           _coordinationMutex.unlock();
           continue;
         }
