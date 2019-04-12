@@ -5,9 +5,11 @@
 namespace resource_management
 {
 
-EventsPluginTest::EventsPluginTest() : _nh(new ros::NodeHandle())
+void EventsPluginTest::setNodeHandle(ros::NodeHandlePtr nh)
 {
-  _subscriber = _nh->subscribe("resource_management/test", 10, &EventsPluginTest::callback, this);
+  _nh = nh;
+  if(_nh)
+    _subscriber = _nh->subscribe("test", 10, &EventsPluginTest::callback, this);
 }
 
 void EventsPluginTest::callback(const std_msgs::String::ConstPtr& msg)

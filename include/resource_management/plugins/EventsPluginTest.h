@@ -2,7 +2,6 @@
 #define EVENTSPLUGINTEST_H
 
 #include <string>
-#include <ros/ros.h>
 
 #include "std_msgs/String.h"
 
@@ -14,10 +13,10 @@ namespace resource_management
 class EventsPluginTest : public EventsInterface
 {
 public:
-  EventsPluginTest();
+  EventsPluginTest() {}
+  void setNodeHandle(ros::NodeHandlePtr nh);
 
 private:
-  ros::NodeHandlePtr _nh;
   ros::Subscriber _subscriber;
 
   void callback(const std_msgs::String::ConstPtr& msg);

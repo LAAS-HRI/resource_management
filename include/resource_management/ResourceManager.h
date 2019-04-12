@@ -364,7 +364,10 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::loadEventsPlugin
   }
 
   for(auto plugin : _plugins)
+  {
+    plugin->setNodeHandle(_nh);
     plugin->registerSpreading([this](auto event){ this->insertEvent(event); });
+  }
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
