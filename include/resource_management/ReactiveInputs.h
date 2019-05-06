@@ -44,7 +44,7 @@ ReactiveInputs<T>::ReactiveInputs(ros::NodeHandlePtr nh, const std::vector<std::
     {
         _buffers.push_back(bufferStorage[prio_buffer_names[index]]);
 
-        std::string sub_name = prio_buffer_names[index] + "_";
+        std::string sub_name = prio_buffer_names[index] + "/";
         std::string type_id = typeid(T).name();
         if(std::regex_match(type_id, match, regex_name))
           sub_name += match[1].str() + "_" + match[2].str();
