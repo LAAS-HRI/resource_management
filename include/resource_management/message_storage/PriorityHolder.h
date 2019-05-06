@@ -10,20 +10,19 @@ enum importance_priority_t
 {
   vital     = 4,
   urgent    = 3,
-  important = 2,
-  helpful   = 1,
-  weak      = 0,
-  useless   = -1,
-  avoid     = -2
+  high      = 2,
+  standard  = 1,
+  low       = 0,
+  void_msg  = -1
 };
 
 enum focus_priority_t
 {
-  fullfocus   = 4,
+  atomic      = 4,
   prioritize  = 3,
   normal      = 2,
   secondary   = 1,
-  ignore      = 0,
+  background  = 0,
   inhibit     = -1
 };
 
@@ -38,13 +37,11 @@ public:
     priority_ = priority;
     priorities_ = std::vector<std::vector<int8_t> >(
       {
-        {-6, -5, -4, -3, -2},
-        {-1, 0 , 1 , 2 , 19},
-        {3 , 4 , 5 , 6 , 20},
-        {7 , 8 , 9 , 10, 21},
-        {11, 12, 13, 14, 22},
-        {15, 16, 17, 18, 23},
-        {24, 25, 26, 27, 28}
+        {0 , 1 , 2 , 3 , 16},
+        {4 , 5 , 6 , 7 , 17},
+        {8 , 9 , 10, 11, 18},
+        {12, 13, 14, 15, 19},
+        {20, 21, 22, 23, 24}
       }
     );
   }

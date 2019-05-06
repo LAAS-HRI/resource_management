@@ -34,9 +34,12 @@ double ReactiveBufferStorage::getHighestPriority()
     {
       if((int)buffers_[it]->getPriority() >= 0) // test if buffer is inhibit
       {
-        int16_t tmp = (*buffers_[it])()->operator*(buffers_[it]->getPriority());
-        if(tmp > max_priority)
-          max_priority = tmp;
+        if((int)(*buffers_[it])()->getPriority() >= 0) // test if message if void
+        {
+          int16_t tmp = (*buffers_[it])()->operator*(buffers_[it]->getPriority());
+          if(tmp > max_priority)
+            max_priority = tmp;
+        }
       }
     }
   }
@@ -55,11 +58,14 @@ std::shared_ptr<ReactiveBuffer> ReactiveBufferStorage::getMorePriority()
     {
       if((int)buffers_[it]->getPriority() >= 0) // test if buffer is inhibit
       {
-        int16_t tmp = (*buffers_[it])()->operator*(buffers_[it]->getPriority());
-        if(tmp > max_priority)
+        if((int)(*buffers_[it])()->getPriority() >= 0) // test if message if void
         {
-          max_priority = tmp;
-          found = buffers_[it];
+          int16_t tmp = (*buffers_[it])()->operator*(buffers_[it]->getPriority());
+          if(tmp > max_priority)
+          {
+            max_priority = tmp;
+            found = buffers_[it];
+          }
         }
       }
     }

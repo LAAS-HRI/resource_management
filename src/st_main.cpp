@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 
   /**********************/
   std::shared_ptr<resource_management::StateStorage> states = std::make_shared<resource_management::StateStorage>(0, ros::Duration(-1),ros::Time::now());
-  states->setPriority(resource_management::important);
+  states->setPriority(resource_management::high);
 
   resource_management::CoordinationTransition t1(ros::Duration(1), ros::Duration(-1), std::vector<std::string>());
   states->addTransition("state1", "state2", t1);

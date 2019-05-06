@@ -7,7 +7,7 @@ ReactiveBuffer::ReactiveBuffer(const std::string& name)
   name_ = name;
   data_ = nullptr;
   has_been_published_ = true;
-  setPriority(ignore);
+  setPriority(background);
 }
 
 void ReactiveBuffer::setData(std::shared_ptr<MessageAbstraction> data)

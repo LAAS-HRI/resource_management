@@ -121,8 +121,8 @@ public:
     }
 
     // the minimal priorities for a message to have a chance to be considered. It depends on the existence of artificial life on the manager.
-    int minimalMessagePriority(){return (has_artificial_life==True ? ::resource_management_msgs::MessagePriority::USELESS : ::resource_management_msgs::MessagePriority::AVOID);}
-    int minimalMessageBuffPriority(){return (has_artificial_life==True ? ::resource_management_msgs::PrioritiesSetter::SECONDARY : ::resource_management_msgs::PrioritiesSetter::IGNORE);}
+    int minimalMessagePriority(){return (has_artificial_life==True ? ::resource_management_msgs::MessagePriority::LOW : ::resource_management_msgs::MessagePriority::VOID);}
+    int minimalMessageBuffPriority(){return (has_artificial_life==True ? ::resource_management_msgs::PrioritiesSetter::SECONDARY : ::resource_management_msgs::PrioritiesSetter::BACKGROUND);}
     std::string expectedDefault(){return (has_artificial_life==True ? "artificial_life" : reactive_input_names[0]);}
 
     size_t reactiveBufferNumber(){return reactive_input_publishers.size();}
@@ -260,9 +260,9 @@ TEST_F(RosNodeFixture, reset){
 // with messages of strictly same importance
 // for all input priority and message importance except AVOID.
 TEST_F(RosNodeFixture, reactiveInputPriorityPreempt){
-    for(int base_prio=::resource_management_msgs::PrioritiesSetter::IGNORE; base_prio<=::resource_management_msgs::PrioritiesSetter::FULLFOCUS; ++base_prio){
-        for (int top_prio=base_prio+1; top_prio <= ::resource_management_msgs::PrioritiesSetter::FULLFOCUS; ++top_prio){
-            for(int message_prio=::resource_management_msgs::MessagePriority::AVOID; message_prio <= ::resource_management_msgs::MessagePriority::VITAL; ++message_prio){
+    for(int base_prio=::resource_management_msgs::PrioritiesSetter::BACKGROUND; base_prio<=::resource_management_msgs::PrioritiesSetter::ATOMIC; ++base_prio){
+        for (int top_prio=base_prio+1; top_prio <= ::resource_management_msgs::PrioritiesSetter::ATOMIC; ++top_prio){
+            for(int message_prio=::resource_management_msgs::MessagePriority::VOID; message_prio <= ::resource_management_msgs::MessagePriority::VITAL; ++message_prio){
                 for(size_t top_prio_i = 0; top_prio_i < reactive_input_names.size(); ++top_prio_i){
                     if(skipTest()) continue;
                     std::vector<signed short> prio(reactive_input_names.size(),base_prio);
@@ -293,8 +293,8 @@ TEST_F(RosNodeFixture, reactiveInputPriorityPreempt){
 // whatever the reactive input priorities are (except FULLFOCUS, not tested here).
 // Only test for message that should be preferred over artificial_life
 TEST_F(RosNodeFixture, reactiveInputMsgImportancePreempt){
-    for(int base_prio=minimalMessageBuffPriority(); base_prio<=::resource_management_msgs::PrioritiesSetter::FULLFOCUS-1; ++base_prio){
-        for (int other_prio=minimalMessageBuffPriority(); other_prio <= ::resource_management_msgs::PrioritiesSetter::FULLFOCUS-1; ++other_prio){
+    for(int base_prio=minimalMessageBuffPriority(); base_prio<=::resource_management_msgs::PrioritiesSetter::ATOMIC-1; ++base_prio){
+        for (int other_prio=minimalMessageBuffPriority(); other_prio <= ::resource_management_msgs::PrioritiesSetter::ATOMIC-1; ++other_prio){
             for(int message_prio=minimalMessagePriority(); message_prio <= ::resource_management_msgs::MessagePriority::VITAL; ++message_prio){
                 for(int message_top_prio=message_prio+1; message_top_prio <= ::resource_management_msgs::MessagePriority::VITAL; ++message_top_prio){
                     for(size_t other_prio_i = 0; other_prio_i < reactive_input_names.size(); ++other_prio_i){
@@ -329,9 +329,9 @@ TEST_F(RosNodeFixture, reactiveInputMsgImportancePreempt){
 // Except AVOID ones (not tested)
 // When all other inputs have a priority < fullfocus (strictly inferior)
 TEST_F(RosNodeFixture, fullFocusPreempt){
-    for(int base_prio=minimalMessageBuffPriority(); base_prio<=::resource_management_msgs::PrioritiesSetter::FULLFOCUS-1; ++base_prio){
-        int other_prio=::resource_management_msgs::PrioritiesSetter::FULLFOCUS;
-        for(int message_prio=::resource_management_msgs::MessagePriority::USELESS; message_prio <= ::resource_management_msgs::MessagePriority::VITAL-1; ++message_prio){
+    for(int base_prio=minimalMessageBuffPriority(); base_prio<=::resource_management_msgs::PrioritiesSetter::ATOMIC-1; ++base_prio){
+        int other_prio=::resource_management_msgs::PrioritiesSetter::ATOMIC;
+        for(int message_prio=::resource_management_msgs::MessagePriority::LOW; message_prio <= ::resource_management_msgs::MessagePriority::VITAL-1; ++message_prio){
             for(int message_top_prio=message_prio+1; message_top_prio <= ::resource_management_msgs::MessagePriority::VITAL-1; ++message_top_prio){
                 for(size_t other_prio_i = 0; other_prio_i < reactive_input_names.size(); ++other_prio_i){
                     std::vector<signed short> prio(reactive_input_names.size(),base_prio);
@@ -363,7 +363,7 @@ TEST_F(RosNodeFixture, fullFocusPreempt){
 // when several reactive inputs have the same priority, the selected one is the one with the
 // message with higher importance
 TEST_F(RosNodeFixture, sameBufferPrioSelectMessagePrio){
-    for(int base_prio=minimalMessageBuffPriority(); base_prio<=::resource_management_msgs::PrioritiesSetter::FULLFOCUS; ++base_prio){
+    for(int base_prio=minimalMessageBuffPriority(); base_prio<=::resource_management_msgs::PrioritiesSetter::ATOMIC; ++base_prio){
         std::vector<signed short> prio(reactive_input_names.size(),base_prio);
         setPriorities(prio);
         for(int message_prio=minimalMessagePriority(); message_prio <= ::resource_management_msgs::MessagePriority::VITAL; ++message_prio){
@@ -391,8 +391,8 @@ TEST_F(RosNodeFixture, sameBufferPrioSelectMessagePrio){
 
 // vital message on whatever input preempts any other message (including fullfocus)
 TEST_F(RosNodeFixture, vitalPreemptsAny){
-    for(int base_prio=minimalMessageBuffPriority(); base_prio<=::resource_management_msgs::PrioritiesSetter::FULLFOCUS; ++base_prio){
-        for (int other_prio=minimalMessageBuffPriority(); other_prio <= ::resource_management_msgs::PrioritiesSetter::FULLFOCUS; ++other_prio){
+    for(int base_prio=minimalMessageBuffPriority(); base_prio<=::resource_management_msgs::PrioritiesSetter::ATOMIC; ++base_prio){
+        for (int other_prio=minimalMessageBuffPriority(); other_prio <= ::resource_management_msgs::PrioritiesSetter::ATOMIC; ++other_prio){
             for(size_t other_prio_i = 0; other_prio_i < reactive_input_names.size(); ++other_prio_i){
                 std::vector<signed short> prio(reactive_input_names.size(),base_prio);
                 prio[other_prio_i]=other_prio;

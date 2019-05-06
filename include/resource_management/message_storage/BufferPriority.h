@@ -12,7 +12,7 @@ public:
 
   int operator*(const importance_priority_t other) const
   {
-    return (int)priorities_[(int)other + 2][(int)priority_];
+    return (int)priorities_[(int)other][(int)priority_];
   }
 private:
 };

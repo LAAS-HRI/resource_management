@@ -68,22 +68,22 @@ bool CoordinationSignals<T>::_serviceCallback(typename T::Request &req, typename
     states->setInitialState(req.header.initial_state);
 
     assert(req.header.priority.value <= 4);
-    assert(req.header.priority.value >= -2);
-    if((req.header.priority.value > 4) || (req.header.priority.value < -2))
+    assert(req.header.priority.value >= -1);
+    if((req.header.priority.value > 4) || (req.header.priority.value < -1))
     {
       ROS_ERROR_STREAM("Coordination signal priority out of range");
       return false;
     }
 
-    importance_priority_t priority = avoid;
+    importance_priority_t priority = void_msg;
     switch (req.header.priority.value) {
       case 4: priority = vital; break;
       case 3: priority = urgent; break;
-      case 2: priority = important; break;
-      case 1: priority = helpful; break;
-      case 0: priority = weak; break;
-      case -1: priority = useless; break;
-      default: priority = avoid; break;
+      case 2: priority = high; break;
+      case 1: priority = standard; break;
+      case 0: priority = low; break;
+      case -1: priority = void_msg; break;
+      default: priority = void_msg; break;
     }
     states->setPriority(priority);
 

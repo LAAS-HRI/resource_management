@@ -12,7 +12,7 @@ public:
 
   int operator*(focus_priority_t other)
   {
-    return (int)priorities_[(int)priority_ + 2][(int)other];
+    return (int)priorities_[(int)priority_][(int)other];
   }
 private:
 };

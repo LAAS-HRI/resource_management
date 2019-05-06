@@ -37,7 +37,7 @@ std::shared_ptr<StateStorage> CoordinationSignalsStorage::pop(double priority)
 
   if(max_index >= 0)
   {
-    max_priority = states_storage_[max_index]->operator*(fullfocus);
+    max_priority = states_storage_[max_index]->operator*(atomic);
 
     if(max_priority >= priority)
     {
@@ -73,7 +73,7 @@ bool CoordinationSignalsStorage::poppable(double priority)
 
   if(max_index >= 0)
   {
-    max_priority = states_storage_[max_index]->operator*(fullfocus);
+    max_priority = states_storage_[max_index]->operator*(atomic);
 
     if(max_priority > priority)
       res = states_storage_[max_index];

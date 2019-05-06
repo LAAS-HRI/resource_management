@@ -166,10 +166,10 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::createReactiveBu
     _reactiveInputs.clear();
     _reactiveBufferStorage=std::make_shared<ReactiveBufferStorage>(getBufferNames());
 
-    _reactiveBufferStorage->setPriority("artificial_life", secondary);
+    _reactiveBufferStorage->setPriority("artificial_life", background);
     _artificialLifeBuffer=_reactiveBufferStorage->operator[]("artificial_life");
 
-    _reactiveBufferStorage->setPriority("coordination_signals", fullfocus);
+    _reactiveBufferStorage->setPriority("coordination_signals", atomic);
     _coordinationSignalBuffer=_reactiveBufferStorage->operator[]("coordination_signals");
 }
 
@@ -189,17 +189,17 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::prioritiesCallba
     }
   }
 
-  focus_priority_t priority = ignore;
+  focus_priority_t priority = background;
   for(size_t i = 0; i < min; i++)
   {
     switch (msg.values[i]) {
-      case 4: priority = fullfocus; break;
+      case 4: priority = atomic; break;
       case 3: priority = prioritize; break;
       case 2: priority = normal; break;
       case 1: priority = secondary; break;
-      case 0: priority = ignore; break;
+      case 0: priority = background; break;
       case -1: priority = inhibit; break;
-      default: priority = ignore; break;
+      default: priority = background; break;
     }
 
     if(std::find(_reactiveBuffersNames.begin(), _reactiveBuffersNames.end(), msg.buffers[i]) != _reactiveBuffersNames.end())

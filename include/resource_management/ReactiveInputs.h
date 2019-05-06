@@ -62,22 +62,22 @@ void ReactiveInputs<T>::_subscriberCallback(size_t index, const boost::shared_pt
     auto wrap = std::make_shared<MessageWrapper<typename T::_data_type>>(msg->data);
 
     assert(msg->priority.value <= 4);
-    assert(msg->priority.value >= -2);
-    if((msg->priority.value > 4) || (msg->priority.value < -2))
+    assert(msg->priority.value >= -1);
+    if((msg->priority.value > 4) || (msg->priority.value < -1))
     {
       ROS_ERROR_STREAM("Reactive message priority out of range");
       return;
     }
 
-    importance_priority_t priority = avoid;
+    importance_priority_t priority = void_msg;
     switch (msg->priority.value) {
       case 4: priority = vital; break;
       case 3: priority = urgent; break;
-      case 2: priority = important; break;
-      case 1: priority = helpful; break;
-      case 0: priority = weak; break;
-      case -1: priority = useless; break;
-      default: priority = avoid; break;
+      case 2: priority = high; break;
+      case 1: priority = standard; break;
+      case 0: priority = low; break;
+      case -1: priority = void_msg; break;
+      default: priority = void_msg; break;
     }
 
     wrap->setPriority(priority);

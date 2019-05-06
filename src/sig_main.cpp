@@ -82,8 +82,8 @@ int main()
   buffers.setPriority("monitoring", resource_management::prioritize);
   buffers.setPriority("speaking", resource_management::normal);
 
-  m1.setPriority(resource_management::helpful);
-  m2.setPriority(resource_management::helpful);
+  m1.setPriority(resource_management::standard);
+  m2.setPriority(resource_management::standard);
 
   buffers["monitoring"]->setData(std::make_shared<resource_management::MessageWrapper<std::string>>(m1));
   buffers["speaking"]->setData(std::make_shared<resource_management::MessageWrapper<std::string>>(m2));
@@ -94,8 +94,8 @@ int main()
 
   buffers.getMorePriorityData()->publish();
 
-  m2.setPriority(resource_management::avoid);
-  m3.setPriority(resource_management::helpful);
+  m2.setPriority(resource_management::void_msg);
+  m3.setPriority(resource_management::standard);
   buffers["monitoring"]->setData(std::make_shared<resource_management::MessageWrapper<test_t>>(m3));
 
   buffers.getMorePriorityData()->publish();

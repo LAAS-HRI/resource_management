@@ -11,7 +11,7 @@ ArtificialLife::ArtificialLife(std::shared_ptr<resource_management::ReactiveBuff
 
   auto wrapped_OnOff_data = std::make_shared<resource_management::MessageWrapper<bool>>(on);
 
-  wrapped_OnOff_data->setPriority(resource_management::useless);
+  wrapped_OnOff_data->setPriority(resource_management::low);
 
   _buffer->setData(wrapped_OnOff_data);
 }
@@ -23,7 +23,7 @@ void ArtificialLife::init()
 
   auto wrapped_OnOff_data = std::make_shared<resource_management::MessageWrapper<bool>>(on);
 
-  wrapped_OnOff_data->setPriority(resource_management::useless);
+  wrapped_OnOff_data->setPriority(resource_management::low);
 
   _buffer->setData(wrapped_OnOff_data);
 }
@@ -37,7 +37,7 @@ void ArtificialLife::inLoop()
     on = !on;
 
     auto wrapped_OnOff_data = std::make_shared<resource_management::MessageWrapper<bool>>(on);
-    wrapped_OnOff_data->setPriority(resource_management::useless);
+    wrapped_OnOff_data->setPriority(resource_management::low);
     _buffer->setData(wrapped_OnOff_data);
   }
 }
