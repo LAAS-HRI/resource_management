@@ -1,10 +1,10 @@
-#include "resource_management/state_machine/CoordinationStateMachine.h"
+#include "resource_management/state_machine/StateMachine.h"
 
 #include <unistd.h>
 
 namespace resource_management {
 
-CoordinationStateMachine::CoordinationStateMachine(float rate)
+StateMachine::StateMachine(float rate)
 {
   publishState_ = nullptr;
   time_out_ = ros::Duration(-1);
@@ -13,7 +13,7 @@ CoordinationStateMachine::CoordinationStateMachine(float rate)
   new_state_ = false;
 }
 
-bool CoordinationStateMachine::runing()
+bool StateMachine::runing()
 {
   bool res = false;
   internal_state_mutex_.lock();
@@ -22,7 +22,7 @@ bool CoordinationStateMachine::runing()
   return res;
 }
 
-void CoordinationStateMachine::run()
+void StateMachine::run()
 {
   if(internal_state_.state_ != nullptr)
     internal_state_.state_->startState();
@@ -106,7 +106,7 @@ void CoordinationStateMachine::run()
   internal_state_mutex_.unlock();
 }
 
-StateMachineInternalState_t CoordinationStateMachine::getInternalState()
+StateMachineInternalState_t StateMachine::getInternalState()
 {
   internal_state_mutex_.lock();
   StateMachineInternalState_t tmp = internal_state_;
@@ -114,7 +114,7 @@ StateMachineInternalState_t CoordinationStateMachine::getInternalState()
   return tmp;
 }
 
-std::string CoordinationStateMachine::getCurrentStateName()
+std::string StateMachine::getCurrentStateName()
 {
   std::string name = "";
   internal_state_mutex_.lock();
@@ -124,14 +124,14 @@ std::string CoordinationStateMachine::getCurrentStateName()
   return name;
 }
 
-bool CoordinationStateMachine::isNewState()
+bool StateMachine::isNewState()
 {
   bool res = new_state_;
   new_state_= false;
   return res;
 }
 
-bool CoordinationStateMachine::isWildcardState()
+bool StateMachine::isWildcardState()
 {
   bool res = false;
   internal_state_mutex_.lock();
@@ -145,7 +145,7 @@ bool CoordinationStateMachine::isWildcardState()
   return res;
 }
 
-void CoordinationStateMachine::setInitialState(StateMachineState* state, uint32_t state_machine_id)
+void StateMachine::setInitialState(StateMachineState* state, uint32_t state_machine_id)
 {
   internal_state_mutex_.lock();
   internal_state_.state_machine_id = state_machine_id;
@@ -155,12 +155,12 @@ void CoordinationStateMachine::setInitialState(StateMachineState* state, uint32_
   internal_state_mutex_.unlock();
 }
 
-void CoordinationStateMachine::setPublicationFunction(std::function<void(StateMachineInternalState_t)> publishState)
+void StateMachine::setPublicationFunction(std::function<void(StateMachineInternalState_t)> publishState)
 {
   publishState_ = publishState;
 }
 
-void CoordinationStateMachine::runOnceNoEvent()
+void StateMachine::runOnceNoEvent()
 {
   StateMachineState* tmp_state = internal_state_.state_;
   transtition_state_t tmp_transition = internal_state_.state_->update(&tmp_state);
@@ -186,7 +186,7 @@ void CoordinationStateMachine::runOnceNoEvent()
   }
 }
 
-void CoordinationStateMachine::runOnceWithEvents(std::queue<std::string>& events)
+void StateMachine::runOnceWithEvents(std::queue<std::string>& events)
 {
   while(events.empty() == false)
   {

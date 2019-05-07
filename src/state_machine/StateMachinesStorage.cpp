@@ -116,7 +116,7 @@ void StateMachinesStorage::clean()
       internal_state.state_machine_id = states_storage_[i]->getId();
       internal_state.state_ = nullptr;
       internal_state.transition_state_ = transition_dead_line;
-      // inform that the coordination signal will be removed
+      // inform that the state machine will be removed
       if(publishState_)
         publishState_(internal_state);
       states_storage_.erase(states_storage_.begin() + i);

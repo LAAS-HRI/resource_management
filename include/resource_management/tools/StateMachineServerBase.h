@@ -1,5 +1,5 @@
-#ifndef _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_COORDINATIONSERVERBASE_H_
-#define _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_COORDINATIONSERVERBASE_H_
+#ifndef _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_STATEMACHINESERVERBASE_H_
+#define _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_STATEMACHINESERVERBASE_H_
 
 #include <functional>
 
@@ -12,19 +12,19 @@ namespace resource_management
 {
 
 template<class MessageType>
-class CoordinationServerBase
+class StateMachineServerBase
 {
 public:
-  CoordinationServerBase(ros::NodeHandlePtr nh, syd::string name)
+  StateMachineServerBase(ros::NodeHandlePtr nh, syd::string name)
   {
     _nh = nh;
     _name = name;
     _id = -1;
   }
 
-  bool sendCoordinationSignal(MessageType srv)
+  bool sendStateMachine(MessageType srv)
   {
-    ros::ServiceClient client = n.serviceClient<MessageType>(_name + "/coordination_signal_register");
+    ros::ServiceClient client = n.serviceClient<MessageType>(_name + "/state_machine_register");
     if(client.call(srv))
       return true;
     else
@@ -36,7 +36,7 @@ public:
     if(id_ == -1)
       return false;
 
-    ros::ServiceClient client = n.serviceClient<resource_management_msgs::StateMachinesCancel>(_name + "/coordination_signal_cancel");
+    ros::ServiceClient client = n.serviceClient<resource_management_msgs::StateMachinesCancel>(_name + "/state_machine_cancel");
     resource_management_msgs::StateMachinesCancel srv;
     srv.request.id = _id;
     _id = -1;
@@ -53,4 +53,4 @@ private:
 
 }
 
-#endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_COORDINATIONSERVERBASE_H_
+#endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_STATEMACHINESERVERBASE_H_

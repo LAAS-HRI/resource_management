@@ -1,5 +1,5 @@
-#ifndef COORDINATIONSTATEMACHINE_H
-#define COORDINATIONSTATEMACHINE_H
+#ifndef STATEMACHINE_H
+#define STATEMACHINE_H
 
 #include "resource_management/state_machine/EventStorage.h"
 
@@ -13,10 +13,10 @@
 
 namespace resource_management {
 
-class CoordinationStateMachine : public EventStorage
+class StateMachine : public EventStorage
 {
 public:
-  CoordinationStateMachine(float rate = 100);
+  StateMachine(float rate = 100);
 
   void run();
   StateMachineInternalState_t getInternalState();
@@ -46,4 +46,4 @@ private:
 
 } // namespace resource_management
 
-#endif // COORDINATIONSTATEMACHINE_H
+#endif // STATEMACHINE_H

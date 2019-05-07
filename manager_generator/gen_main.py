@@ -78,7 +78,7 @@ for x in args.target_types :
     filename='StateMachineState'+name+'.msg'
     msg_files.append(filename)
     f = open(os.path.join(args.package_name,'msg',filename),'w')
-    f.write("resource_management/CoordinationStateHeader header\n")
+    f.write("resource_management/StateMachineStateHeader header\n")
     f.write("{} data\n".format(data_type))
     f.close()
 
@@ -94,11 +94,11 @@ for x in args.target_types :
     f.close()
 
 
-#   CoordinationSignal
-filename='CoordinationSignal.msg'
+#   StateMachine
+filename='StateMachine.msg'
 msg_files.append(filename)
 f_signal=open(os.path.join(args.package_name,'msg',filename),'w')
-f_signal.write("resource_management/EndCondition end_condition # coordination signal must stop whatever state it is in if this condition is verified\n")
+f_signal.write("resource_management/EndCondition end_condition # state machine must stop whatever state it is in if this condition is verified\n")
 for x in args.target_types :
     name=x.split(':')[0]
     data_type=x.split(':')[1]
@@ -113,7 +113,7 @@ mainfile=os.path.join(args.package_name, "src", args.package_name+".cpp")
 fo = open(mainfile,"w")
 
 # include message headers
-fo.write('#include "{}/{}.h"\n'.format(args.package_name,"CoordinationSignal"))
+fo.write('#include "{}/{}.h"\n'.format(args.package_name,"StateMachine"))
 
 if args.target_types:
     for x in args.target_types:
@@ -124,8 +124,8 @@ if args.target_types:
 #main
 fo.write("\nint main(int argc, char *argv[]){\n")
 
-# coordination signals
-fo.write('CoordinationSignals<{}::CoordinationSignal>  coordSignals("coordination_signals");\n'.format(args.package_name))
+# state machines
+fo.write('StateMachines<{}::StateMachine>  stateMachines("state_machines");\n'.format(args.package_name))
 
 # priority targets
 priority_targets = []
@@ -136,7 +136,7 @@ if args.priority_topics:
         fo.write("ReactiveInputs<{}::{}> {}(\"{}\");\n".format(args.package_name,msg_type,'prio_'+topic,topic))
         priority_targets.append('prio_'+topic)
 
-fo.write('ResourceManager mgr(coordSignals, {});\n'.format('{'+', '.join(priority_targets)+'}'))
+fo.write('ResourceManager mgr(stateMachines, {});\n'.format('{'+', '.join(priority_targets)+'}'))
 
 
 fo.write("}\n")

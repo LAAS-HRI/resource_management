@@ -26,7 +26,7 @@ include_directories(
 add_library(state_machine_lib
   src/state_machine/StateMachineTransition.cpp
   src/state_machine/StateMachineState.cpp
-  src/state_machine/CoordinationStateMachine.cpp
+  src/state_machine/StateMachine.cpp
   src/state_machine/EventStorage.cpp
   src/state_machine/StateStorage.cpp
   src/state_machine/StateMachinesStorage.cpp

@@ -1,4 +1,4 @@
-#include "led_manager_msgs/CoordinationSignal.h"
+#include "led_manager_msgs/StateMachine.h"
 #include "led_manager_msgs/Color.h"
 #include "led_manager_msgs/OnOff.h"
 #include "led_manager_test/ArtificialLife.h"
@@ -8,7 +8,7 @@
 
 #include <thread>
 
-class LedManager : public resource_management::ResourceManager<led_manager_msgs::CoordinationSignal
+class LedManager : public resource_management::ResourceManager<led_manager_msgs::StateMachine
       ,led_manager_msgs::Color
       ,led_manager_msgs::OnOff
 >
@@ -26,16 +26,16 @@ public:
     }
 
 private:
-    std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> stateFromMsg(const led_manager_msgs::CoordinationSignal::Request &msg) override;
+    std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> stateFromMsg(const led_manager_msgs::StateMachine::Request &msg) override;
     std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
-    transitionFromMsg(const led_manager_msgs::CoordinationSignal::Request &msg) override;
-    led_manager_msgs::CoordinationSignal::Response generateResponseMsg(uint32_t id) override;
+    transitionFromMsg(const led_manager_msgs::StateMachine::Request &msg) override;
+    led_manager_msgs::StateMachine::Response generateResponseMsg(uint32_t id) override;
 
     void publishColorMsg(float msg, bool is_new);
     void publishOnOffMsg(bool msg, bool is_new);
 };
 
-std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> LedManager::stateFromMsg(const led_manager_msgs::CoordinationSignal::Request &msg)
+std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> LedManager::stateFromMsg(const led_manager_msgs::StateMachine::Request &msg)
 {
     std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> states;
 
@@ -53,7 +53,7 @@ std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> L
 }
 
 std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
-LedManager::transitionFromMsg(const led_manager_msgs::CoordinationSignal::Request &msg)
+LedManager::transitionFromMsg(const led_manager_msgs::StateMachine::Request &msg)
 {
     std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>> transitions;
 
@@ -79,9 +79,9 @@ LedManager::transitionFromMsg(const led_manager_msgs::CoordinationSignal::Reques
     return transitions;
 }
 
-led_manager_msgs::CoordinationSignal::Response LedManager::generateResponseMsg(uint32_t id)
+led_manager_msgs::StateMachine::Response LedManager::generateResponseMsg(uint32_t id)
 {
-  led_manager_msgs::CoordinationSignal::Response res;
+  led_manager_msgs::StateMachine::Response res;
   res.id = id;
   return res;
 }

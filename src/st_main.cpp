@@ -1,4 +1,4 @@
-#include "resource_management/state_machine/CoordinationStateMachine.h"
+#include "resource_management/state_machine/StateMachine.h"
 #include "resource_management/state_machine/StateStorage.h"
 #include "resource_management/state_machine/StateMachinesStorage.h"
 
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
   ros::init(argc,argv,"st_demo");
   ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
 
-  resource_management::StateMachinesStorage coordination_signals;
+  resource_management::StateMachinesStorage state_machines;
 
   /**********************/
   std::shared_ptr<resource_management::StateStorage> states = std::make_shared<resource_management::StateStorage>(0, ros::Duration(-1),ros::Time::now());
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 
   states->setInitialState("state1");
 
-  coordination_signals.push(states);
+  state_machines.push(states);
 
   /**********************/
   std::shared_ptr<resource_management::StateStorage> states_2 = std::make_shared<resource_management::StateStorage>(1);
@@ -66,21 +66,21 @@ int main(int argc, char** argv)
 
   states_2->setInitialState("state4");
 
-  coordination_signals.push(states_2);
+  state_machines.push(states_2);
 
   /**********************/
-  while(coordination_signals.empty() == false)
+  while(state_machines.empty() == false)
   {
     std::cout << " ************* " << std::endl;
-    std::shared_ptr<resource_management::StateStorage> current = coordination_signals.pop();
+    std::shared_ptr<resource_management::StateStorage> current = state_machines.pop();
 
-    resource_management::CoordinationStateMachine sm;
+    resource_management::StateMachine sm;
     sm.setPublicationFunction(&publishState);
     sm.setInitialState(current->getInitialState(), current->getId());
     sm.setTimeout(current->getTimeout());
     sm.setDeadLine(current->getDeadLine());
 
-    std::thread th(&resource_management::CoordinationStateMachine::run, &sm);
+    std::thread th(&resource_management::StateMachine::run, &sm);
     usleep(2000000);
     sm.addEvent("regex");
     th.join();

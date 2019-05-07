@@ -1,5 +1,5 @@
-#ifndef COORDINATIONSTATE_H
-#define COORDINATIONSTATE_H
+#ifndef STATEMACHINESTATE_H
+#define STATEMACHINESTATE_H
 
 #include "resource_management/state_machine/StateMachineTransition.h"
 
@@ -49,4 +49,4 @@ private:
 
 } // namespace resource_management
 
-#endif // COORDINATIONSTATE_H
+#endif // STATEMACHINESTATE_H

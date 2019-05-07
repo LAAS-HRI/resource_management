@@ -1,5 +1,5 @@
-#ifndef COORDINATIONSIGNALSSTORAGE_H
-#define COORDINATIONSIGNALSSTORAGE_H
+#ifndef STATEMACHINESSTORAGE_H
+#define STATEMACHINESSTORAGE_H
 
 #include "resource_management/state_machine/StateStorage.h"
 
@@ -32,4 +32,4 @@ private:
 
 } // namespace resource_management
 
-#endif //COORDINATIONSIGNALSSTORAGE_H
+#endif //STATEMACHINESSTORAGE_H
