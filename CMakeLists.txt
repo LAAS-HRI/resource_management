@@ -29,7 +29,7 @@ add_library(state_machine_lib
   src/state_machine/CoordinationStateMachine.cpp
   src/state_machine/EventStorage.cpp
   src/state_machine/StateStorage.cpp
-  src/state_machine/CoordinationSignalsStorage.cpp
+  src/state_machine/StateMachinesStorage.cpp
 )
 add_dependencies(state_machine_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 

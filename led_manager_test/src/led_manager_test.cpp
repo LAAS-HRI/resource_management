@@ -3,7 +3,6 @@
 #include "led_manager_msgs/OnOff.h"
 #include "led_manager_test/ArtificialLife.h"
 
-#include <resource_management/CoordinationSignals.h>
 #include <resource_management/ReactiveInputs.h>
 #include <resource_management/ResourceManager.h>
 

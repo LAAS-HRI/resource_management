@@ -196,7 +196,7 @@ public:
 
     CoordinationSignalFixture(): RosNodeFixture()
     {
-        coord_sig_client = nh.serviceClient<${project_name}_msgs::CoordinationSignal>("/${project_name}/coordination_signals_register");
+        coord_sig_client = nh.serviceClient<${project_name}_msgs::CoordinationSignal>("/${project_name}/state_machines_register");
     }
 
     ${project_name}_msgs::CoordinationSignal makeCoordinationSignal(std::string initial, double timeout, double dl_in_secs_from_now, int prio){

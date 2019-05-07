@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
   onoff_state.header.transitions.clear();
 
   {
-    resource_management_msgs::CoordinationSignalsTransition transition;
+    resource_management_msgs::StateMachineTransition transition;
     transition.next_state = "state_1";
     transition.end_condition.timeout = ros::Duration(-1);
     transition.end_condition.duration = ros::Duration(10);//1
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
   }
 
   {
-    resource_management_msgs::CoordinationSignalsTransition transition;
+    resource_management_msgs::StateMachineTransition transition;
     transition.next_state = "state_2";
     transition.end_condition.timeout = ros::Duration(-1);
     transition.end_condition.duration = ros::Duration(1);//-1
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
   color_state.header.transitions.clear();
 
   {
-    resource_management_msgs::CoordinationSignalsTransition transition;
+    resource_management_msgs::StateMachineTransition transition;
     transition.next_state = "state_0";
     transition.end_condition.timeout = ros::Duration(-1);
     transition.end_condition.duration = ros::Duration(1);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
   color_state.header.transitions.clear();
 
   {
-    resource_management_msgs::CoordinationSignalsTransition transition;
+    resource_management_msgs::StateMachineTransition transition;
     transition.next_state = "state_3";
     transition.end_condition.timeout = ros::Duration(-1);
     transition.end_condition.duration = ros::Duration(2);
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
   color_state.header.transitions.clear();
 
   {
-    resource_management_msgs::CoordinationSignalsTransition transition;
+    resource_management_msgs::StateMachineTransition transition;
     transition.next_state = "state_4";
     transition.end_condition.timeout = ros::Duration(-1);
     transition.end_condition.duration = ros::Duration(2);
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
   onoff_state.header.transitions.clear();
 
   {
-    resource_management_msgs::CoordinationSignalsTransition transition;
+    resource_management_msgs::StateMachineTransition transition;
     transition.next_state = "state_5";
     transition.end_condition.timeout = ros::Duration(-1);
     transition.end_condition.duration = ros::Duration(2);
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 
   std::cout << "will pub" << std::endl;
   led_manager_msgs::CoordinationSignal srv;
-  ros::ServiceClient client = nh->serviceClient<led_manager_msgs::CoordinationSignal>("/led_manager_test/coordination_signals_register");
+  ros::ServiceClient client = nh->serviceClient<led_manager_msgs::CoordinationSignal>("/led_manager_test/state_machines_register");
   srv.request = signal;
   client.call(srv);
 

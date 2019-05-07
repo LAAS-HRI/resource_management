@@ -4,7 +4,6 @@
 !!end
 #include "${project_name}/ArtificialLife.h"
 
-#include <resource_management/CoordinationSignals.h>
 #include <resource_management/ReactiveInputs.h>
 #include <resource_management/ResourceManager.h>
 

@@ -8,10 +8,10 @@
 
 namespace resource_management {
 
-class CoordinationSignalsStorage
+class StateMachinesStorage
 {
 public:
-  CoordinationSignalsStorage() { unpoppable_ = false; }
+  StateMachinesStorage() { unpoppable_ = false; }
   bool empty();
   void push(std::shared_ptr<StateStorage>& state_storage);
   std::shared_ptr<StateStorage> pop(double priority = -100);

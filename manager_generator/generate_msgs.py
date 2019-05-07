@@ -156,7 +156,7 @@ def main():
         filename='CoordinationState'+name+'.msg'
         msg_files.append(filename)
         f = open(os.path.join(args.package_name,'msg',filename),'w+')
-        f.write("resource_management_msgs/CoordinationStateHeader header\n")
+        f.write("resource_management_msgs/StateMachineStateHeader header\n")
         f.write("{} data\n".format(data_type))
         f.close()
 
@@ -176,7 +176,7 @@ def main():
     filename='CoordinationSignal.srv'
     srv_files.append(filename)
     f_signal=open(os.path.join(args.package_name,'srv',filename),'w+')
-    f_signal.write("resource_management_msgs/CoordinationSignalHeader header\n")
+    f_signal.write("resource_management_msgs/StateMachineHeader header\n")
     for x in message_types :
         name=x[0]
         #data_type=x[1]

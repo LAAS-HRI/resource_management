@@ -1,5 +1,5 @@
-#ifndef _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_COORDINATION_SIGNALS_H_
-#define _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_COORDINATION_SIGNALS_H_
+#ifndef _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_STATE_MACHINES_H_
+#define _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_STATE_MACHINES_H_
 
 #include <ros/ros.h>
 #include <ros/console.h>
@@ -10,68 +10,61 @@
 
 #include "state_machine/CoordinationStateMachine.h"
 #include "state_machine/StateStorage.h"
-#include "state_machine/CoordinationSignalsStorage.h"
+#include "state_machine/StateMachinesStorage.h"
 
 #include "message_storage/MessageWrapper.h"
-#include "resource_management_msgs/CoordinationSignalsTransition.h"
+#include "resource_management_msgs/StateMachineTransition.h"
 
 namespace resource_management {
 
-struct CoordinationHeader_t
-{
-  ros::Duration time_out;
-  ros::Time begin_dead_line;
-  int priority;
-};
-
-class CoordinationSignalsBase
+class StateMachinesBase
 {
 };
 
 template<class T>
-class CoordinationSignals : public CoordinationSignalsBase
+class StateMachines : public StateMachinesBase
 {
 public:
     using StateFromMsgFn = boost::function<std::map<std::string,std::shared_ptr<MessageAbstraction>>(const typename T::Request&)>;
     using TransitionFromMsgFn = boost::function<std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>(const typename T::Request&)>;
     using GenerateResponseMsgFn = boost::function< typename T::Response(uint32_t)>;
 
-    CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn, std::shared_ptr<CoordinationSignalsStorage> storage);
+    StateMachines(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn, std::shared_ptr<StateMachinesStorage> storage);
 
 private:
     bool _serviceCallback(typename T::Request &req, typename T::Response &res);
     ros::NodeHandlePtr _nh;
     ros::ServiceServer _serviceServer;
-    StateFromMsgFn _getStateDataFromCoordinationSignalMsg;
-    TransitionFromMsgFn _getTransitionsFromCoordinationSignalMsg;
+    StateFromMsgFn _getStateDataFromStateMachineMsg;
+    TransitionFromMsgFn _getTransitionsFromStateMachineMsg;
     GenerateResponseMsgFn _generateResponseMsg;
-    std::shared_ptr<CoordinationSignalsStorage> _storage;
-    uint32_t _coordinationSignalsId;
+    std::shared_ptr<StateMachinesStorage> _storage;
+    uint32_t _stateMachinesId;
 };
 
 template<class T>
-CoordinationSignals<T>::CoordinationSignals(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn generateResponseMsg, std::shared_ptr<CoordinationSignalsStorage> storage):
+StateMachines<T>::StateMachines(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn generateResponseMsg, std::shared_ptr<StateMachinesStorage> storage):
     _nh(std::move(nh)),
-    _getStateDataFromCoordinationSignalMsg(std::move(stateFromMsg)),
-    _getTransitionsFromCoordinationSignalMsg(std::move(transitionFromMsg)),
+    _getStateDataFromStateMachineMsg(std::move(stateFromMsg)),
+    _getTransitionsFromStateMachineMsg(std::move(transitionFromMsg)),
     _generateResponseMsg(std::move(generateResponseMsg))
 {
     _storage = storage;
-    _coordinationSignalsId = 0;
-    _serviceServer = _nh->advertiseService("coordination_signals_register",&CoordinationSignals<T>::_serviceCallback,this);
+    _stateMachinesId = 0;
+    _serviceServer = _nh->advertiseService("state_machines_register",&StateMachines<T>::_serviceCallback,this);
 }
 
 template<class T>
-bool CoordinationSignals<T>::_serviceCallback(typename T::Request &req, typename T::Response &res)
+bool StateMachines<T>::_serviceCallback(typename T::Request &req, typename T::Response &res)
 {
-    std::shared_ptr<StateStorage> states = std::make_shared<StateStorage>(_coordinationSignalsId, req.header.timeout, req.header.begin_dead_line);
+    std::shared_ptr<StateStorage> states = std::make_shared<StateStorage>(_stateMachinesId, req.header.timeout, req.header.begin_dead_line);
     states->setInitialState(req.header.initial_state);
 
     assert(req.header.priority.value <= 4);
     assert(req.header.priority.value >= -1);
     if((req.header.priority.value > 4) || (req.header.priority.value < -1))
     {
-      ROS_ERROR_STREAM("Coordination signal priority out of range");
+      ROS_ERROR_STREAM("State machine priority out of range");
       return false;
     }
 
@@ -87,7 +80,7 @@ bool CoordinationSignals<T>::_serviceCallback(typename T::Request &req, typename
     }
     states->setPriority(priority);
 
-    auto transitions = _getTransitionsFromCoordinationSignalMsg(req);
+    auto transitions = _getTransitionsFromStateMachineMsg(req);
 
     for(auto &t : transitions){
         resource_management_msgs::EndCondition &end_condition = std::get<2>(t);
@@ -95,7 +88,7 @@ bool CoordinationSignals<T>::_serviceCallback(typename T::Request &req, typename
         states->addTransition(std::get<0>(t),std::get<1>(t),transition);
     }
 
-    auto stateData = _getStateDataFromCoordinationSignalMsg(req);
+    auto stateData = _getStateDataFromStateMachineMsg(req);
     for(auto it : stateData)
       states->addData(it.first, it.second);
 
@@ -103,17 +96,17 @@ bool CoordinationSignals<T>::_serviceCallback(typename T::Request &req, typename
     {
       _storage->push(states);
 
-      res = _generateResponseMsg(_coordinationSignalsId);
-      _coordinationSignalsId++;
+      res = _generateResponseMsg(_stateMachinesId);
+      _stateMachinesId++;
       return true;
     }
     else
     {
-      ROS_ERROR_STREAM("No valid coordination signals container");
+      ROS_ERROR_STREAM("No valid state machines container");
       return false;
     }
 }
 
 } // namespace resource_management
 
-#endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_COORDINATION_SIGNALS_H_
+#endif // _RESOURCE_MANAGEMENT_INCLUDE_RESOURCE_MANAGEMENT_STATE_MACHINES_H_

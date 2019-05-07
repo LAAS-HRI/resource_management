@@ -1,8 +1,8 @@
-#include "resource_management/state_machine/CoordinationSignalsStorage.h"
+#include "resource_management/state_machine/StateMachinesStorage.h"
 
 namespace resource_management {
 
-bool CoordinationSignalsStorage::empty()
+bool StateMachinesStorage::empty()
 {
   mutex_.lock();
   size_t nb_states = states_storage_.size();
@@ -14,14 +14,14 @@ bool CoordinationSignalsStorage::empty()
     return false;
 }
 
-void CoordinationSignalsStorage::push(std::shared_ptr<StateStorage>& state_storage)
+void StateMachinesStorage::push(std::shared_ptr<StateStorage>& state_storage)
 {
   mutex_.lock();
   states_storage_.push_back(state_storage);
   mutex_.unlock();
 }
 
-std::shared_ptr<StateStorage> CoordinationSignalsStorage::pop(double priority)
+std::shared_ptr<StateStorage> StateMachinesStorage::pop(double priority)
 {
   int max_index = -1;
   int max_priority = -100;
@@ -51,7 +51,7 @@ std::shared_ptr<StateStorage> CoordinationSignalsStorage::pop(double priority)
   return res;
 }
 
-bool CoordinationSignalsStorage::poppable(double priority)
+bool StateMachinesStorage::poppable(double priority)
 {
   if(unpoppable_)
   {
@@ -83,7 +83,7 @@ bool CoordinationSignalsStorage::poppable(double priority)
   return (res != nullptr);
 }
 
-bool CoordinationSignalsStorage::remove(uint32_t id)
+bool StateMachinesStorage::remove(uint32_t id)
 {
   bool found = false;
 
@@ -101,12 +101,12 @@ bool CoordinationSignalsStorage::remove(uint32_t id)
   return found;
 }
 
-void CoordinationSignalsStorage::setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState)
+void StateMachinesStorage::setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState)
 {
   publishState_ = publishState;
 }
 
-void CoordinationSignalsStorage::clean()
+void StateMachinesStorage::clean()
 {
   for(size_t i = 0; i < states_storage_.size(); )
   {

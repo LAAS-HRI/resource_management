@@ -1,6 +1,6 @@
 #include "resource_management/state_machine/CoordinationStateMachine.h"
 #include "resource_management/state_machine/StateStorage.h"
-#include "resource_management/state_machine/CoordinationSignalsStorage.h"
+#include "resource_management/state_machine/StateMachinesStorage.h"
 
 #include <ros/ros.h>
 
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
   ros::init(argc,argv,"st_demo");
   ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
 
-  resource_management::CoordinationSignalsStorage coordination_signals;
+  resource_management::StateMachinesStorage coordination_signals;
 
   /**********************/
   std::shared_ptr<resource_management::StateStorage> states = std::make_shared<resource_management::StateStorage>(0, ros::Duration(-1),ros::Time::now());

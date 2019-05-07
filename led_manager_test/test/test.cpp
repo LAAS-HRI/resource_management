@@ -194,7 +194,7 @@ public:
 
     CoordinationSignalFixture(): RosNodeFixture()
     {
-        coord_sig_client = nh.serviceClient<led_manager_msgs::CoordinationSignal>("/led_manager_test/coordination_signals_register");
+        coord_sig_client = nh.serviceClient<led_manager_msgs::CoordinationSignal>("/led_manager_test/state_machines_register");
     }
 
     led_manager_msgs::CoordinationSignal makeCoordinationSignal(std::string initial, double timeout, double dl_in_secs_from_now, int prio){
@@ -205,15 +205,15 @@ public:
         sig.request.header.priority.value=prio;
         return sig;
     }
-    void addState(led_manager_msgs::CoordinationSignal::Request &request, const std::string &id, const std::vector<::resource_management_msgs::CoordinationSignalsTransition> & transitions = {}){
+    void addState(led_manager_msgs::CoordinationSignal::Request &request, const std::string &id, const std::vector<::resource_management_msgs::StateMachineTransition> & transitions = {}){
         led_manager_msgs::CoordinationStateColor state;
         state.header.id=id;
         state.header.transitions = transitions;
         request.states_Color.push_back(state);
     }
 
-    ::resource_management_msgs::CoordinationSignalsTransition makeTransition(std::string next_state, double timeout, double duration, std::vector<std::string> regexs){
-        ::resource_management_msgs::CoordinationSignalsTransition trans;
+    ::resource_management_msgs::StateMachineTransition makeTransition(std::string next_state, double timeout, double duration, std::vector<std::string> regexs){
+        ::resource_management_msgs::StateMachineTransition trans;
         trans.next_state=std::move(next_state);
         trans.end_condition.timeout=ros::Duration(std::move(timeout));
         trans.end_condition.duration=ros::Duration(std::move(duration));
