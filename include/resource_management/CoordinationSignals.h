@@ -108,7 +108,10 @@ bool CoordinationSignals<T>::_serviceCallback(typename T::Request &req, typename
       return true;
     }
     else
+    {
+      ROS_ERROR_STREAM("No valid coordination signals container");
       return false;
+    }
 }
 
 } // namespace resource_management

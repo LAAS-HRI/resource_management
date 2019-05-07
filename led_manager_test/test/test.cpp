@@ -97,9 +97,9 @@ public:
     }
 
     void resetManagerNode(){
-        setPriorities(std::vector<signed short>(reactive_input_names.size(),2)); //normal priority
+        setPriorities(std::vector<signed short>(reactive_input_names.size(),resource_management_msgs::PrioritiesSetter::NORMAL)); //normal priority
         for(auto &buf : reactive_input_publishers){
-            buf->sendMessage(-1); // void priority
+            buf->sendMessage(resource_management_msgs::MessagePriority::STANDARD); // standard priority
         }
         if(has_artificial_life==Unset){
             if(expectActiveBuffer("artificial_life",2.) != "artificial_life"){
@@ -420,7 +420,7 @@ TEST_F(CoordinationSignalFixture,uniqueIds){
     std::vector<uint> ids;
     ids.reserve(100);
     for(size_t i = 0; i <100; ++i){
-        auto sig = makeSimpleCoordinationSignal(2);
+        auto sig = makeSimpleCoordinationSignal(resource_management::MessagePriority::STANDARD);
         bool srv_res = coord_sig_client.call(sig);
         EXPECT_TRUE(srv_res) << "failed to call coordination signal registration service";
         if(srv_res){
