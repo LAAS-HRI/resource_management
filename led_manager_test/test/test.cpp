@@ -420,7 +420,7 @@ TEST_F(CoordinationSignalFixture,uniqueIds){
     std::vector<uint> ids;
     ids.reserve(100);
     for(size_t i = 0; i <100; ++i){
-        auto sig = makeSimpleCoordinationSignal(resource_management::MessagePriority::STANDARD);
+        auto sig = makeSimpleCoordinationSignal(resource_management_msgs::MessagePriority::STANDARD);
         bool srv_res = coord_sig_client.call(sig);
         EXPECT_TRUE(srv_res) << "failed to call coordination signal registration service";
         if(srv_res){
