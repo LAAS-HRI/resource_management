@@ -12,7 +12,7 @@ template<class MessageType>
 std::string topic_name(const std::string &reactive_buffer_name, const std::string &ns=""){
     std::string name=ns;
     if (!name.empty() && name[name.size()-1]!='/') name += '/';
-    name += reactive_buffer_name + "_";
+    name += reactive_buffer_name + "/";
     std::regex regex_name("^N\\d+(.*)\\d+(.*)_ISaIvEEE$");
     std::smatch match;
     std::string type_id = typeid(MessageType).name();

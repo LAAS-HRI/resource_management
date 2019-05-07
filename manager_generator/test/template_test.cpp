@@ -101,7 +101,7 @@ public:
     void resetManagerNode(){
         setPriorities(std::vector<signed short>(reactive_input_names.size(),2)); //normal priority
         for(auto &buf : reactive_input_publishers){
-            buf->sendMessage(-2); // avoid priority
+            buf->sendMessage(-1); // avoid priority
         }
         if(has_artificial_life==Unset){
             if(expectActiveBuffer("artificial_life",2.) != "artificial_life"){
