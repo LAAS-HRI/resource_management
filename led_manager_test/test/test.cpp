@@ -12,7 +12,7 @@
 
 #include "led_manager_msgs/Color.h"
 #include "led_manager_msgs/OnOff.h"
-#include "led_manager_msgs/CoordinationSignal.h"
+#include "led_manager_msgs/StateMachine.h"
 
 std::vector<std::string> reactive_input_names = {"emotion", "tagada", "switch"};
 
@@ -187,26 +187,26 @@ public:
 
 RosNodeFixture::OptionalBool RosNodeFixture::has_artificial_life = RosNodeFixture::Unset;
 
-class CoordinationSignalFixture : public RosNodeFixture {
+class StateMachineFixture : public RosNodeFixture {
 public:
 
-    ros::ServiceClient coord_sig_client;
+    ros::ServiceClient state_machine_client;
 
-    CoordinationSignalFixture(): RosNodeFixture()
+    StateMachineFixture(): RosNodeFixture()
     {
-        coord_sig_client = nh.serviceClient<led_manager_msgs::CoordinationSignal>("/led_manager_test/state_machines_register");
+        state_machine_client = nh.serviceClient<led_manager_msgs::StateMachine>("/led_manager_test/state_machines_register");
     }
 
-    led_manager_msgs::CoordinationSignal makeCoordinationSignal(std::string initial, double timeout, double dl_in_secs_from_now, int prio){
-        led_manager_msgs::CoordinationSignal sig;
+    led_manager_msgs::StateMachine makeStateMachine(std::string initial, double timeout, double dl_in_secs_from_now, int prio){
+        led_manager_msgs::StateMachine sig;
         sig.request.header.initial_state=std::move(initial);
         sig.request.header.timeout=ros::Duration(timeout);
         sig.request.header.begin_dead_line = ros::Time::now() + ros::Duration(dl_in_secs_from_now);
         sig.request.header.priority.value=prio;
         return sig;
     }
-    void addState(led_manager_msgs::CoordinationSignal::Request &request, const std::string &id, const std::vector<::resource_management_msgs::StateMachineTransition> & transitions = {}){
-        led_manager_msgs::CoordinationStateColor state;
+    void addState(led_manager_msgs::StateMachine::Request &request, const std::string &id, const std::vector<::resource_management_msgs::StateMachineTransition> & transitions = {}){
+        led_manager_msgs::StateMachineStateColor state;
         state.header.id=id;
         state.header.transitions = transitions;
         request.states_Color.push_back(state);
@@ -221,8 +221,8 @@ public:
         return trans;
     }
 
-    led_manager_msgs::CoordinationSignal makeSimpleCoordinationSignal(int prio){
-        auto sig = makeCoordinationSignal("0",.5,.5,prio);
+    led_manager_msgs::StateMachine makeSimpleStateMachine(int prio){
+        auto sig = makeStateMachine("0",.5,.5,prio);
         addState(sig.request, "0", {makeTransition("final",0.2,0.2,{})});
         return sig;
     }
@@ -415,29 +415,29 @@ TEST_F(RosNodeFixture, vitalPreemptsAny){
     }
 }
 
-// test coordination signal id are unique
-TEST_F(CoordinationSignalFixture,uniqueIds){
+// test state machine id are unique
+TEST_F(StateMachineFixture,uniqueIds){
     std::vector<uint> ids;
     ids.reserve(100);
     for(size_t i = 0; i <100; ++i){
-        auto sig = makeSimpleCoordinationSignal(resource_management_msgs::MessagePriority::STANDARD);
-        bool srv_res = coord_sig_client.call(sig);
-        EXPECT_TRUE(srv_res) << "failed to call coordination signal registration service";
+        auto sig = makeSimpleStateMachine(resource_management_msgs::MessagePriority::STANDARD);
+        bool srv_res = state_machine_client.call(sig);
+        EXPECT_TRUE(srv_res) << "failed to call state machine registration service";
         if(srv_res){
             auto search = std::find(ids.begin(),ids.end(),sig.response.id);
-            EXPECT_EQ(ids.end(),search) << "coordination signal id is not unique";
+            EXPECT_EQ(ids.end(),search) << "state machine id is not unique";
             ids.push_back(sig.response.id);
         }
     }
 }
 
-// send one coord sig. meanwhile send n with different prio. check the higher prio one is selected when first one ends
+// send one state machine meanwhile send n with different prio. check the higher prio one is selected when first one ends
 
-// test coordination sig duration (timeout)
+// test state machine duration (timeout)
 
-// test coord sig begin deadline -> send one coord sig and another one that should start before the first ended. it will not be executed
+// test state machine begin deadline -> send one state machine and another one that should start before the first ended. it will not be executed
 
-// send 1 coord sig. send a second and cancel it before it starts. check it is not executed.
+// send 1 state machine send a second and cancel it before it starts. check it is not executed.
 
 
 

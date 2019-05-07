@@ -18,10 +18,10 @@ StateStorage::~StateStorage()
 void StateStorage::addState(const std::string& id)
 {
   if(states_.find(id) == states_.end())
-    states_[id] = new CoordinationState(id);
+    states_[id] = new StateMachineState(id);
 }
 
-void StateStorage::addTransition(const std::string& id, const std::string& id_next, CoordinationTransition& transition)
+void StateStorage::addTransition(const std::string& id, const std::string& id_next, StateMachineTransition& transition)
 {
   if(states_.find(id) == states_.end())
     addState(id);
@@ -45,7 +45,7 @@ void StateStorage::setInitialState(const std::string& id)
   initial_state_ = id;
 }
 
-CoordinationState* StateStorage::getInitialState()
+StateMachineState* StateStorage::getInitialState()
 {
   if(states_.find(initial_state_) != states_.end())
     return states_[initial_state_];
@@ -61,7 +61,7 @@ std::shared_ptr<MessageAbstraction> StateStorage::getStateData(const std::string
     return nullptr;
 }
 
-CoordinationState* StateStorage::operator[](const std::string& id)
+StateMachineState* StateStorage::operator[](const std::string& id)
 {
   if(states_.find(id) != states_.end())
     return states_[id];

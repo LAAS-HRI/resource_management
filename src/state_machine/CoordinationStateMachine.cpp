@@ -106,10 +106,10 @@ void CoordinationStateMachine::run()
   internal_state_mutex_.unlock();
 }
 
-CoordinationInternalState_t CoordinationStateMachine::getInternalState()
+StateMachineInternalState_t CoordinationStateMachine::getInternalState()
 {
   internal_state_mutex_.lock();
-  CoordinationInternalState_t tmp = internal_state_;
+  StateMachineInternalState_t tmp = internal_state_;
   internal_state_mutex_.unlock();
   return tmp;
 }
@@ -145,7 +145,7 @@ bool CoordinationStateMachine::isWildcardState()
   return res;
 }
 
-void CoordinationStateMachine::setInitialState(CoordinationState* state, uint32_t state_machine_id)
+void CoordinationStateMachine::setInitialState(StateMachineState* state, uint32_t state_machine_id)
 {
   internal_state_mutex_.lock();
   internal_state_.state_machine_id = state_machine_id;
@@ -155,14 +155,14 @@ void CoordinationStateMachine::setInitialState(CoordinationState* state, uint32_
   internal_state_mutex_.unlock();
 }
 
-void CoordinationStateMachine::setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState)
+void CoordinationStateMachine::setPublicationFunction(std::function<void(StateMachineInternalState_t)> publishState)
 {
   publishState_ = publishState;
 }
 
 void CoordinationStateMachine::runOnceNoEvent()
 {
-  CoordinationState* tmp_state = internal_state_.state_;
+  StateMachineState* tmp_state = internal_state_.state_;
   transtition_state_t tmp_transition = internal_state_.state_->update(&tmp_state);
 
   if(tmp_state != internal_state_.state_)
@@ -196,7 +196,7 @@ void CoordinationStateMachine::runOnceWithEvents(std::queue<std::string>& events
     std::string event = events.front();
     events.pop();
 
-    CoordinationState* tmp_state = internal_state_.state_;
+    StateMachineState* tmp_state = internal_state_.state_;
     transtition_state_t tmp_transition = internal_state_.state_->update(&tmp_state, event);
 
     if(tmp_state != internal_state_.state_)

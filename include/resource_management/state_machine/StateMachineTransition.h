@@ -1,5 +1,5 @@
-#ifndef COORDINATIONTRANSITION_H
-#define COORDINATIONTRANSITION_H
+#ifndef STATEMACHINETRANSITION_H
+#define STATEMACHINETRANSITION_H
 
 #include <ros/ros.h>
 
@@ -21,10 +21,10 @@ enum transtition_state_t
   transition_none,
 };
 
-class CoordinationTransition
+class StateMachineTransition
 {
 public:
-  CoordinationTransition(ros::Duration duration, ros::Duration time_out, const std::vector<std::string>& regexs);
+  StateMachineTransition(ros::Duration duration, ros::Duration time_out, const std::vector<std::string>& regexs);
 
   void start();
   void reset();
@@ -43,4 +43,4 @@ private:
 
 } // namespace resource_management
 
-#endif // COORDINATIONTRANSITION_H
+#endif // STATEMACHINETRANSITION_H

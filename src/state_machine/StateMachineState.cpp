@@ -1,25 +1,25 @@
-#include "resource_management/state_machine/CoordinationState.h"
+#include "resource_management/state_machine/StateMachineState.h"
 
 namespace resource_management {
 
-CoordinationState::CoordinationState(std::string id)
+StateMachineState::StateMachineState(std::string id)
 {
   id_ = id;
 }
 
-void CoordinationState::setTransition(CoordinationState* next, CoordinationTransition tansition)
+void StateMachineState::setTransition(StateMachineState* next, StateMachineTransition tansition)
 {
   transitions_conditions_.push_back(tansition);
   transitions_next_state_.push_back(next);
 }
 
-void CoordinationState::startState()
+void StateMachineState::startState()
 {
   for(auto& transition : transitions_conditions_)
     transition.start();
 }
 
-transtition_state_t CoordinationState::update(CoordinationState** current_state, const std::string& event)
+transtition_state_t StateMachineState::update(StateMachineState** current_state, const std::string& event)
 {
   transtition_state_t transtition_state = transition_none;
   size_t next_index = -1;
@@ -60,7 +60,7 @@ transtition_state_t CoordinationState::update(CoordinationState** current_state,
   return transtition_state;
 }
 
-bool CoordinationState::endState()
+bool StateMachineState::endState()
 {
   if(transitions_conditions_.size() == 0)
     return true;

@@ -101,7 +101,7 @@ bool StateMachinesStorage::remove(uint32_t id)
   return found;
 }
 
-void StateMachinesStorage::setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState)
+void StateMachinesStorage::setPublicationFunction(std::function<void(StateMachineInternalState_t)> publishState)
 {
   publishState_ = publishState;
 }
@@ -112,7 +112,7 @@ void StateMachinesStorage::clean()
   {
     if(states_storage_[i]->isTooLate())
     {
-      CoordinationInternalState_t internal_state;
+      StateMachineInternalState_t internal_state;
       internal_state.state_machine_id = states_storage_[i]->getId();
       internal_state.state_ = nullptr;
       internal_state.transition_state_ = transition_dead_line;

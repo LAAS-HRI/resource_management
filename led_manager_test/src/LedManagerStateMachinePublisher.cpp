@@ -1,9 +1,9 @@
-#include "led_manager_msgs/CoordinationSignal.h"
+#include "led_manager_msgs/StateMachine.h"
 
 #include <ros/ros.h>
 
 /*
-add_executable(${PROJECT_NAME}_test src/LedManagerCoordinationPublisher.cpp)
+add_executable(${PROJECT_NAME}_test src/LedManagerStateMachinePublisher.cpp)
 add_dependencies(${PROJECT_NAME}_test ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES})
 */
@@ -13,14 +13,14 @@ int main(int argc, char *argv[])
   ros::init(argc,argv,"led_manager_test_pub");
   ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
 
-  led_manager_msgs::CoordinationSignal::Request signal;
+  led_manager_msgs::StateMachine::Request signal;
   signal.header.timeout = ros::Duration(-1);
   signal.header.begin_dead_line = ros::Time(0);
   signal.header.priority.value = resource_management_msgs::MessagePriority::URGENT;
   signal.header.initial_state = "state_0";
 
-  led_manager_msgs::CoordinationStateColor color_state;
-  led_manager_msgs::CoordinationStateOnOff onoff_state;
+  led_manager_msgs::StateMachineStateColor color_state;
+  led_manager_msgs::StateMachineStateOnOff onoff_state;
 
   /* STATE_0 */
 
@@ -112,8 +112,8 @@ int main(int argc, char *argv[])
   signal.states_OnOff.push_back(onoff_state);
 
   std::cout << "will pub" << std::endl;
-  led_manager_msgs::CoordinationSignal srv;
-  ros::ServiceClient client = nh->serviceClient<led_manager_msgs::CoordinationSignal>("/led_manager_test/state_machines_register");
+  led_manager_msgs::StateMachine srv;
+  ros::ServiceClient client = nh->serviceClient<led_manager_msgs::StateMachine>("/led_manager_test/state_machines_register");
   srv.request = signal;
   client.call(srv);
 

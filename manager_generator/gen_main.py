@@ -71,11 +71,11 @@ def createCatkinFiles(args,msg_files):
 
 msg_files=[]
 
-#   CoordinationState
+#   StateMachineState
 for x in args.target_types :
     name=x.split(':')[0]
     data_type=x.split(':')[1]
-    filename='CoordinationState'+name+'.msg'
+    filename='StateMachineState'+name+'.msg'
     msg_files.append(filename)
     f = open(os.path.join(args.package_name,'msg',filename),'w')
     f.write("resource_management/CoordinationStateHeader header\n")
@@ -102,7 +102,7 @@ f_signal.write("resource_management/EndCondition end_condition # coordination si
 for x in args.target_types :
     name=x.split(':')[0]
     data_type=x.split(':')[1]
-    f_signal.write("{}[] states_{}\n".format('CoordinationState'+name,data_type))
+    f_signal.write("{}[] states_{}\n".format('StateMachineState'+name,data_type))
 
 createCatkinFiles(args,msg_files)
 

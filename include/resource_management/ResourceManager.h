@@ -74,7 +74,7 @@ private:
     void createReactiveBufferStorage();
 
     void prioritiesCallback(const resource_management_msgs::PrioritiesSetter& msg);
-    void publishState(CoordinationInternalState_t state);
+    void publishState(StateMachineInternalState_t state);
     bool coordinationSignalCancel(resource_management_msgs::StateMachinesCancel::Request  &req,
                                   resource_management_msgs::StateMachinesCancel::Response &res);
 
@@ -405,7 +405,7 @@ void ResourceManager<CoordinationSignalType,InputDataTypes...>::setCoordinationS
 }
 
 template<typename CoordinationSignalType, typename ...InputDataTypes>
-void ResourceManager<CoordinationSignalType,InputDataTypes...>::publishState(CoordinationInternalState_t state)
+void ResourceManager<CoordinationSignalType,InputDataTypes...>::publishState(StateMachineInternalState_t state)
 {
   std::string state_event;
   switch (state.transition_state_) {

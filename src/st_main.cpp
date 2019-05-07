@@ -8,7 +8,7 @@
 #include <thread>
 #include <unistd.h>
 
-void publishState(resource_management::CoordinationInternalState_t state)
+void publishState(resource_management::StateMachineInternalState_t state)
 {
   std::chrono::time_point<std::chrono::system_clock> now_point = std::chrono::system_clock::now();
   std::time_t now = std::chrono::system_clock::to_time_t(now_point);
@@ -44,10 +44,10 @@ int main(int argc, char** argv)
   std::shared_ptr<resource_management::StateStorage> states = std::make_shared<resource_management::StateStorage>(0, ros::Duration(-1),ros::Time::now());
   states->setPriority(resource_management::high);
 
-  resource_management::CoordinationTransition t1(ros::Duration(1), ros::Duration(-1), std::vector<std::string>());
+  resource_management::StateMachineTransition t1(ros::Duration(1), ros::Duration(-1), std::vector<std::string>());
   states->addTransition("state1", "state2", t1);
 
-  resource_management::CoordinationTransition t2(ros::Duration(-1), ros::Duration(5), std::vector<std::string>({"regex"}));
+  resource_management::StateMachineTransition t2(ros::Duration(-1), ros::Duration(5), std::vector<std::string>({"regex"}));
   states->addTransition("state2", "state3", t2);
 
   states->setInitialState("state1");
@@ -58,10 +58,10 @@ int main(int argc, char** argv)
   std::shared_ptr<resource_management::StateStorage> states_2 = std::make_shared<resource_management::StateStorage>(1);
   states_2->setPriority(resource_management::urgent);
 
-  resource_management::CoordinationTransition t3(ros::Duration(1), ros::Duration(-1), std::vector<std::string>());
+  resource_management::StateMachineTransition t3(ros::Duration(1), ros::Duration(-1), std::vector<std::string>());
   states_2->addTransition("state4", "state5", t3);
 
-  resource_management::CoordinationTransition t4(ros::Duration(-1), ros::Duration(2), std::vector<std::string>());
+  resource_management::StateMachineTransition t4(ros::Duration(-1), ros::Duration(2), std::vector<std::string>());
   states_2->addTransition("state5", "state6", t4);
 
   states_2->setInitialState("state4");

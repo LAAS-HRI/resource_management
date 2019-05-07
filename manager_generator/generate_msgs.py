@@ -149,11 +149,11 @@ def main():
     msg_files=[]
     srv_files=[]
 
-    #   CoordinationState
+    #   StateMachineState
     for x in message_types :
         name=x[0]
         data_type=x[1]
-        filename='CoordinationState'+name+'.msg'
+        filename='StateMachineState'+name+'.msg'
         msg_files.append(filename)
         f = open(os.path.join(args.package_name,'msg',filename),'w+')
         f.write("resource_management_msgs/StateMachineStateHeader header\n")
@@ -172,15 +172,15 @@ def main():
         f.close()
 
 
-    #   CoordinationSignal
-    filename='CoordinationSignal.srv'
+    #   StateMachine
+    filename='StateMachine.srv'
     srv_files.append(filename)
     f_signal=open(os.path.join(args.package_name,'srv',filename),'w+')
     f_signal.write("resource_management_msgs/StateMachineHeader header\n")
     for x in message_types :
         name=x[0]
         #data_type=x[1]
-        f_signal.write("{}[] states_{}\n".format('CoordinationState'+name,name))
+        f_signal.write("{}[] states_{}\n".format('StateMachineState'+name,name))
     f_signal.write("---\n")
     f_signal.write("uint32 id")
     createCatkinFiles(args,msg_files, srv_files, settings)

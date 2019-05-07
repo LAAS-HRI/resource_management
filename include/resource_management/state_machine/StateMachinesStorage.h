@@ -19,7 +19,7 @@ public:
   void setUnpoppable() { unpoppable_ = true; }
   bool remove(uint32_t id);
 
-  void setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState);
+  void setPublicationFunction(std::function<void(StateMachineInternalState_t)> publishState);
   void clean();
 
 private:
@@ -27,7 +27,7 @@ private:
   std::mutex mutex_;
   bool unpoppable_;
 
-  std::function<void(CoordinationInternalState_t)> publishState_;
+  std::function<void(StateMachineInternalState_t)> publishState_;
 };
 
 } // namespace resource_management

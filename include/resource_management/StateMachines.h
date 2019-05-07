@@ -84,7 +84,7 @@ bool StateMachines<T>::_serviceCallback(typename T::Request &req, typename T::Re
 
     for(auto &t : transitions){
         resource_management_msgs::EndCondition &end_condition = std::get<2>(t);
-        CoordinationTransition transition(end_condition.duration,end_condition.timeout,end_condition.regex_end_condition);
+        StateMachineTransition transition(end_condition.duration,end_condition.timeout,end_condition.regex_end_condition);
         states->addTransition(std::get<0>(t),std::get<1>(t),transition);
     }
 

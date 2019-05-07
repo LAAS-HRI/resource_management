@@ -3,8 +3,8 @@
 
 #include "resource_management/state_machine/EventStorage.h"
 
-#include "resource_management/state_machine/CoordinationTransition.h"
-#include "resource_management/state_machine/CoordinationState.h"
+#include "resource_management/state_machine/StateMachineTransition.h"
+#include "resource_management/state_machine/StateMachineState.h"
 
 #include <ros/ros.h>
 
@@ -19,14 +19,14 @@ public:
   CoordinationStateMachine(float rate = 100);
 
   void run();
-  CoordinationInternalState_t getInternalState();
+  StateMachineInternalState_t getInternalState();
   std::string getCurrentStateName();
   bool isNewState();
   bool isWildcardState();
   bool runing();
 
-  void setInitialState(CoordinationState* state, uint32_t state_machine_id = 0);
-  void setPublicationFunction(std::function<void(CoordinationInternalState_t)> publishState);
+  void setInitialState(StateMachineState* state, uint32_t state_machine_id = 0);
+  void setPublicationFunction(std::function<void(StateMachineInternalState_t)> publishState);
   void setTimeout(ros::Duration time_out) { time_out_ = time_out; }
   void setDeadLine(ros::Time begin_dead_line) { begin_dead_line_ = begin_dead_line; }
 
@@ -35,8 +35,8 @@ private:
   ros::Duration time_out_;
   ros::Time begin_dead_line_;
 
-  std::function<void(CoordinationInternalState_t)> publishState_;
-  CoordinationInternalState_t internal_state_;
+  std::function<void(StateMachineInternalState_t)> publishState_;
+  StateMachineInternalState_t internal_state_;
   bool new_state_;
   std::mutex internal_state_mutex_;
 

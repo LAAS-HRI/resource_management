@@ -13,7 +13,7 @@
 !!for data_type in message_types
 #include "${{project_name}}_msgs/{data_type[0]}.h"
 !!end
-#include "${project_name}_msgs/CoordinationSignal.h"
+#include "${project_name}_msgs/StateMachine.h"
 
 std::vector<std::string> reactive_input_names = {${reactive_input_names_cs}};
 
@@ -189,27 +189,27 @@ public:
 
 RosNodeFixture::OptionalBool RosNodeFixture::has_artificial_life = RosNodeFixture::Unset;
 
-class CoordinationSignalFixture : public RosNodeFixture {
+class StateMachineFixture : public RosNodeFixture {
 public:
 
-    ros::ServiceClient coord_sig_client;
+    ros::ServiceClient state_machine_client;
 
-    CoordinationSignalFixture(): RosNodeFixture()
+    StateMachineFixture(): RosNodeFixture()
     {
-        coord_sig_client = nh.serviceClient<${project_name}_msgs::CoordinationSignal>("/${project_name}/state_machines_register");
+        state_machine_client = nh.serviceClient<${project_name}_msgs::StateMachine>("/${project_name}/state_machines_register");
     }
 
-    ${project_name}_msgs::CoordinationSignal makeCoordinationSignal(std::string initial, double timeout, double dl_in_secs_from_now, int prio){
-        ${project_name}_msgs::CoordinationSignal sig;
+    ${project_name}_msgs::StateMachine makeStateMachine(std::string initial, double timeout, double dl_in_secs_from_now, int prio){
+        ${project_name}_msgs::StateMachine sig;
         sig.request.header.initial_state=std::move(initial);
         sig.request.header.timeout=ros::Duration(timeout);
         sig.request.header.begin_dead_line = ros::Time::now() + ros::Duration(dl_in_secs_from_now);
         sig.request.header.priority.value=prio;
         return sig;
     }
-    void addState(${project_name}_msgs::CoordinationSignal::Request &request, const std::string &id, const std::vector<::resource_management_msgs::CoordinationSignalsTransition> & transitions = {}){
+    void addState(${project_name}_msgs::StateMachine::Request &request, const std::string &id, const std::vector<::resource_management_msgs::StateMachineTransition> & transitions = {}){
 !!fmt message_types
-        ${{project_name}}_msgs::CoordinationState{0[0][0]} state;
+        ${{project_name}}_msgs::StateMachineState{0[0][0]} state;
 !!end
         state.header.id=id;
         state.header.transitions = transitions;
@@ -218,8 +218,8 @@ public:
 !!end
     }
 
-    ::resource_management_msgs::CoordinationSignalsTransition makeTransition(std::string next_state, double timeout, double duration, std::vector<std::string> regexs){
-        ::resource_management_msgs::CoordinationSignalsTransition trans;
+    ::resource_management_msgs::StateMachineTransition makeTransition(std::string next_state, double timeout, double duration, std::vector<std::string> regexs){
+        ::resource_management_msgs::StateMachineTransition trans;
         trans.next_state=std::move(next_state);
         trans.end_condition.timeout=ros::Duration(std::move(timeout));
         trans.end_condition.duration=ros::Duration(std::move(duration));
@@ -227,8 +227,8 @@ public:
         return trans;
     }
 
-    ${project_name}_msgs::CoordinationSignal makeSimpleCoordinationSignal(int prio){
-        auto sig = makeCoordinationSignal("0",.5,.5,prio);
+    ${project_name}_msgs::StateMachine makeSimpleStateMachine(int prio){
+        auto sig = makeStateMachine("0",.5,.5,prio);
         addState(sig.request, "0", {makeTransition("final",0.2,0.2,{})});
         return sig;
     }
@@ -421,29 +421,29 @@ TEST_F(RosNodeFixture, vitalPreemptsAny){
     }
 }
 
-// test coordination signal id are unique
-TEST_F(CoordinationSignalFixture,uniqueIds){
+// test state machine id are unique
+TEST_F(StateMachineFixture,uniqueIds){
     std::vector<uint> ids;
     ids.reserve(100);
     for(size_t i = 0; i <100; ++i){
-        auto sig = makeSimpleCoordinationSignal(resource_management_msgs::MessagePriority::STANDARD);
-        bool srv_res = coord_sig_client.call(sig);
-        EXPECT_TRUE(srv_res) << "failed to call coordination signal registration service";
+        auto sig = makeSimpleStateMachine(resource_management_msgs::MessagePriority::STANDARD);
+        bool srv_res = state_machine_client.call(sig);
+        EXPECT_TRUE(srv_res) << "failed to call state machine registration service";
         if(srv_res){
             auto search = std::find(ids.begin(),ids.end(),sig.response.id);
-            EXPECT_EQ(ids.end(),search) << "coordination signal id is not unique";
+            EXPECT_EQ(ids.end(),search) << "state machine id is not unique";
             ids.push_back(sig.response.id);
         }
     }
 }
 
-// send one coord sig. meanwhile send n with different prio. check the higher prio one is selected when first one ends
+// send one state machine meanwhile send n with different prio. check the higher prio one is selected when first one ends
 
-// test coordination sig duration (timeout)
+// test state machine duration (timeout)
 
-// test coord sig begin deadline -> send one coord sig and another one that should start before the first ended. it will not be executed
+// test state machine begin deadline -> send one state machine and another one that should start before the first ended. it will not be executed
 
-// send 1 coord sig. send a second and cancel it before it starts. check it is not executed.
+// send 1 state machine send a second and cancel it before it starts. check it is not executed.
 
 
 

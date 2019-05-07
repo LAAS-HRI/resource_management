@@ -1,8 +1,8 @@
-#include "resource_management/state_machine/CoordinationTransition.h"
+#include "resource_management/state_machine/StateMachineTransition.h"
 
 namespace resource_management {
 
-CoordinationTransition::CoordinationTransition(ros::Duration duration, ros::Duration time_out, const std::vector<std::string>& regexs)
+StateMachineTransition::StateMachineTransition(ros::Duration duration, ros::Duration time_out, const std::vector<std::string>& regexs)
 {
   duration_ = duration;
   time_out_ = time_out;
@@ -13,17 +13,17 @@ CoordinationTransition::CoordinationTransition(ros::Duration duration, ros::Dura
   }
 }
 
-void CoordinationTransition::start()
+void StateMachineTransition::start()
 {
   start_ = ros::Time::now();
 }
 
-void CoordinationTransition::reset()
+void StateMachineTransition::reset()
 {
   start_ = {};
 }
 
-transtition_state_t CoordinationTransition::evaluate()
+transtition_state_t StateMachineTransition::evaluate()
 {
   ros::Time now = ros::Time::now();
 
@@ -35,7 +35,7 @@ transtition_state_t CoordinationTransition::evaluate()
     return transition_wait;
 }
 
-transtition_state_t CoordinationTransition::evaluate(const std::string& event)
+transtition_state_t StateMachineTransition::evaluate(const std::string& event)
 {
   ros::Time now = ros::Time::now();
 
