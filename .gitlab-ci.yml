@@ -27,7 +27,7 @@
     - bash ./src/resource_management/led_manager_test/deploy ./src
     - catkin_make
     - source devel/setup.bash
-    - catkin_make run_tests_led_manager_test_rostest && catkin_make run_tests_led_manager_rostest && catkin_make test
+    - rostest led_manager_test main.test --text && rostest led_manager main.test --text && catkin_make test
 
 .kinetic_before_template : &kinetic_before_definition
   before_script:
