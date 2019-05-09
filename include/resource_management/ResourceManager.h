@@ -104,7 +104,7 @@ private:
     ros::ServiceServer _stateMachineCancelService;
 
     double _hz;
-    StateMachine _StateMachine;
+    StateMachineRunner _StateMachine;
     std::shared_ptr<StateStorage> _activeStateMachine;
     std::mutex _stateMachineMutex;
 };
@@ -237,7 +237,7 @@ void ResourceManager<StateMachineType,InputDataTypes...>::run()
           _StateMachine.setTimeout(_activeStateMachine->getTimeout());
           _StateMachine.setDeadLine(_activeStateMachine->getDeadLine());
 
-          sm_th = std::thread(&StateMachine::run, &_StateMachine);
+          sm_th = std::thread(&StateMachineRunner::run, &_StateMachine);
           state_machine_running = true;
           _stateMachineMutex.unlock();
           continue;

@@ -1,4 +1,4 @@
-#include "resource_management/state_machine/StateMachine.h"
+#include "resource_management/state_machine/StateMachineRunner.h"
 #include "resource_management/state_machine/StateStorage.h"
 #include "resource_management/state_machine/StateMachinesStorage.h"
 
@@ -74,13 +74,13 @@ int main(int argc, char** argv)
     std::cout << " ************* " << std::endl;
     std::shared_ptr<resource_management::StateStorage> current = state_machines.pop();
 
-    resource_management::StateMachine sm;
+    resource_management::StateMachineRunner sm;
     sm.setPublicationFunction(&publishState);
     sm.setInitialState(current->getInitialState(), current->getId());
     sm.setTimeout(current->getTimeout());
     sm.setDeadLine(current->getDeadLine());
 
-    std::thread th(&resource_management::StateMachine::run, &sm);
+    std::thread th(&resource_management::StateMachineRunner::run, &sm);
     usleep(2000000);
     sm.addEvent("regex");
     th.join();

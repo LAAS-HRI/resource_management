@@ -13,10 +13,10 @@
 
 namespace resource_management {
 
-class StateMachine : public EventStorage
+class StateMachineRunner : public EventStorage
 {
 public:
-  StateMachine(float rate = 100);
+  StateMachineRunner(float rate = 100);
 
   void run();
   StateMachineInternalState_t getInternalState();

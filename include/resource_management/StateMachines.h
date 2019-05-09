@@ -8,7 +8,7 @@
 #include <tuple>
 #include <utility>
 
-#include "state_machine/StateMachine.h"
+#include "state_machine/StateMachineRunner.h"
 #include "state_machine/StateStorage.h"
 #include "state_machine/StateMachinesStorage.h"
 

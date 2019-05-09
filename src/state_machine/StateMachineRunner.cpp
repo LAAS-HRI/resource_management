@@ -1,10 +1,10 @@
-#include "resource_management/state_machine/StateMachine.h"
+#include "resource_management/state_machine/StateMachineRunner.h"
 
 #include <unistd.h>
 
 namespace resource_management {
 
-StateMachine::StateMachine(float rate)
+StateMachineRunner::StateMachineRunner(float rate)
 {
   publishState_ = nullptr;
   time_out_ = ros::Duration(-1);
@@ -13,7 +13,7 @@ StateMachine::StateMachine(float rate)
   new_state_ = false;
 }
 
-bool StateMachine::runing()
+bool StateMachineRunner::runing()
 {
   bool res = false;
   internal_state_mutex_.lock();
@@ -22,7 +22,7 @@ bool StateMachine::runing()
   return res;
 }
 
-void StateMachine::run()
+void StateMachineRunner::run()
 {
   if(internal_state_.state_ != nullptr)
     internal_state_.state_->startState();
@@ -106,7 +106,7 @@ void StateMachine::run()
   internal_state_mutex_.unlock();
 }
 
-StateMachineInternalState_t StateMachine::getInternalState()
+StateMachineInternalState_t StateMachineRunner::getInternalState()
 {
   internal_state_mutex_.lock();
   StateMachineInternalState_t tmp = internal_state_;
@@ -114,7 +114,7 @@ StateMachineInternalState_t StateMachine::getInternalState()
   return tmp;
 }
 
-std::string StateMachine::getCurrentStateName()
+std::string StateMachineRunner::getCurrentStateName()
 {
   std::string name = "";
   internal_state_mutex_.lock();
@@ -124,14 +124,14 @@ std::string StateMachine::getCurrentStateName()
   return name;
 }
 
-bool StateMachine::isNewState()
+bool StateMachineRunner::isNewState()
 {
   bool res = new_state_;
   new_state_= false;
   return res;
 }
 
-bool StateMachine::isWildcardState()
+bool StateMachineRunner::isWildcardState()
 {
   bool res = false;
   internal_state_mutex_.lock();
@@ -145,7 +145,7 @@ bool StateMachine::isWildcardState()
   return res;
 }
 
-void StateMachine::setInitialState(StateMachineState* state, uint32_t state_machine_id)
+void StateMachineRunner::setInitialState(StateMachineState* state, uint32_t state_machine_id)
 {
   internal_state_mutex_.lock();
   internal_state_.state_machine_id = state_machine_id;
@@ -155,12 +155,12 @@ void StateMachine::setInitialState(StateMachineState* state, uint32_t state_mach
   internal_state_mutex_.unlock();
 }
 
-void StateMachine::setPublicationFunction(std::function<void(StateMachineInternalState_t)> publishState)
+void StateMachineRunner::setPublicationFunction(std::function<void(StateMachineInternalState_t)> publishState)
 {
   publishState_ = publishState;
 }
 
-void StateMachine::runOnceNoEvent()
+void StateMachineRunner::runOnceNoEvent()
 {
   StateMachineState* tmp_state = internal_state_.state_;
   transtition_state_t tmp_transition = internal_state_.state_->update(&tmp_state);
@@ -186,7 +186,7 @@ void StateMachine::runOnceNoEvent()
   }
 }
 
-void StateMachine::runOnceWithEvents(std::queue<std::string>& events)
+void StateMachineRunner::runOnceWithEvents(std::queue<std::string>& events)
 {
   while(events.empty() == false)
   {
