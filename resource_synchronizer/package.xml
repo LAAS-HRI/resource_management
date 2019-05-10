@@ -1,0 +1,15 @@
+<package format="2">
+  <name>resource_synchronizer</name>
+  <version>0.1.0</version>
+  <description>
+      resource_synchronizer package.
+  </description>
+  <maintainer email="gsarthou@laas.fr">Guillaume Sarthou</maintainer>
+  <license>TBD</license>
+
+  <depend>roscpp</depend>
+  <depend>resource_management_msgs</depend>
+  <depend>resource_synchronizer_msgs</depend>
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>
