@@ -183,7 +183,7 @@ def main():
 
 
     #   StateMachine Service
-    filename='StateMachine.srv'
+    filename='StateMachineRegister.srv'
     srv_files.append(filename)
     f_signal=open(os.path.join(args.package_name,'srv',filename),'w+')
     f_signal.write("resource_management_msgs/StateMachineHeader header\n")
