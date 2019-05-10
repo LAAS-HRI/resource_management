@@ -27,6 +27,7 @@ def createCatkinFiles(args,msg_files,srv_files, settings):
     'add_message_files(\n'
     'FILES\n'
     '{msgs}\n'
+    'StateMachineRequest.msg'             
     ')\n'
     '\n'
     '## Generate services in the \'srv\' folder\n'
@@ -171,16 +172,22 @@ def main():
         f.write("{} data\n".format(data_type))
         f.close()
 
-
     #   StateMachine
+    filename = 'StateMachine.msg'
+    with open(os.path.join(args.package_name, 'msg', filename), 'w+') as f:
+        for x in message_types :
+            name=x[0]
+            #data_type=x[1]
+            f.write("{}[] states_{}\n".format('StateMachineState'+name,name))
+
+
+
+    #   StateMachine Service
     filename='StateMachine.srv'
     srv_files.append(filename)
     f_signal=open(os.path.join(args.package_name,'srv',filename),'w+')
     f_signal.write("resource_management_msgs/StateMachineHeader header\n")
-    for x in message_types :
-        name=x[0]
-        #data_type=x[1]
-        f_signal.write("{}[] states_{}\n".format('StateMachineState'+name,name))
+    f_signal.write("StateMachine state_machine\n")
     f_signal.write("---\n")
     f_signal.write("uint32 id")
     createCatkinFiles(args,msg_files, srv_files, settings)
