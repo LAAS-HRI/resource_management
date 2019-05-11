@@ -13,7 +13,7 @@
 !!for data_type in message_types
 #include "${{project_name}}_msgs/{data_type[0]}.h"
 !!end
-#include "${project_name}_msgs/StateMachine.h"
+#include "${project_name}_msgs/StateMachineRegister.h"
 
 std::vector<std::string> reactive_input_names = {${reactive_input_names_cs}};
 
@@ -196,25 +196,25 @@ public:
 
     StateMachineFixture(): RosNodeFixture()
     {
-        state_machine_client = nh.serviceClient<${project_name}_msgs::StateMachine>("/${project_name}/state_machines_register");
+        state_machine_client = nh.serviceClient<${project_name}_msgs::StateMachineRegister>("/${project_name}/state_machines_register");
     }
 
-    ${project_name}_msgs::StateMachine makeStateMachine(std::string initial, double timeout, double dl_in_secs_from_now, int prio){
-        ${project_name}_msgs::StateMachine sig;
+    ${project_name}_msgs::StateMachineRegister makeStateMachine(std::string initial, double timeout, double dl_in_secs_from_now, int prio){
+        ${project_name}_msgs::StateMachineRegister sig;
         sig.request.header.initial_state=std::move(initial);
         sig.request.header.timeout=ros::Duration(timeout);
         sig.request.header.begin_dead_line = ros::Time::now() + ros::Duration(dl_in_secs_from_now);
         sig.request.header.priority.value=prio;
         return sig;
     }
-    void addState(${project_name}_msgs::StateMachine::Request &request, const std::string &id, const std::vector<::resource_management_msgs::StateMachineTransition> & transitions = {}){
+    void addState(${project_name}_msgs::StateMachineRegister::Request &request, const std::string &id, const std::vector<::resource_management_msgs::StateMachineTransition> & transitions = {}){
 !!fmt message_types
         ${{project_name}}_msgs::StateMachineState{0[0][0]} state;
 !!end
         state.header.id=id;
         state.header.transitions = transitions;
 !!fmt message_types
-        request.states_{0[0][0]}.push_back(state);
+        request.state_machine.states_{0[0][0]}.push_back(state);
 !!end
     }
 
@@ -227,7 +227,7 @@ public:
         return trans;
     }
 
-    ${project_name}_msgs::StateMachine makeSimpleStateMachine(int prio){
+    ${project_name}_msgs::StateMachineRegister makeSimpleStateMachine(int prio){
         auto sig = makeStateMachine("0",.5,.5,prio);
         addState(sig.request, "0", {makeTransition("final",0.2,0.2,{})});
         return sig;

@@ -12,7 +12,7 @@
 
 #include "led_manager_msgs/Color.h"
 #include "led_manager_msgs/OnOff.h"
-#include "led_manager_msgs/StateMachine.h"
+#include "led_manager_msgs/StateMachineRegister.h"
 
 std::vector<std::string> reactive_input_names = {"emotion", "tagada", "switch"};
 
@@ -194,22 +194,22 @@ public:
 
     StateMachineFixture(): RosNodeFixture()
     {
-        state_machine_client = nh.serviceClient<led_manager_msgs::StateMachine>("/led_manager_test/state_machines_register");
+        state_machine_client = nh.serviceClient<led_manager_msgs::StateMachineRegister>("/led_manager_test/state_machines_register");
     }
 
-    led_manager_msgs::StateMachine makeStateMachine(std::string initial, double timeout, double dl_in_secs_from_now, int prio){
-        led_manager_msgs::StateMachine sig;
+    led_manager_msgs::StateMachineRegister makeStateMachine(std::string initial, double timeout, double dl_in_secs_from_now, int prio){
+        led_manager_msgs::StateMachineRegister sig;
         sig.request.header.initial_state=std::move(initial);
         sig.request.header.timeout=ros::Duration(timeout);
         sig.request.header.begin_dead_line = ros::Time::now() + ros::Duration(dl_in_secs_from_now);
         sig.request.header.priority.value=prio;
         return sig;
     }
-    void addState(led_manager_msgs::StateMachine::Request &request, const std::string &id, const std::vector<::resource_management_msgs::StateMachineTransition> & transitions = {}){
+    void addState(led_manager_msgs::StateMachineRegister::Request &request, const std::string &id, const std::vector<::resource_management_msgs::StateMachineTransition> & transitions = {}){
         led_manager_msgs::StateMachineStateColor state;
         state.header.id=id;
         state.header.transitions = transitions;
-        request.states_Color.push_back(state);
+        request.state_machine.states_Color.push_back(state);
     }
 
     ::resource_management_msgs::StateMachineTransition makeTransition(std::string next_state, double timeout, double duration, std::vector<std::string> regexs){
@@ -221,7 +221,7 @@ public:
         return trans;
     }
 
-    led_manager_msgs::StateMachine makeSimpleStateMachine(int prio){
+    led_manager_msgs::StateMachineRegister makeSimpleStateMachine(int prio){
         auto sig = makeStateMachine("0",.5,.5,prio);
         addState(sig.request, "0", {makeTransition("final",0.2,0.2,{})});
         return sig;
