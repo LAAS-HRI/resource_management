@@ -1,4 +1,4 @@
-#include "led_manager_msgs/StateMachine.h"
+#include "led_manager_msgs/StateMachineRegister.h"
 
 #include <ros/ros.h>
 
@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   ros::init(argc,argv,"led_manager_test_pub");
   ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
 
-  led_manager_msgs::StateMachine::Request signal;
+  led_manager_msgs::StateMachineRegister::Request signal;
   signal.header.timeout = ros::Duration(-1);
   signal.header.begin_dead_line = ros::Time(0);
   signal.header.priority.value = resource_management_msgs::MessagePriority::URGENT;
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     onoff_state.header.transitions.push_back(transition);
   }
 
-  signal.states_OnOff.push_back(onoff_state);
+  signal.state_machine.states_OnOff.push_back(onoff_state);
 
   /* STATE_1 */
 
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     color_state.header.transitions.push_back(transition);
   }
 
-  signal.states_Color.push_back(color_state);
+  signal.state_machine.states_Color.push_back(color_state);
 
   /* STATE_2 */
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     color_state.header.transitions.push_back(transition);
   }
 
-  signal.states_Color.push_back(color_state);
+  signal.state_machine.states_Color.push_back(color_state);
 
   /* STATE_3 */
 
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
     color_state.header.transitions.push_back(transition);
   }
 
-  signal.states_Color.push_back(color_state);
+  signal.state_machine.states_Color.push_back(color_state);
 
   /* STATE_4 */
 
@@ -109,11 +109,11 @@ int main(int argc, char *argv[])
     onoff_state.header.transitions.push_back(transition);
   }
 
-  signal.states_OnOff.push_back(onoff_state);
+  signal.state_machine.states_OnOff.push_back(onoff_state);
 
   std::cout << "will pub" << std::endl;
-  led_manager_msgs::StateMachine srv;
-  ros::ServiceClient client = nh->serviceClient<led_manager_msgs::StateMachine>("/led_manager_test/state_machines_register");
+  led_manager_msgs::StateMachineRegister srv;
+  ros::ServiceClient client = nh->serviceClient<led_manager_msgs::StateMachineRegister>("/led_manager_test/state_machines_register");
   srv.request = signal;
   client.call(srv);
 

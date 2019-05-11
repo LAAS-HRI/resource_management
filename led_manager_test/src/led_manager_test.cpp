@@ -1,4 +1,4 @@
-#include "led_manager_msgs/StateMachine.h"
+#include "led_manager_msgs/StateMachineRegister.h"
 #include "led_manager_msgs/Color.h"
 #include "led_manager_msgs/OnOff.h"
 #include "led_manager_test/ArtificialLife.h"
@@ -8,7 +8,7 @@
 
 #include <thread>
 
-class LedManager : public resource_management::ResourceManager<led_manager_msgs::StateMachine
+class LedManager : public resource_management::ResourceManager<led_manager_msgs::StateMachineRegister
       ,led_manager_msgs::Color
       ,led_manager_msgs::OnOff
 >
@@ -26,25 +26,25 @@ public:
     }
 
 private:
-    std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> stateFromMsg(const led_manager_msgs::StateMachine::Request &msg) override;
+    std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> stateFromMsg(const led_manager_msgs::StateMachineRegister::Request &msg) override;
     std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
-    transitionFromMsg(const led_manager_msgs::StateMachine::Request &msg) override;
-    led_manager_msgs::StateMachine::Response generateResponseMsg(uint32_t id) override;
+    transitionFromMsg(const led_manager_msgs::StateMachineRegister::Request &msg) override;
+    led_manager_msgs::StateMachineRegister::Response generateResponseMsg(uint32_t id) override;
 
     void publishColorMsg(float msg, bool is_new);
     void publishOnOffMsg(bool msg, bool is_new);
 };
 
-std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> LedManager::stateFromMsg(const led_manager_msgs::StateMachine::Request &msg)
+std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> LedManager::stateFromMsg(const led_manager_msgs::StateMachineRegister::Request &msg)
 {
     std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> states;
 
-    for(auto x : msg.states_Color){
+    for(auto x : msg.state_machine.states_Color){
         auto wrap = states[x.header.id] = std::make_shared<resource_management::MessageWrapper<float>>(x.data);
         wrap->setPriority(static_cast<resource_management::importance_priority_t>(msg.header.priority.value));
     }
 
-    for(auto x : msg.states_OnOff){
+    for(auto x : msg.state_machine.states_OnOff){
         auto wrap = states[x.header.id] = std::make_shared<resource_management::MessageWrapper<bool>>(x.data);
         wrap->setPriority(static_cast<resource_management::importance_priority_t>(msg.header.priority.value));
     }
@@ -53,11 +53,11 @@ std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> L
 }
 
 std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
-LedManager::transitionFromMsg(const led_manager_msgs::StateMachine::Request &msg)
+LedManager::transitionFromMsg(const led_manager_msgs::StateMachineRegister::Request &msg)
 {
     std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>> transitions;
 
-    for(auto x : msg.states_Color){
+    for(auto x : msg.state_machine.states_Color){
         for(auto t : x.header.transitions){
             transitions.push_back(
                         std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
@@ -67,7 +67,7 @@ LedManager::transitionFromMsg(const led_manager_msgs::StateMachine::Request &msg
         }
     }
 
-    for(auto x : msg.states_OnOff){
+    for(auto x : msg.state_machine.states_OnOff){
         for(auto t : x.header.transitions){
             transitions.push_back(
                         std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
@@ -79,9 +79,9 @@ LedManager::transitionFromMsg(const led_manager_msgs::StateMachine::Request &msg
     return transitions;
 }
 
-led_manager_msgs::StateMachine::Response LedManager::generateResponseMsg(uint32_t id)
+led_manager_msgs::StateMachineRegister::Response LedManager::generateResponseMsg(uint32_t id)
 {
-  led_manager_msgs::StateMachine::Response res;
+  led_manager_msgs::StateMachineRegister::Response res;
   res.id = id;
   return res;
 }
