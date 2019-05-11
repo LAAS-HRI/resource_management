@@ -27,7 +27,7 @@ def createCatkinFiles(args,msg_files,srv_files, settings):
     'add_message_files(\n'
     'FILES\n'
     '{msgs}\n'
-    'StateMachineRequest.msg'             
+    'StateMachine.msg'             
     ')\n'
     '\n'
     '## Generate services in the \'srv\' folder\n'
