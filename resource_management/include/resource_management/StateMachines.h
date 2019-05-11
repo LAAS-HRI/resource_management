@@ -29,7 +29,7 @@ public:
     using TransitionFromMsgFn = boost::function<std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>(const typename T::Request&)>;
     using GenerateResponseMsgFn = boost::function< typename T::Response(uint32_t)>;
 
-    StateMachines(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn, std::shared_ptr<StateMachinesStorage> storage);
+    StateMachines(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn, std::shared_ptr<StateMachinesStorage> storage, bool synchronized = false);
 
 private:
     bool _serviceCallback(typename T::Request &req, typename T::Response &res);
@@ -43,7 +43,7 @@ private:
 };
 
 template<class T>
-StateMachines<T>::StateMachines(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn generateResponseMsg, std::shared_ptr<StateMachinesStorage> storage):
+StateMachines<T>::StateMachines(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn generateResponseMsg, std::shared_ptr<StateMachinesStorage> storage, bool synchronized):
     _nh(std::move(nh)),
     _getStateDataFromStateMachineMsg(std::move(stateFromMsg)),
     _getTransitionsFromStateMachineMsg(std::move(transitionFromMsg)),
@@ -51,7 +51,7 @@ StateMachines<T>::StateMachines(ros::NodeHandlePtr nh, StateFromMsgFn stateFromM
 {
     _storage = storage;
     _stateMachinesId = 0;
-    _serviceServer = _nh->advertiseService("state_machines_register",&StateMachines<T>::_serviceCallback,this);
+    _serviceServer = _nh->advertiseService(synchronized ? "state_machines_register__" : "state_machines_register", &StateMachines<T>::_serviceCallback,this);
 }
 
 template<class T>

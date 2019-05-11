@@ -48,7 +48,7 @@ class ResourceManager
 {
 public:
     /// also creates 2 buffers for artificial life and state machines
-    ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames, const std::vector<std::string>& pluginsNames);
+    ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames, const std::vector<std::string>& pluginsNames, bool synchronized = false);
     ~ResourceManager();
 
     void run();
@@ -110,7 +110,7 @@ private:
 };
 
 template<typename StateMachineType, typename ...InputDataTypes>
-ResourceManager<StateMachineType,InputDataTypes...>::ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames, const std::vector<std::string>& pluginsNames):
+ResourceManager<StateMachineType,InputDataTypes...>::ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames, const std::vector<std::string>& pluginsNames, bool synchronized):
     _nh(std::move(nh)), _loader("resource_management", "resource_management::EventsInterface")
 {
     loadEventsPlugins(pluginsNames);
@@ -122,15 +122,16 @@ ResourceManager<StateMachineType,InputDataTypes...>::ResourceManager(ros::NodeHa
                                               boost::bind(&ResourceManager<StateMachineType,InputDataTypes...>::stateFromMsg,this,_1),
                                               boost::bind(&ResourceManager<StateMachineType,InputDataTypes...>::transitionFromMsg,this,_1),
                                               boost::bind(&ResourceManager<StateMachineType,InputDataTypes...>::generateResponseMsg,this,_1),
-                                              _stateMachineStorage
+                                              _stateMachineStorage,
+                                              synchronized
                                           );
     addBufferNames(reactiveInputNames);
     createReactiveBufferStorage();
     Impl<InputDataTypes...>::add(_reactiveInputs,_nh,reactiveInputNames,*_reactiveBufferStorage);
     _activeBufferPublisher = _nh->advertise<std_msgs::String>("active_buffer", 10, true);
     _prioritiesSubscriber = _nh->subscribe("set_priorities", 10, &ResourceManager<StateMachineType,InputDataTypes...>::prioritiesCallback, this);
-    _stateMachineStatusPublisher = _nh->advertise<resource_management_msgs::StateMachinesStatus>("state_machine_status", 10);
-    _stateMachineCancelService = _nh->advertiseService("state_machine_cancel", &ResourceManager<StateMachineType,InputDataTypes...>::stateMachineCancel, this);
+    _stateMachineStatusPublisher = _nh->advertise<resource_management_msgs::StateMachinesStatus>(synchronized ? "state_machine_status__" : "state_machine_status", 10);
+    _stateMachineCancelService = _nh->advertiseService(synchronized ? "state_machine_cancel__" : "state_machine_cancel", &ResourceManager<StateMachineType,InputDataTypes...>::stateMachineCancel, this);
 
     if(!_nh->getParam("freq", _hz))
     {

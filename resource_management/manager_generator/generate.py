@@ -31,10 +31,14 @@ def createCatkinFiles(args, settings):
     '# DEPENDS\n'
     ')\n'
     '\n'
-    'include_directories(include ${{catkin_INCLUDE_DIRS}})\n'
-    'add_executable(${{PROJECT_NAME}} src/${{PROJECT_NAME}}.cpp src/ArtificialLife.cpp)\n'
+    'include_directories(include ${{catkin_INCLUDE_DIRS}})\n\n'
+    'add_executable(${{PROJECT_NAME}} src/main.cpp src/${{PROJECT_NAME}}.cpp src/ArtificialLife.cpp)\n'
     'add_dependencies(${{PROJECT_NAME}} ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}} ${{catkin_EXPORTED_TARGETS}})\n'
     'target_link_libraries(${{PROJECT_NAME}} ${{catkin_LIBRARIES}})\n'
+    '\n'
+    'add_executable(${{PROJECT_NAME}}_synchronised src/main_synchronised.cpp src/${{PROJECT_NAME}}.cpp src/ArtificialLife.cpp)\n'
+    'add_dependencies(${{PROJECT_NAME}}_synchronised ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}} ${{catkin_EXPORTED_TARGETS}})\n'
+    'target_link_libraries(${{PROJECT_NAME}}_synchronised ${{catkin_LIBRARIES}})\n'
     '\n'
     'if(CATKIN_ENABLE_TESTING)\n'
     '    find_package(rostest REQUIRED)\n'
@@ -154,7 +158,9 @@ def main():
     createCatkinFiles(args, settings)
 
     # led_manager.cpp
-    configure_template(os.path.join(generator_dir,'template_main.cpp'),os.path.join(project_name, "src", project_name +".cpp"),settings)
+    configure_template(os.path.join(generator_dir,'template_manager.cpp'),os.path.join(project_name, "src", project_name +".cpp"),settings)
+    # led_manager.h
+    configure_template(os.path.join(generator_dir,'template_manager.h'),os.path.join(project_name, "include", project_name, project_name +".h"),settings)
 
     # ArtificialLife.cpp
     configure_template(os.path.join(generator_dir,'template_artificialLife.cpp'),os.path.join(project_name, "src", "ArtificialLife.cpp"),settings)
@@ -165,6 +171,11 @@ def main():
     configure_template(os.path.join(generator_dir,'test','template_test.cpp'),os.path.join(project_name, "test", "test.cpp"),settings)
     # main.test
     configure_template(os.path.join(generator_dir,'test','template_main.test'),os.path.join(project_name, "test", "main.test"),settings)
+
+    # main.cpp
+    configure_template(os.path.join(generator_dir,'template_main.cpp'),os.path.join(project_name, "src", "main.cpp"),settings)
+    # main_synchronised.cpp
+    configure_template(os.path.join(generator_dir,'template_main_synchronised.cpp'),os.path.join(project_name, "src", "main_synchronised.cpp"),settings)
 
 if __name__ == '__main__':
     main()
