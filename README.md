@@ -7,6 +7,17 @@ Matser : [![Build Status](https://gitlab.com/laas-hri/resource_management/badges
 A basic library for implementing robot part resource management.
 
 
+## Create your own manager
+
+```
+roscd resource_management; cd ../..
+mkdir led_manager; cd led_manager
+python3 ../resource_management/resource_management/manager_generator/generate_msgs.py --package-name led_manager_msgs --target-types Color,float32,float OnOff,bool,bool --reactive-topics emotion tagada switch
+python3 ../resource_management/resource_management/manager_generator/generate.py --package-name led_manager --target-types Color,float32,float OnOff,bool,bool --reactive-topics emotion tagada switch
+cd ../..
+catkin_make
+```
+
 ## Messages and buffers priorities
 
 |          |              | 4            | 3            | 2           | 1           | 0            | -1          |
