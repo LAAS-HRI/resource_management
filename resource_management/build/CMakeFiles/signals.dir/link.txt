@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/signals.dir/src/sig_main.cpp.o  -o signals libmessage_lib.a -lpthread 
