@@ -31,4 +31,4 @@ catkin_make
 | **-1**   |**VOID**      | :x:          | :x:          | :x:         | :x:         | :x:          | :x:         |
 
 [Release-Url]: https://github.com/LAAS-HRI/resource_management/releases
-[Release-image]: http://img.shields.io/badge/release-v0.1.0-1eb0fc.svg
+[Release-image]: http://img.shields.io/badge/release-v0.2.0-1eb0fc.svg
