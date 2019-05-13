@@ -20,7 +20,7 @@ def create_msg_and_srv_files(package_msg_dir, dependencies):
         msg_file_name = "SubStateMachine_{type}".format(type=dep.type)
         subsm_msg_name = os.path.join(package_msg_dir, "msg", "{msg_file_name}.msg".format(msg_file_name=msg_file_name))
         with open(subsm_msg_name, "w") as f:
-            f.write("resource_synchronizer_msgs/SubStateMachine header\n"
+            f.write("resource_synchronizer_msgs/SubStateMachineHeader header\n"
                     "{type}/StateMachine state_machine_{name}".format(type=dep.type, name=dep.name))
         msgs_files.append("{msg_file_name}.msg".format(msg_file_name=msg_file_name))
         fsm_srv_file += ("{msg_file_name} state_machine_{name}\n".format(msg_file_name=msg_file_name, name=dep.name))
@@ -32,6 +32,7 @@ def create_msg_and_srv_files(package_msg_dir, dependencies):
     return msgs_files, srvs_files
 
 def create_catkin_files_msgs(package_name, package_dir, dependencies, msgs_to_gen, srvs_to_gen):
+    unique_dep_type = set([d.type for d in dependencies])
     # CmakeLists.txt for msgs package
     with open(os.path.join(package_dir, "CMakeLists.txt"),"w") as fcmake:
         fcmake.write("cmake_minimum_required(VERSION 2.8.3)\n"
@@ -42,14 +43,13 @@ def create_catkin_files_msgs(package_name, package_dir, dependencies, msgs_to_ge
                      "message_generation\n"
                      "resource_management_msgs\n"
                      "resource_synchronizer_msgs\n"
-                     +"\n".join([d.type for d in dependencies])+"\n"
+                     +"\n".join(unique_dep_type)+"\n"
                      ")\n"
                      "\n"
                      "## Generate messages in the \'msg\' folder\n"
                      "add_message_files(\n"
                      "FILES\n"
                      +"\n".join(msgs_to_gen)+"\n"
-                     "StateMachineRequest.m\n"
                      ")\n"
                      "   \n"
                      "## Generate services in the \'srv\' folder\n"
@@ -58,11 +58,10 @@ def create_catkin_files_msgs(package_name, package_dir, dependencies, msgs_to_ge
                      +"\n".join(srvs_to_gen)+"\n"
                      ")\n"
                      "   \n"
-                     "generate_messages(DEPENDENCIES resource_management_msgs {catkin_msgs_deps})\n"
+                     "generate_messages(DEPENDENCIES resource_management_msgs resource_synchronizer_msgs {catkin_msgs_deps})\n"
                      "\n"
-                     "catkin_package(CATKIN_DEPENDS message_runtime {catkin_msgs_deps}""")
+                     "catkin_package(CATKIN_DEPENDS message_runtime {catkin_msgs_deps})".format(catkin_msgs_deps=" ".join(unique_dep_type)))
 
-    unique_dep_type = set([d.type for d in dependencies])
     pack_deps = ['<depend>'+d+'</depend>\n' for d in unique_dep_type]
     # package.xml
     with open(os.path.join(package_dir, "package.xml"),"w") as fpackage:
@@ -94,10 +93,10 @@ def create_catkin_files_src(package_name, package_dir, package_msgs_name):
                      "message_generation\n"
                      "resource_management_msgs\n"
                      "resource_synchronizer_msgs\n"
-                     "{package_msgs_name}\n".format(package_msgs_name=package_msgs_name)+
+                     "{package_msgs_name}\n"
                      ")\n"
                      "\n"
-                     "catkin_package(CATKIN_DEPENDS message_runtime {catkin_msgs_deps}""")
+                     "catkin_package(CATKIN_DEPENDS message_runtime {package_msgs_name})".format(package_msgs_name=package_msgs_name))
 
     # package.xml
     with open(os.path.join(package_dir, "package.xml"),"w") as fpackage:
@@ -136,8 +135,10 @@ if __name__ == "__main__":
     os.makedirs(os.path.join(package_msg_dir, "msg"))
     os.makedirs(os.path.join(package_msg_dir, "srv"))
 
-    msgs_to_gen, srvs_to_gen = create_msg_and_srv_files(package_msg_dir, args.dependencies)
+    msgs_dep = [ResourceManager(d.type + "_msgs", d.name) for d in args.dependencies]
 
-    create_catkin_files_msgs(package_msg_name, package_msg_dir, args.dependencies, msgs_to_gen, srvs_to_gen)
+    msgs_to_gen, srvs_to_gen = create_msg_and_srv_files(package_msg_dir, msgs_dep)
+
+    create_catkin_files_msgs(package_msg_name, package_msg_dir, msgs_dep, msgs_to_gen, srvs_to_gen)
 
     create_catkin_files_src(args.package_name, package_src_dir, package_msg_name)
