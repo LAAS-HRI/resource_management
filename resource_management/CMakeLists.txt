@@ -39,7 +39,7 @@ add_library(message_lib
 )
 
 add_library(resource_management_plugin
-  src/plugins/EventsPluginTest.cpp
+  src/plugins/EventsPluginStr.cpp
   )
 target_link_libraries(resource_management_plugin state_machine_lib message_lib)
 

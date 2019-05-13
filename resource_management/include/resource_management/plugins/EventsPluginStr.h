@@ -10,10 +10,10 @@
 namespace resource_management
 {
 
-class EventsPluginTest : public EventsInterface
+class EventsPluginStr : public EventsInterface
 {
 public:
-  EventsPluginTest() {}
+  EventsPluginStr() {}
   void setNodeHandle(ros::NodeHandlePtr nh);
 
 private:
