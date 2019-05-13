@@ -1,5 +1,7 @@
 #include "led_manager_msgs/StateMachineRegister.h"
 
+#include "resource_management/tools/StateMachineServer.h"
+
 #include <ros/ros.h>
 
 /*
@@ -12,6 +14,12 @@ int main(int argc, char *argv[])
 {
   ros::init(argc,argv,"led_manager_test_pub");
   ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
+
+  ros::AsyncSpinner spinner(1); // Use 4 threads
+  spinner.start();
+
+  resource_management::StateMachineServer<led_manager_msgs::StateMachineRegister> server("led_manager_test");
+  server.waitForServer();
 
   led_manager_msgs::StateMachineRegister::Request signal;
   signal.header.timeout = ros::Duration(-1);
@@ -111,13 +119,16 @@ int main(int argc, char *argv[])
 
   signal.state_machine.states_OnOff.push_back(onoff_state);
 
-  std::cout << "will pub" << std::endl;
   led_manager_msgs::StateMachineRegister srv;
-  ros::ServiceClient client = nh->serviceClient<led_manager_msgs::StateMachineRegister>("/led_manager_test/state_machines_register");
   srv.request = signal;
-  client.call(srv);
+  server.send(srv);
 
-  std::cout << "id = " << srv.response.id << std::endl;
+  if(server.waitForResult())
+    std::cout << "SUCCESS" << std::endl;
+  else
+    std::cout << "ERROR" << std::endl;
+
+  std::cout << server.getResult().toString() << std::endl;
 
   return 0;
 }
