@@ -21,7 +21,7 @@ def create_msg_and_srv_files(package_msg_dir, dependencies):
         subsm_msg_name = os.path.join(package_msg_dir, "msg", "{msg_file_name}.msg".format(msg_file_name=msg_file_name))
         with open(subsm_msg_name, "w") as f:
             f.write("resource_synchronizer_msgs/SubStateMachineHeader header\n"
-                    "{type}/StateMachine state_machine_{name}".format(type=dep.type, name=dep.name))
+                    "{type}/StateMachine state_machine".format(type=dep.type))
         msgs_files.append("{msg_file_name}.msg".format(msg_file_name=msg_file_name))
         fsm_srv_file += ("{msg_file_name} state_machine_{name}\n".format(msg_file_name=msg_file_name, name=dep.name))
     fsm_srv_file += "---\nuint32 id\nstring error"
