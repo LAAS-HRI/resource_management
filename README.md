@@ -9,7 +9,7 @@ A basic library for implementing robot part resource management.
 
 ## Create your own manager
 
-```
+```bash
 roscd resource_management; cd ../..
 mkdir led_manager; cd led_manager
 python3 ../resource_management/resource_management/manager_generator/generate_msgs.py --package-name led_manager_msgs --target-types Color,float32,float OnOff,bool,bool --reactive-topics emotion tagada switch
@@ -29,6 +29,15 @@ catkin_make
 | **1**    |**STANDARD**  | 17           | 7            | 6           | 5           | 4            | :x:         |
 | **0**    |**LOW**       | 16           | 3            | 2           | 1           | 0            | :x:         |
 | **-1**   |**VOID**      | :x:          | :x:          | :x:         | :x:         | :x:          | :x:         |
+
+## Create a synchronizer
+
+```bash
+roscd resource_synchronizer; cd ../..
+python3 resource_management/resource_synchronizer/synchronizer_generator/generate_synchronizer.py led_resource_synchronizer led_manager:led_R led_manager:led_G led_manager:led_B
+cd ..
+catkin_make
+```
 
 [Release-Url]: https://github.com/LAAS-HRI/resource_management/releases
 [Release-image]: http://img.shields.io/badge/release-v0.2.0-1eb0fc.svg
