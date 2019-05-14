@@ -1,6 +1,7 @@
 #include "led_manager_msgs/StateMachineRegister.h"
 
 #include "resource_management/tools/StateMachineServer.h"
+#include "resource_management/tools/StateMsg.h"
 
 #include <ros/ros.h>
 
@@ -32,92 +33,44 @@ int main(int argc, char *argv[])
 
   /* STATE_0 */
 
-  onoff_state.data = true;
-  onoff_state.header.id = "state_0";
-  onoff_state.header.transitions.clear();
-
   {
-    resource_management_msgs::StateMachineTransition transition;
-    transition.next_state = "state_1";
-    transition.end_condition.timeout = ros::Duration(-1);
-    transition.end_condition.duration = ros::Duration(10);//1
-    onoff_state.header.transitions.push_back(transition);
+    resource_management::StateMsg<led_manager_msgs::StateMachineStateOnOff, bool> state("state_0", true);
+    state.addTransition("state_1", ros::Duration(-1), ros::Duration(10));
+    state.addTransition("state_2", ros::Duration(-1), ros::Duration(1), {"end_loop"});
+    signal.state_machine.states_OnOff.push_back(state());
   }
-
-  {
-    resource_management_msgs::StateMachineTransition transition;
-    transition.next_state = "state_2";
-    transition.end_condition.timeout = ros::Duration(-1);
-    transition.end_condition.duration = ros::Duration(1);//-1
-    transition.end_condition.regex_end_condition.push_back("end_loop");
-    onoff_state.header.transitions.push_back(transition);
-  }
-
-  signal.state_machine.states_OnOff.push_back(onoff_state);
 
   /* STATE_1 */
 
-  color_state.data = 100;
-  color_state.header.id = "state_1";
-  color_state.header.transitions.clear();
-
   {
-    resource_management_msgs::StateMachineTransition transition;
-    transition.next_state = "state_0";
-    transition.end_condition.timeout = ros::Duration(-1);
-    transition.end_condition.duration = ros::Duration(1);
-    color_state.header.transitions.push_back(transition);
+    resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_1", 100);
+    state.addTransition("state_0", ros::Duration(-1), ros::Duration(1));
+    signal.state_machine.states_Color.push_back(state());
   }
-
-  signal.state_machine.states_Color.push_back(color_state);
 
   /* STATE_2 */
 
-  color_state.data = 150;
-  color_state.header.id = "state_2";
-  color_state.header.transitions.clear();
-
   {
-    resource_management_msgs::StateMachineTransition transition;
-    transition.next_state = "state_3";
-    transition.end_condition.timeout = ros::Duration(-1);
-    transition.end_condition.duration = ros::Duration(2);
-    color_state.header.transitions.push_back(transition);
+    resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_2", 150);
+    state.addTransition("state_3", ros::Duration(-1), ros::Duration(2));
+    signal.state_machine.states_Color.push_back(state());
   }
-
-  signal.state_machine.states_Color.push_back(color_state);
 
   /* STATE_3 */
 
-  color_state.data = 200;
-  color_state.header.id = "state_3";
-  color_state.header.transitions.clear();
-
   {
-    resource_management_msgs::StateMachineTransition transition;
-    transition.next_state = "state_4";
-    transition.end_condition.timeout = ros::Duration(-1);
-    transition.end_condition.duration = ros::Duration(2);
-    color_state.header.transitions.push_back(transition);
+    resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_3", 200);
+    state.addTransition("state_4", ros::Duration(-1), ros::Duration(2));
+    signal.state_machine.states_Color.push_back(state());
   }
-
-  signal.state_machine.states_Color.push_back(color_state);
 
   /* STATE_4 */
 
-  onoff_state.data = false;
-  onoff_state.header.id = "state_4";
-  onoff_state.header.transitions.clear();
-
   {
-    resource_management_msgs::StateMachineTransition transition;
-    transition.next_state = "state_5";
-    transition.end_condition.timeout = ros::Duration(-1);
-    transition.end_condition.duration = ros::Duration(2);
-    onoff_state.header.transitions.push_back(transition);
+    resource_management::StateMsg<led_manager_msgs::StateMachineStateOnOff, bool> state("state_4", false);
+    state.addTransition("state_5", ros::Duration(-1), ros::Duration(2));
+    signal.state_machine.states_OnOff.push_back(state());
   }
-
-  signal.state_machine.states_OnOff.push_back(onoff_state);
 
   led_manager_msgs::StateMachineRegister srv;
   srv.request = signal;
