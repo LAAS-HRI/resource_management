@@ -48,6 +48,11 @@ public:
     return state_machine_;
   }
 
+  int getPriority()
+  {
+    return header_.priority;
+  }
+
 private:
   T state_machine_;
   resource_management_msgs::StateMachineHeader header_;

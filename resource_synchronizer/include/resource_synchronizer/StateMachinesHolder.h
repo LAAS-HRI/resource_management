@@ -3,12 +3,19 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 
 #include "resource_synchronizer/StateMachine.h"
 #include "resource_management/tools/StateMachineServer.h"
 
 namespace resource_synchronizer
 {
+
+struct StateMachinePriority
+{
+  int priority;
+  int state_machine_id;
+};
 
 template<typename SMT, typename RMT>
 class StateMachinesHolder
@@ -64,9 +71,30 @@ public:
     return running_id_;
   }
 
+  StateMachinePriority getHighestPriority()
+  {
+    mutex_.lock();
+    StateMachinePriority highest;
+    highest.priority = -100;
+    highest.state_machine_id = -1;
+
+    for(const auto& it : state_machines_)
+    {
+      if(it.second.getPriority() > highest.priority)
+      {
+        highest.priority = it.second.getPriority();
+        highest.state_machine_id = it.first;
+      }
+    }
+    mutex_.unlock();
+
+    return highest;
+  }
+
 private:
   std::map<int, state_machine_type_> state_machines_;
   int running_id_;
+  std::mutex mutex_;
 
   resource_management::StateMachineServer<RMT> server_;
 
@@ -76,9 +104,11 @@ private:
     {
       if(status.state_name_ == "")
       {
+        mutex_.lock();
         running_id_ = -1;
         auto it = state_machines_.find(running_id_);
-        state_machines_.earse(it);
+        state_machines_.erase(it);
+        mutex_.unlock();
       }
       std::cout << status.toString() << std::endl;
     }
