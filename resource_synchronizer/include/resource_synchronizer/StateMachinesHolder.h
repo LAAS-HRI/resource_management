@@ -36,8 +36,9 @@ public:
 
   void insert(int id, SMT sub_state_machine, resource_management_msgs::MessagePriority importance)
   {
-    state_machines_.insert( std::pair<int, state_machine_type_>
-      (id, state_machine_type_(sub_state_machine.state_machine, sub_state_machine.header, importance) ) );
+    if(sub_state_machine.header.initial_state != "")
+      state_machines_.insert( std::pair<int, state_machine_type_>
+        (id, state_machine_type_(sub_state_machine.state_machine, sub_state_machine.header, importance) ) );
   }
 
   bool send(int id)
@@ -75,24 +76,43 @@ public:
     return running_id_;
   }
 
-  StateMachinePriority getHighestPriority()
+  std::vector<StateMachinePriority> getPriorities()
   {
+    std::vector<StateMachinePriority> priorities;
+
     mutex_.lock();
-    StateMachinePriority highest;
-    highest.priority = -100;
-    highest.state_machine_id = -1;
 
     for(const auto& it : state_machines_)
     {
-      if(it.second.getPriority() > highest.priority)
+      StateMachinePriority priority;
+      priority.priority = it.second.getPriority();
+      priority.state_machine_id = it.first;
+
+      size_t index = 0;
+      for(size_t i = 0; i < priorities.size(); i++)
       {
-        highest.priority = it.second.getPriority();
-        highest.state_machine_id = it.first;
+        if(priority.priority > priorities[i].priority)
+        {
+          index = i;
+          break;
+        }
       }
+      priorities.insert(priorities.begin() + index, priority);
     }
     mutex_.unlock();
 
-    return highest;
+    return priorities;
+  }
+
+  void clean()
+  {
+    for(size_t i = 0; i < state_machines_.size();)
+    {
+      if(state_machines_[i].isTooLate())
+        state_machines_.erase(state_machines_.begin() + i);
+      else
+        i++;
+    }
   }
 
   void registerSatusCallback(std::function<void(resource_synchronizer_msgs::MetaStateMachinesStatus)> status_callback) { status_callback_ = status_callback; }
