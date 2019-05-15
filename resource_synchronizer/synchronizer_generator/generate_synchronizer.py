@@ -93,6 +93,7 @@ def create_catkin_files_src(package_name, package_dir, package_msgs_name):
                      "\n"
                      "find_package(catkin REQUIRED\n"
                      "roscpp\n"
+                     "resource_management\n"
                      "resource_synchronizer\n"
                      "resource_management_msgs\n"
                      "resource_synchronizer_msgs\n"
