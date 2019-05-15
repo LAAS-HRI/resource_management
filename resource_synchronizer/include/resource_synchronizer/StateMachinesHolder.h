@@ -54,7 +54,6 @@ public:
     {
       server_.cancel();
       server_.waitForResult();
-      running_id_ = -1;
       return true;
     }
     return false;
@@ -62,11 +61,6 @@ public:
 
   int isRunning()
   {
-    if(running_id_ != -1)
-    {
-      if(state_machines_[running_id_].getResult().state_name_ == "")
-        running_id_ = -1;
-    }
     return running_id_;
   }
 
@@ -81,7 +75,11 @@ private:
     if(running_id_ == -1)
     {
       if(status.state_name_ == "")
+      {
         running_id_ = -1;
+        auto it = state_machines_.find(running_id_);
+        state_machines_.earse(it);
+      }
       std::cout << status.toString() << std::endl;
     }
   }
