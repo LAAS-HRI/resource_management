@@ -47,6 +47,8 @@ public:
   stateMachineState_t getResult() { return state_; }
   bool cancel();
 
+  void registerSatusCallback(std::function<void(stateMachineState_t)> status_callback) { status_callback_ = status_callback; }
+
 private:
   ros::NodeHandle nh_;
   std::string name_;
@@ -62,6 +64,8 @@ private:
   std::string cancel_topic_name_;
   std::string status_topic_name_;
   ros::Subscriber status_subscriber_;
+
+  std::function<void(stateMachineState_t)> status_callback_;
 
   stateMachineState_t state_;
 
@@ -197,7 +201,8 @@ void StateMachineServer<MessageType>::statusCallback(const resource_management_m
   {
     state_.state_name_ = msg.state_name;
     state_.state_event_ = msg.state_event;
-    //std::cout << state_.toString() << std::endl;
+    if(status_callback_)
+      status_callback_(state_);
   }
 }
 

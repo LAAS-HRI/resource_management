@@ -38,6 +38,11 @@ public:
     return header_;
   }
 
+  T getStateMachineMsg()
+  {
+    return state_machine_;
+  }
+
   T operator()()
   {
     return state_machine_;
