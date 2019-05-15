@@ -24,7 +24,7 @@ ros::NodeHandlePtr _nh;
 !!end
 unsigned int _current_id;
 
-ros::ServiceServer* _register_service;
+ros::ServiceServer _register_service;
 };
 
 } // namespace ${project_name}

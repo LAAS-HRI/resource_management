@@ -16,7 +16,7 @@ class StateMachinesHolder
   typedef StateMachine<typename SMT::_state_machine_type> state_machine_type_;
 
 public:
-  StateMachinesHolder(std::string name) : server_(name)
+  StateMachinesHolder(std::string name) : server_(name, true)
   {
     server_.waitForServer();
     server_.registerSatusCallback([this](auto status){ this->stateMachineStatus(status); });
@@ -31,6 +31,9 @@ public:
 
   bool send(int id)
   {
+    if(running_id_ != -1)
+      return false;
+
     auto it = state_machines_.find(id);
     if(it != state_machines_.end())
     {
@@ -76,7 +79,11 @@ private:
   void stateMachineStatus(resource_management::stateMachineState_t status)
   {
     if(running_id_ == -1)
+    {
+      if(status.state_name_ == "")
+        running_id_ = -1;
       std::cout << status.toString() << std::endl;
+    }
   }
 };
 

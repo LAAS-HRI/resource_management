@@ -5,12 +5,12 @@ namespace ${project_name} {
 
 ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
 !!for sub_fsm in sub_fsms
-    _holder_{sub_fsm.name}("{sub_fsm.name}"),
+  _holder_{sub_fsm.name}("{sub_fsm.name}"),
 !!end
-_current_id(0)
+  _current_id(0)
 {
 
-  _register_service = new ros::ServiceServer(_nh->advertiseService("${project_name}_register_meta_state_machine", &${class_name}::registerMetaStateMachine, this));
+  _register_service = _nh->advertiseService("${project_name}_register_meta_state_machine", &${class_name}::registerMetaStateMachine, this);
   ROS_INFO("${project_name} ready.");
 }
 
@@ -32,4 +32,6 @@ int main(int argc, char** argv){
   ${project_name}::${class_name} syn(nh);
 
   ros::spin();
+
+  return 0;
 }
