@@ -4,9 +4,12 @@
 #include <string>
 #include <map>
 #include <mutex>
+#include <functional>
 
 #include "resource_synchronizer/StateMachine.h"
 #include "resource_management/tools/StateMachineServer.h"
+
+#include "resource_synchronizer_msgs/MetaStateMachinesStatus.h"
 
 namespace resource_synchronizer
 {
@@ -28,6 +31,7 @@ public:
     server_.waitForServer();
     server_.registerSatusCallback([this](auto status){ this->stateMachineStatus(status); });
     running_id_ = -1;
+    name_ = name;
   }
 
   void insert(int id, SMT sub_state_machine, resource_management_msgs::MessagePriority importance)
@@ -91,17 +95,29 @@ public:
     return highest;
   }
 
+  void registerSatusCallback(std::function<void(resource_synchronizer_msgs::MetaStateMachinesStatus)> status_callback) { status_callback_ = status_callback; }
+
 private:
   std::map<int, state_machine_type_> state_machines_;
   int running_id_;
   std::mutex mutex_;
+  std::string name_;
 
   resource_management::StateMachineServer<RMT> server_;
+  std::function<void(resource_synchronizer_msgs::MetaStateMachinesStatus)> status_callback_;
 
   void stateMachineStatus(resource_management::stateMachineState_t status)
   {
     if(running_id_ == -1)
     {
+      resource_synchronizer_msgs::MetaStateMachinesStatus msg;
+      msg.id = running_id_;
+      msg.resource = name_;
+      msg.state_name = status.state_name_;
+      msg.state_event = status.state_event_;
+      if(status_callback_)
+        status_callback_(msg);
+
       if(status.state_name_ == "")
       {
         mutex_.lock();

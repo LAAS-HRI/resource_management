@@ -12,7 +12,18 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
 {
 
   _register_service = _nh->advertiseService("${project_name}_register_meta_state_machine", &${class_name}::registerMetaStateMachine, this);
+  _state_machine_status_publisher = _nh->advertise<resource_synchronizer_msgs::MetaStateMachinesStatus>("state_machine_status", 10);
+
+!!for sub_fsm in sub_fsms
+  _holder_{sub_fsm.name}.registerSatusCallback([this](auto status){{ this->publishStatus(status); }});
+!!end
+
   ROS_INFO("${project_name} ready.");
+}
+
+void ${class_name}::publishStatus(resource_synchronizer_msgs::MetaStateMachinesStatus status)
+{
+  _state_machine_status_publisher.publish(status);
 }
 
 bool ${class_name}::registerMetaStateMachine(${project_name_msgs}::MetaStateMachine::Request &req,
