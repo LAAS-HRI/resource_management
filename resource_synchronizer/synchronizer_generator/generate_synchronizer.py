@@ -1,9 +1,14 @@
 import argparse
 import os
 import sys
-from typing import NamedTuple
+from typing import NamedTuple, List
+import string
 
 ResourceManager = NamedTuple("ResourceManager", [("type", str), ("name", str)])
+
+SubFsm = NamedTuple("SubFsm", [("type", str), ("res_name", str), ("name", str)])
+Settings = NamedTuple("Settings", [("sub_fsms", List[SubFsm]), ("project_name", str), ("class_name", str), ("project_name_msgs", str),
+                                   ("unique_msgs_deps", List[str])])
 
 def type_and_name(double_points_str):
     sp = double_points_str.split(':')
@@ -24,7 +29,7 @@ def create_msg_and_srv_files(package_msg_dir, dependencies):
                     "{type}/StateMachine state_machine".format(type=dep.type))
         msgs_files.append("{msg_file_name}.msg".format(msg_file_name=msg_file_name))
         fsm_srv_file += ("{msg_file_name} state_machine_{name}\n".format(msg_file_name=msg_file_name, name=dep.name))
-    fsm_srv_file += "---\nuint32 id\nstring error"
+    fsm_srv_file += "---\nint32 id\nstring error"
     with open(fsm_srv_file_name, "w") as f:
         f.write(fsm_srv_file)
     srvs_files.append("MetaStateMachine.srv")
@@ -87,7 +92,7 @@ def create_catkin_files_src(package_name, package_dir, package_msgs_name):
     # CmakeLists.txt for src package
     with open(os.path.join(package_dir, "CMakeLists.txt"),"w") as fcmake:
         fcmake.write("cmake_minimum_required(VERSION 2.8.3)\n"
-                     "project({package_name})\n".format(package_name=package_name)+
+                     "project({package_name})\n"
                      "\n"
                      "add_compile_options(-std=c++14 -Wall -Wextra -pthread)\n"
                      "\n"
@@ -108,7 +113,12 @@ def create_catkin_files_src(package_name, package_dir, package_msgs_name):
                      "  include\n"
                      "  ${{catkin_INCLUDE_DIRS}}\n"
                      "  ${{INCLUDE_DIRS}}\n"
-                     ")\n".format(package_msgs_name=package_msgs_name))
+                     ")\n"
+                     "\n"
+                     "add_executable(synchronizer src/{package_name}.cpp)\n"
+                     "add_dependencies(synchronizer ${{${{PROJECT_NAME}}_EXPORTED_TARGETS}} ${{catkin_EXPORTED_TARGETS}})\n"
+                     "target_link_libraries(synchronizer\n${{catkin_LIBRARIES}}\n)\n"
+                     "\n".format(package_name=package_name, package_msgs_name=package_msgs_name))
 
     # package.xml
     with open(os.path.join(package_dir, "package.xml"),"w") as fpackage:
@@ -132,6 +142,55 @@ def create_catkin_files_src(package_name, package_dir, package_msgs_name):
                        '\t<exec_depend>message_runtime</exec_depend>\n'
                        '</package>\n')
 
+def underscore_to_CamelCase(word):
+    return ''.join(x.capitalize() or '_' for x in word.split('_'))
+
+def substitue_for_loop(tpl,for_var,the_list):
+    res=""
+    for x in the_list:
+        res+=eval('tpl.format({}=x)'.format(for_var))
+    return res
+
+def substitue_fmt(tpl,unused0,the_var):
+    return tpl.format(the_var)
+
+
+def configure_template(template_path, output_path, msgs_dep, project_name, package_msgs_name):
+    sub_fsms = [SubFsm("SubStateMachine_{type}".format(type=d.type), d.type, d.name) for d in msgs_dep]
+    unique_deps = list(set([d.type for d in msgs_dep]))
+    settings = Settings(sub_fsms, project_name, underscore_to_CamelCase(project_name), package_msgs_name, unique_deps)
+    f_in = open(template_path,'r')
+    tpl = ""
+    tpl_inside=""
+    for_var=""
+    inside=False
+    for line in f_in:
+        if line.startswith('!!for '):
+            inside='for_loop'
+            command=line[2:-1]
+            for_var=command[command.find(' ')+1:]
+            for_var=for_var[0:for_var.find(' ')]
+            for_list=command[command.find(' in ')+4:]
+            tpl_inside=""
+        elif line.startswith('!!fmt '):
+            inside='fmt'
+            command=line[2:-1]
+            for_list=command[command.find(' ')+1:]
+            tpl_inside=""
+        elif line.startswith('!!end'):
+            tpl+=eval('substitue_{}(tpl_inside,for_var,settings.{})'.format(inside,for_list))
+            inside=None
+        elif inside:
+            tpl_inside+=line
+        else:
+            tpl+=line
+    f_in.close()
+
+    # write main cpp file
+
+    fo = open(output_path,"w+")
+    fo.write(string.Template(tpl).substitute(**settings._asdict()))
+    fo.close()
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser(
@@ -147,6 +206,7 @@ if __name__ == "__main__":
     package_src_dir = os.path.join(args.package_name, args.package_name)
     generator_dir=os.path.dirname(sys.argv[0])
     os.makedirs(os.path.join(package_src_dir, "src"))
+    os.makedirs(os.path.join(package_src_dir, "include"))
     os.makedirs(os.path.join(package_msg_dir, "msg"))
     os.makedirs(os.path.join(package_msg_dir, "srv"))
 
@@ -157,3 +217,10 @@ if __name__ == "__main__":
     create_catkin_files_msgs(package_msg_name, package_msg_dir, msgs_dep, msgs_to_gen, srvs_to_gen)
 
     create_catkin_files_src(args.package_name, package_src_dir, package_msg_name)
+
+    configure_template(os.path.join(generator_dir, "template_resource_synchronizer.h"), os.path.join(package_src_dir, "include", args.package_name + ".h"),
+                       msgs_dep, args.package_name, package_msg_name)
+
+    configure_template(os.path.join(generator_dir, "template_resource_synchronizer.cpp"),
+                       os.path.join(package_src_dir, "src", args.package_name + ".cpp"),
+                       msgs_dep, args.package_name, package_msg_name)
