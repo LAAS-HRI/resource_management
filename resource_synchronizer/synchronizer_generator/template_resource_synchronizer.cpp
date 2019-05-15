@@ -1,7 +1,8 @@
 #include "${project_name}.h"
 #include <resource_synchronizer_msgs/MetaStateMachineHeader.h>
 
-namespace ${project_name} {
+namespace ${project_name}
+{
 
 ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
 !!for sub_fsm in sub_fsms
@@ -23,6 +24,7 @@ ${project_name_msgs}::MetaStateMachine::Response &res){
   _current_id++;
   return true;
 }
+
 } // namespace ${project_name}
 
 int main(int argc, char** argv){

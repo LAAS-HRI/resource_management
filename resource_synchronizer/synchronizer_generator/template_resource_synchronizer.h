@@ -8,7 +8,8 @@
 #include "{dep}/StateMachineRegister.h"
 !!end
 
-namespace ${project_name} {
+namespace ${project_name}
+{
 
 class ${class_name}
 {
@@ -18,13 +19,13 @@ public:
                                 ${project_name_msgs}::MetaStateMachine::Response &res);
 
 private:
-ros::NodeHandlePtr _nh;
+  ros::NodeHandlePtr _nh;
 !!for sub_fsm in sub_fsms
-    resource_synchronizer::StateMachinesHolder<${{project_name_msgs}}::{sub_fsm.type}, {sub_fsm.res_name}::StateMachineRegister> _holder_{sub_fsm.name};
+  resource_synchronizer::StateMachinesHolder<${{project_name_msgs}}::{sub_fsm.type}, {sub_fsm.res_name}::StateMachineRegister> _holder_{sub_fsm.name};
 !!end
-unsigned int _current_id;
+  unsigned int _current_id;
 
-ros::ServiceServer _register_service;
+  ros::ServiceServer _register_service;
 };
 
 } // namespace ${project_name}
