@@ -28,6 +28,7 @@ public:
 
   virtual int isRunning() = 0;
   virtual bool isOneRunning(int id) = 0;
+  virtual bool canReplace(int id) = 0;
 
   virtual std::vector<int> getIdsPerPriorities() = 0;
   virtual void clean() = 0;
@@ -144,6 +145,21 @@ public:
       res.push_back(x.state_machine_id);
 
     return res;
+  }
+
+  bool canReplace(int id)
+  {
+    if(running_id_ == -1)
+      return true;
+    else
+    {
+      auto it_id = state_machines_.find(id);
+      auto it_running_id = state_machines_.find(running_id_);
+      if(it_id->second.getHeaderMsg().priority.value > it_running_id->second.getHeaderMsg().priority.value)
+        return true;
+      else
+        return false;
+    }
   }
 
   void clean()

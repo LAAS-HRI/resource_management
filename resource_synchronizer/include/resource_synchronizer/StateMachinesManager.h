@@ -47,15 +47,23 @@ public:
           if(st_id != -1)
           {
             bool to_take = true;
-            for(size_t j = 0; j < ids_.size(); j++)
+
+            if(state_machines_holders_[i]->canReplace(st_id))
             {
-              if(i != j)
+              for(size_t j = 0; j < ids_.size(); j++)
               {
-                auto it = std::find(ids_[j].begin(), ids_[j].end(), st_id);
-                if (it != ids_[j].end() && it != ids_[j].begin())
-                  to_take = false;
+                if(i != j)
+                {
+                  auto it = std::find(ids_[j].begin(), ids_[j].end(), st_id);
+                  if (it != ids_[j].end() && it != ids_[j].begin())
+                    to_take = false;
+                  else if((it != ids_[j].end()) && (!state_machines_holders_[j]->canReplace(st_id)))
+                    to_take = false;
+                }
               }
             }
+            else
+              to_take = false;
 
             if(to_take)
             {
@@ -68,9 +76,20 @@ public:
 
               clean();
             }
+            else // remove state machine not executable for this run
+            {
+              for(size_t j = 0; j < ids_.size(); j++)
+              {
+                auto it = std::find(ids_[j].begin(), ids_[j].end(), st_id);
+                if (it != ids_[j].end())
+                  ids_[j].erase(it);
+              }
+            }
           }
         }
       }
+
+      // ids to run are in ids_
 
       r.sleep();
     }
