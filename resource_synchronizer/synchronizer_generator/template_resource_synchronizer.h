@@ -21,10 +21,10 @@ class ${class_name}
 {
 public:
   ${class_name}(ros::NodeHandlePtr nh);
-  bool registerMetaStateMachine(${project_name_msgs}::MetaStateMachine::Request &req,
-                                ${project_name_msgs}::MetaStateMachine::Response &res);
 
   void publishStatus(resource_synchronizer_msgs::MetaStateMachinesStatus status);
+
+  void run();
 
 private:
   ros::NodeHandlePtr _nh;
@@ -38,6 +38,9 @@ private:
   ros::ServiceServer _register_service;
   ros::Publisher _state_machine_status_publisher;
   ros::ServiceServer _state_machine_cancel_service;
+
+  bool registerMetaStateMachine(${project_name_msgs}::MetaStateMachine::Request &req,
+                                ${project_name_msgs}::MetaStateMachine::Response &res);
 
   bool stateMachineCancel
       (resource_management_msgs::StateMachinesCancel::Request  &req,

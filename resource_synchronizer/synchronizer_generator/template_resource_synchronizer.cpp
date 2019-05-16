@@ -1,4 +1,7 @@
 #include "${project_name}.h"
+
+#include <thread>
+
 #include <resource_synchronizer_msgs/MetaStateMachineHeader.h>
 
 namespace ${project_name}
@@ -29,6 +32,16 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
 void ${class_name}::publishStatus(resource_synchronizer_msgs::MetaStateMachinesStatus status)
 {
   _state_machine_status_publisher.publish(status);
+}
+
+void ${class_name}::run()
+{
+  std::thread ${project_name}_thread(&resource_synchronizer::StateMachinesManager::run, &_manager);
+
+  ros::spin();
+
+  _manager.stop();
+  ${project_name}_thread.join();
 }
 
 bool ${class_name}::registerMetaStateMachine(${project_name_msgs}::MetaStateMachine::Request &req,
@@ -63,7 +76,7 @@ int main(int argc, char** argv){
 
   ${project_name}::${class_name} syn(nh);
 
-  ros::spin();
+  syn.run();
 
   return 0;
 }

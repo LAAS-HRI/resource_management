@@ -2,6 +2,7 @@
 #define RESOURCE_SYNCHRONIZER_STATEMACHINESMANAGER_H
 
 #include <vector>
+#include <atomic>
 
 #include "resource_synchronizer/StateMachinesHolder.h"
 
@@ -11,7 +12,8 @@ namespace resource_synchronizer
 class StateMachinesManager
 {
 public:
-  StateMachinesManager() {}
+  StateMachinesManager() : run_(false) {}
+  ~StateMachinesManager() {}
 
   void registerHolder(StateMachinesHolderBase* holder)
   {
@@ -20,11 +22,21 @@ public:
 
   void run()
   {
-    
+    run_ = true;
+    while(run_ && ros::ok())
+    {
+
+    }
+  }
+
+  void stop()
+  {
+    run_ = false;
   }
 
 private:
   std::vector<StateMachinesHolderBase*> state_machines_holders_;
+  std::atomic<bool> run_;
 };
 
 } // namespace resource_synchronizer
