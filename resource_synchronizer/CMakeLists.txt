@@ -19,3 +19,5 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${INCLUDE_DIRS}
 )
+
+add_executable(a src/test.cpp)

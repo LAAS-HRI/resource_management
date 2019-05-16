@@ -29,7 +29,7 @@ public:
   virtual int isRunning() = 0;
   virtual bool isOneRunning(int id) = 0;
 
-  virtual std::vector<StateMachinePriority> getPriorities() = 0;
+  virtual std::vector<int> getIdsPerPriorities() = 0;
   virtual void clean() = 0;
 };
 
@@ -114,7 +114,7 @@ public:
     return running_id_ == id;
   }
 
-  std::vector<StateMachinePriority> getPriorities()
+  std::vector<int> getIdsPerPriorities()
   {
     std::vector<StateMachinePriority> priorities;
 
@@ -139,7 +139,11 @@ public:
     }
     mutex_.unlock();
 
-    return priorities;
+    std::vector<int> res;
+    for(const auto& x : priorities)
+      res.push_back(x.state_machine_id);
+
+    return res;
   }
 
   void clean()
