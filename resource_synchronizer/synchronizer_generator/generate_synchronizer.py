@@ -142,6 +142,18 @@ def create_catkin_files_src(package_name, package_dir, package_msgs_name):
                        '\t<exec_depend>message_runtime</exec_depend>\n'
                        '</package>\n')
 
+def create_launch_file(package_name, launch_file_dir, dependencies):
+    with open(os.path.join(launch_file_dir, package_name + ".launch"),"w") as flaunch:  # Les légumes sont a vaunlunte !
+        flaunch.write("<launch>\n")
+        for dep in dependencies:
+            flaunch.write('\t<node name="{dep_name}" pkg="{dep_type}" type="{dep_type}" output="screen" />\n'.format(
+                dep_name=dep.name, dep_type=dep.type
+            ))
+        flaunch.write('\t<node name="{package_name}" pkg="{package_name}" type="synchronizer" output="screen" />\n'.format(
+            package_name=package_name
+        ))
+        flaunch.write("</launch>")
+
 def underscore_to_CamelCase(word):
     return ''.join(x.capitalize() or '_' for x in word.split('_'))
 
@@ -209,6 +221,7 @@ if __name__ == "__main__":
     os.makedirs(os.path.join(package_src_dir, "include"))
     os.makedirs(os.path.join(package_msg_dir, "msg"))
     os.makedirs(os.path.join(package_msg_dir, "srv"))
+    os.makedirs(os.path.join(package_src_dir, "launch"))
 
     msgs_dep = [ResourceManager(d.type + "_msgs", d.name) for d in args.dependencies]
 
@@ -224,3 +237,5 @@ if __name__ == "__main__":
     configure_template(os.path.join(generator_dir, "template_resource_synchronizer.cpp"),
                        os.path.join(package_src_dir, "src", args.package_name + ".cpp"),
                        msgs_dep, args.package_name, package_msg_name)
+
+    create_launch_file(args.package_name, os.path.join(package_src_dir, "launch"), args.dependencies)
