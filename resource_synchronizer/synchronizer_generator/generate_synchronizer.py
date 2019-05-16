@@ -146,7 +146,7 @@ def create_launch_file(package_name, launch_file_dir, dependencies):
     with open(os.path.join(launch_file_dir, package_name + ".launch"),"w") as flaunch:  # Les légumes sont a vaunlunte !
         flaunch.write("<launch>\n")
         for dep in dependencies:
-            flaunch.write('\t<node name="{dep_name}" pkg="{dep_type}" type="{dep_type}" output="screen" />\n'.format(
+            flaunch.write('\t<node name="{dep_name}" pkg="{dep_type}" type="{dep_type}_synchronised" output="screen" />\n'.format(
                 dep_name=dep.name, dep_type=dep.type
             ))
         flaunch.write('\t<node name="{package_name}" pkg="{package_name}" type="synchronizer" output="screen" />\n'.format(
