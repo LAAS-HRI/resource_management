@@ -50,7 +50,7 @@ public:
 
   int getPriority()
   {
-    return header_.priority;
+    return header_.priority.value;
   }
 
 private:

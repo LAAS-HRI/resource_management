@@ -18,6 +18,10 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
   _holder_{sub_fsm.name}.registerSatusCallback([this](auto status){{ this->publishStatus(status); }});
 !!end
 
+!!for sub_fsm in sub_fsms
+  _manager.registerHolder(&_holder_{sub_fsm.name});
+!!end
+
   ROS_INFO("${project_name} ready.");
 }
 

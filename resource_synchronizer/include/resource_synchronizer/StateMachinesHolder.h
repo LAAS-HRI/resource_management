@@ -20,8 +20,21 @@ struct StateMachinePriority
   int state_machine_id;
 };
 
+class StateMachinesHolderBase
+{
+public:
+  virtual bool send(int id) = 0;
+  virtual bool cancel() = 0;
+
+  virtual int isRunning() = 0;
+  virtual bool isOneRunning(int id) = 0;
+
+  virtual std::vector<StateMachinePriority> getPriorities() = 0;
+  virtual void clean() = 0;
+};
+
 template<typename SMT, typename RMT>
-class StateMachinesHolder
+class StateMachinesHolder : public StateMachinesHolderBase
 {
   typedef StateMachine<typename SMT::_state_machine_type> state_machine_type_;
 
@@ -76,13 +89,18 @@ public:
     return running_id_;
   }
 
+  bool isOneRunning(int id)
+  {
+    return running_id_ == id;
+  }
+
   std::vector<StateMachinePriority> getPriorities()
   {
     std::vector<StateMachinePriority> priorities;
 
     mutex_.lock();
 
-    for(const auto& it : state_machines_)
+    for(auto it : state_machines_)
     {
       StateMachinePriority priority;
       priority.priority = it.second.getPriority();
@@ -106,12 +124,12 @@ public:
 
   void clean()
   {
-    for(size_t i = 0; i < state_machines_.size();)
+    for(auto it = state_machines_.begin(); it != state_machines_.end();)
     {
-      if(state_machines_[i].isTooLate())
-        state_machines_.erase(state_machines_.begin() + i);
+      if(it->second.isTooLate())
+        state_machines_.erase(it);
       else
-        i++;
+        ++it;
     }
   }
 
