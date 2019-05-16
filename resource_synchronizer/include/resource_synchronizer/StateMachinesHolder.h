@@ -84,6 +84,26 @@ public:
     return false;
   }
 
+  bool cancel(int id)
+  {
+    if(running_id_ == id)
+    {
+      server_.cancel();
+      server_.waitForResult();
+    }
+    else
+    {
+      for(auto it = state_machines_.begin(); it != state_machines_.end();)
+      {
+        if(it->first == id)
+          state_machines_.erase(it);
+        else
+          ++it;
+      }
+    }
+    return true;
+  }
+
   int isRunning()
   {
     return running_id_;

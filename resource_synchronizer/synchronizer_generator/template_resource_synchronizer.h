@@ -3,6 +3,7 @@
 
 #include <ros/ros.h>
 
+#include "resource_management_msgs/StateMachinesCancel.h"
 #include "resource_synchronizer_msgs/MetaStateMachinesStatus.h"
 
 #include "${project_name_msgs}/MetaStateMachine.h"
@@ -36,6 +37,11 @@ private:
 
   ros::ServiceServer _register_service;
   ros::Publisher _state_machine_status_publisher;
+  ros::ServiceServer _state_machine_cancel_service;
+
+  bool stateMachineCancel
+      (resource_management_msgs::StateMachinesCancel::Request  &req,
+      resource_management_msgs::StateMachinesCancel::Response &res);
 };
 
 } // namespace ${project_name}

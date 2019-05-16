@@ -13,6 +13,7 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
 
   _register_service = _nh->advertiseService("${project_name}_register_meta_state_machine", &${class_name}::registerMetaStateMachine, this);
   _state_machine_status_publisher = _nh->advertise<resource_synchronizer_msgs::MetaStateMachinesStatus>("state_machine_status", 10);
+  _state_machine_cancel_service = _nh->advertiseService("state_machine_cancel", &${class_name}::stateMachineCancel, this);
 
 !!for sub_fsm in sub_fsms
   _holder_{sub_fsm.name}.registerSatusCallback([this](auto status){{ this->publishStatus(status); }});
@@ -37,6 +38,20 @@ ${project_name_msgs}::MetaStateMachine::Response &res){
 !!end
   res.id = _current_id;
   _current_id++;
+  return true;
+}
+
+bool ${class_name}::stateMachineCancel
+                    (resource_management_msgs::StateMachinesCancel::Request  &req,
+                    resource_management_msgs::StateMachinesCancel::Response &res)
+{
+  bool done = true;
+!!for sub_fsm in sub_fsms
+  done = done || _holder_{sub_fsm.name}.cancel(req.id);
+!!end
+
+  res.ack = done;
+
   return true;
 }
 
