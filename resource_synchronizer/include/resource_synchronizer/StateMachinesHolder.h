@@ -9,8 +9,6 @@
 #include "resource_synchronizer/StateMachine.h"
 #include "resource_management/tools/StateMachineServer.h"
 
-#include "resource_synchronizer_msgs/MetaStateMachinesStatus.h"
-
 namespace resource_synchronizer
 {
 
@@ -18,6 +16,15 @@ struct StateMachinePriority
 {
   int priority;
   int state_machine_id;
+};
+
+
+struct SubStateMachineStatus
+{
+  std::string resource;
+  std::string state_name;
+  std::string event_name;
+  int id;
 };
 
 class StateMachinesHolderBase
@@ -48,11 +55,16 @@ public:
     name_ = name;
   }
 
-  void insert(int id, SMT sub_state_machine, resource_management_msgs::MessagePriority importance)
+  bool insert(int id, SMT sub_state_machine, resource_management_msgs::MessagePriority importance)
   {
     if(sub_state_machine.header.initial_state != "")
+    {
       state_machines_.insert( std::pair<int, state_machine_type_>
         (id, state_machine_type_(sub_state_machine.state_machine, sub_state_machine.header, importance) ) );
+      return true;
+    }
+    else
+      return false;
   }
 
   bool send(int id)
@@ -173,7 +185,7 @@ public:
     }
   }
 
-  void registerSatusCallback(std::function<void(resource_synchronizer_msgs::MetaStateMachinesStatus)> status_callback) { status_callback_ = status_callback; }
+  void registerSatusCallback(std::function<void(SubStateMachineStatus)> status_callback) { status_callback_ = status_callback; }
 
 private:
   std::map<int, state_machine_type_> state_machines_;
@@ -182,19 +194,19 @@ private:
   std::string name_;
 
   resource_management::StateMachineServer<RMT> server_;
-  std::function<void(resource_synchronizer_msgs::MetaStateMachinesStatus)> status_callback_;
+  std::function<void(SubStateMachineStatus)> status_callback_;
 
   void stateMachineStatus(resource_management::stateMachineState_t status)
   {
     if(running_id_ == -1)
     {
-      resource_synchronizer_msgs::MetaStateMachinesStatus msg;
-      msg.id = running_id_;
-      msg.resource = name_;
-      msg.state_name = status.state_name_;
-      msg.state_event = status.state_event_;
+      SubStateMachineStatus sub_status;
+      sub_status.id = running_id_;
+      sub_status.resource = name_;
+      sub_status.state_name = status.state_name_;
+      sub_status.event_name = status.state_event_;
       if(status_callback_)
-        status_callback_(msg);
+        status_callback_(sub_status);
 
       if(status.state_name_ == "")
       {

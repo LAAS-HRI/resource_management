@@ -2,7 +2,8 @@
 
 #include <thread>
 
-#include <resource_synchronizer_msgs/MetaStateMachineHeader.h>
+#include "resource_synchronizer_msgs/MetaStateMachineHeader.h"
+#include "resource_synchronizer_msgs/MetaStateMachinesStatus.h"
 
 namespace ${project_name}
 {
@@ -29,9 +30,28 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
   ROS_INFO("${project_name} ready.");
 }
 
-void ${class_name}::publishStatus(resource_synchronizer_msgs::MetaStateMachinesStatus status)
+void ${class_name}::publishStatus(resource_synchronizer::SubStateMachineStatus status)
 {
-  _state_machine_status_publisher.publish(status);
+  auto it = _status.find(status.id);
+  if(it != _status.end())
+  {
+    resource_synchronizer_msgs::MetaStateMachinesStatus msg = it->second;
+    int sub_id = -1;
+    for(size_t i = 0; i < msg.resource.size(); i++)
+      if(msg.resource[i] == status.resource)
+      {
+        sub_id = i;
+        break;
+      }
+
+    if(sub_id != -1)
+    {
+      msg.state_name[sub_id] = status.state_name;
+      msg.state_event[sub_id] = status.event_name;
+      _state_machine_status_publisher.publish(msg);
+      removeStatusIfNeeded(sub_id);
+    }
+  }
 }
 
 void ${class_name}::run()
@@ -46,10 +66,19 @@ void ${class_name}::run()
 
 bool ${class_name}::registerMetaStateMachine(${project_name_msgs}::MetaStateMachine::Request &req,
 ${project_name_msgs}::MetaStateMachine::Response &res){
+  _status[_current_id].id = _current_id;
+  bool inserted;
+
 !!for sub_fsm in sub_fsms
-  _holder_{sub_fsm.name}.insert(_current_id, req.state_machine_{sub_fsm.name}, req.header.priority);
+  inserted = _holder_{sub_fsm.name}.insert(_current_id, req.state_machine_{sub_fsm.name}, req.header.priority);
+  if(inserted)
+    _status[_current_id].resource.push_back("{sub_fsm.name}");
+
 !!end
   res.id = _current_id;
+
+  _status[_current_id].state_name.resize(_status[_current_id].resource.size(), "_");
+  _status[_current_id].state_event.resize(_status[_current_id].resource.size());
   _current_id++;
   return true;
 }
@@ -66,6 +95,17 @@ bool ${class_name}::stateMachineCancel
   res.ack = done;
 
   return true;
+}
+
+void ${class_name}::removeStatusIfNeeded(int id)
+{
+  bool remove = true;
+  for(size_t i = 0; i < _status[id].state_name.size(); i++)
+    if(_status[id].state_name[i] != "")
+      remove = false;
+
+  if(remove)
+    _status.erase(id);
 }
 
 } // namespace ${project_name}

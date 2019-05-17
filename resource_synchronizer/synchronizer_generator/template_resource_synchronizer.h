@@ -1,6 +1,8 @@
 #ifndef ${project_name}_RESOURCE_SYNCHRONIZER_H
 #define ${project_name}_RESOURCE_SYNCHRONIZER_H
 
+#include <map>
+
 #include <ros/ros.h>
 
 #include "resource_management_msgs/StateMachinesCancel.h"
@@ -22,7 +24,7 @@ class ${class_name}
 public:
   ${class_name}(ros::NodeHandlePtr nh);
 
-  void publishStatus(resource_synchronizer_msgs::MetaStateMachinesStatus status);
+  void publishStatus(resource_synchronizer::SubStateMachineStatus status);
 
   void run();
 
@@ -34,6 +36,7 @@ private:
   resource_synchronizer::StateMachinesManager _manager;
 
   unsigned int _current_id;
+  std::map<int, resource_synchronizer_msgs::MetaStateMachinesStatus> _status;
 
   ros::ServiceServer _register_service;
   ros::Publisher _state_machine_status_publisher;
@@ -45,6 +48,8 @@ private:
   bool stateMachineCancel
       (resource_management_msgs::StateMachinesCancel::Request  &req,
       resource_management_msgs::StateMachinesCancel::Response &res);
+
+  void removeStatusIfNeeded(int id);
 };
 
 } // namespace ${project_name}
