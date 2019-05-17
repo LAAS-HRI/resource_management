@@ -8,7 +8,7 @@
 #include "resource_management_msgs/StateMachinesCancel.h"
 #include "resource_synchronizer_msgs/MetaStateMachinesStatus.h"
 
-#include "${project_name_msgs}/MetaStateMachine.h"
+#include "${project_name_msgs}/MetaStateMachineRegister.h"
 #include "resource_synchronizer/StateMachinesHolder.h"
 #include "resource_synchronizer/StateMachinesManager.h"
 
@@ -42,8 +42,8 @@ private:
   ros::Publisher _state_machine_status_publisher;
   ros::ServiceServer _state_machine_cancel_service;
 
-  bool registerMetaStateMachine(${project_name_msgs}::MetaStateMachine::Request &req,
-                                ${project_name_msgs}::MetaStateMachine::Response &res);
+  bool registerMetaStateMachine(${project_name_msgs}::MetaStateMachineRegister::Request &req,
+                                ${project_name_msgs}::MetaStateMachineRegister::Response &res);
 
   bool stateMachineCancel
       (resource_management_msgs::StateMachinesCancel::Request  &req,

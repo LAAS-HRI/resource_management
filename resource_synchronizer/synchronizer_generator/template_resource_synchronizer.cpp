@@ -64,8 +64,8 @@ void ${class_name}::run()
   ${project_name}_thread.join();
 }
 
-bool ${class_name}::registerMetaStateMachine(${project_name_msgs}::MetaStateMachine::Request &req,
-${project_name_msgs}::MetaStateMachine::Response &res){
+bool ${class_name}::registerMetaStateMachine(${project_name_msgs}::MetaStateMachineRegister::Request &req,
+${project_name_msgs}::MetaStateMachineRegister::Response &res){
   _status[_current_id].id = _current_id;
   bool inserted;
 

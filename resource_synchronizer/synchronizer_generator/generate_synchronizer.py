@@ -19,7 +19,7 @@ def type_and_name(double_points_str):
 def create_msg_and_srv_files(package_msg_dir, dependencies):
     msgs_files = []
     srvs_files = []
-    fsm_srv_file_name = os.path.join(package_msg_dir, "srv", "MetaStateMachine.srv")
+    fsm_srv_file_name = os.path.join(package_msg_dir, "srv", "MetaStateMachineRegister.srv")
     fsm_srv_file = "resource_synchronizer_msgs/MetaStateMachineHeader header\n"
     for dep in dependencies:
         msg_file_name = "SubStateMachine_{type}".format(type=dep.type)
@@ -32,7 +32,7 @@ def create_msg_and_srv_files(package_msg_dir, dependencies):
     fsm_srv_file += "---\nint32 id\nstring error"
     with open(fsm_srv_file_name, "w") as f:
         f.write(fsm_srv_file)
-    srvs_files.append("MetaStateMachine.srv")
+    srvs_files.append("MetaStateMachineRegister.srv")
 
     return msgs_files, srvs_files
 
