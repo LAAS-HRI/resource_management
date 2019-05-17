@@ -83,7 +83,7 @@ public:
         if(ids_[i].size())
         {
           int running_id = state_machines_holders_[i]->isRunning();
-          if(running_id != ids_[i][0])
+          if(running_id == ids_[i][0])
             continue;
           else if(running_id == -1)
             state_machines_holders_[i]->send(ids_[i][0]);

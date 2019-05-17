@@ -35,10 +35,9 @@ void ${class_name}::publishStatus(resource_synchronizer::SubStateMachineStatus s
   auto it = _status.find(status.id);
   if(it != _status.end())
   {
-    resource_synchronizer_msgs::MetaStateMachinesStatus msg = it->second;
     int sub_id = -1;
-    for(size_t i = 0; i < msg.resource.size(); i++)
-      if(msg.resource[i] == status.resource)
+    for(size_t i = 0; i < it->second.resource.size(); i++)
+      if(it->second.resource[i] == status.resource)
       {
         sub_id = i;
         break;
@@ -46,9 +45,9 @@ void ${class_name}::publishStatus(resource_synchronizer::SubStateMachineStatus s
 
     if(sub_id != -1)
     {
-      msg.state_name[sub_id] = status.state_name;
-      msg.state_event[sub_id] = status.event_name;
-      _state_machine_status_publisher.publish(msg);
+      it->second.state_name[sub_id] = status.state_name;
+      it->second.state_event[sub_id] = status.event_name;
+      _state_machine_status_publisher.publish(it->second);
       removeStatusIfNeeded(sub_id);
     }
   }

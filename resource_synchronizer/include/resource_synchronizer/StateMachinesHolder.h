@@ -198,7 +198,7 @@ private:
 
   void stateMachineStatus(resource_management::stateMachineState_t status)
   {
-    if(running_id_ == -1)
+    if(running_id_ != -1)
     {
       SubStateMachineStatus sub_status;
       sub_status.id = running_id_;
@@ -211,12 +211,11 @@ private:
       if(status.state_name_ == "")
       {
         mutex_.lock();
-        running_id_ = -1;
         auto it = state_machines_.find(running_id_);
         state_machines_.erase(it);
+        running_id_ = -1;
         mutex_.unlock();
       }
-      std::cout << status.toString() << std::endl;
     }
   }
 };
