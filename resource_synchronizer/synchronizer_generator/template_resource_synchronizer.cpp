@@ -14,7 +14,7 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
   _current_id(0)
 {
 
-  _register_service = _nh->advertiseService("${project_name}_register_meta_state_machine", &${class_name}::registerMetaStateMachine, this);
+  _register_service = _nh->advertiseService("state_machines_register", &${class_name}::registerMetaStateMachine, this);
   _state_machine_status_publisher = _nh->advertise<resource_synchronizer_msgs::MetaStateMachinesStatus>("state_machine_status", 10);
   _state_machine_cancel_service = _nh->advertiseService("state_machine_cancel", &${class_name}::stateMachineCancel, this);
 
