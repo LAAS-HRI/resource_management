@@ -414,6 +414,7 @@ void ResourceManager<StateMachineType,InputDataTypes...>::publishState(StateMach
     case transition_pass_on_duration : state_event = "pass_on_duration"; break;
     case transition_timeout : state_event = "timeout"; break;
     case transition_wait : state_event = "wait"; break;
+    case transition_wait_synchro : state_event = "wait_synchro_" + state.synchro_name_; break;
     case transition_global_timeout : state_event = "global_timeout"; break;
     case transition_preampt : state_event = "preampt"; break;
     case transition_dead_line : state_event = "dead_line"; break;
