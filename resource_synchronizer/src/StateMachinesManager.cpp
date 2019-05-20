@@ -8,6 +8,11 @@ void StateMachinesManager::registerHolder(StateMachinesHolderBase* holder)
   state_machines_holders_.push_back(holder);
 }
 
+void StateMachinesManager::insert(int id, resource_synchronizer_msgs::MetaStateMachineHeader header)
+{
+  headers_[id] = header;
+}
+
 void StateMachinesManager::run()
 {
   ros::Rate r(100);
@@ -23,9 +28,10 @@ void StateMachinesManager::run()
 
     while(!isDone())
     {
+      applyConstraints();
+
       for(size_t i = 0; i < ids_.size(); i++)
       {
-
         //get state machine to run
         int st_id = -1;
         if(ids_[i].size() && !done_[i])
@@ -72,11 +78,25 @@ void StateMachinesManager::run()
         if(running_id == ids_[i][0])
           continue;
         else if(running_id == -1)
+        {
           state_machines_holders_[i]->send(ids_[i][0]);
+          sm_start_time_[ids_[i][0]] = ros::Time::now();
+          if(std::find(running_ids_.begin(), running_ids_.end(), ids_[i][0]) == running_ids_.end())
+            running_ids_.push_back(ids_[i][0]);
+        }
         else
         {
           state_machines_holders_[i]->cancel();
+          auto running_it = std::find(running_ids_.begin(), running_ids_.end(), running_id);
+          if(running_it != running_ids_.end())
+            running_ids_.erase(running_it);
+          if(sm_start_time_.find(running_id) != sm_start_time_.end())
+            sm_start_time_.erase(running_id);
+
           state_machines_holders_[i]->send(ids_[i][0]);
+          sm_start_time_[ids_[i][0]] = ros::Time::now();
+          if(std::find(running_ids_.begin(), running_ids_.end(), ids_[i][0]) == running_ids_.end())
+            running_ids_.push_back(ids_[i][0]);
         }
       }
     }
@@ -118,6 +138,45 @@ bool StateMachinesManager::isDone()
   for(const auto& done : done_)
     res = res && done;
   return res;
+}
+
+void StateMachinesManager::applyConstraints()
+{
+  for(const auto& it : headers_)
+  {
+    // is state machine is allready running
+    if(std::find(running_ids_.begin(), running_ids_.end(), it.first) != running_ids_.end())
+    {
+      if(it.second.timeout != ros::Duration(-1))
+      {
+        auto st_it = sm_start_time_.find(it.first);
+        if(st_it != sm_start_time_.end())
+        {
+          if(ros::Time::now() - st_it->second >= it.second.timeout)
+          {
+            for(size_t j = 0; j < state_machines_holders_.size(); j++)
+              state_machines_holders_[j]->cancel(it.first);
+
+            //send status ?
+
+            headers_.erase(it.first);
+            sm_start_time_.erase(it.first);
+          }
+        }
+      }
+    }
+    // if begin dead line is over
+    else if((it.second.begin_dead_line != ros::Time(0)) && (it.second.begin_dead_line != ros::Time::now()))
+    {
+      for(size_t j = 0; j < state_machines_holders_.size(); j++)
+        state_machines_holders_[j]->cancel(it.first);
+
+      //send status ?
+
+      headers_.erase(it.first);
+      sm_start_time_.erase(it.first);
+    }
+  }
 }
 
 void StateMachinesManager::clean()

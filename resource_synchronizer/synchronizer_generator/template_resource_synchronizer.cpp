@@ -74,6 +74,8 @@ ${project_name_msgs}::MetaStateMachineRegister::Response &res){
     _status[_current_id].resource.push_back("{sub_fsm.name}");
 
 !!end
+  _manager.insert(_current_id, req.header);
+
   res.id = _current_id;
 
   _status[_current_id].state_name.resize(_status[_current_id].resource.size(), "_");

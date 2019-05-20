@@ -32,6 +32,7 @@ class StateMachinesHolderBase
 public:
   virtual bool send(int id) = 0;
   virtual bool cancel() = 0;
+  virtual bool cancel(int id) = 0;
 
   virtual int isRunning() = 0;
   virtual bool isOneRunning(int id) = 0;

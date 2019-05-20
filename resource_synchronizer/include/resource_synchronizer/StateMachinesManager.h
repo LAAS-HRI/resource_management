@@ -2,10 +2,12 @@
 #define RESOURCE_SYNCHRONIZER_STATEMACHINESMANAGER_H
 
 #include <vector>
+#include <map>
 #include <atomic>
 
 #include <ros/ros.h>
 
+#include "resource_synchronizer_msgs/MetaStateMachineHeader.h"
 #include "resource_synchronizer/StateMachinesHolder.h"
 
 namespace resource_synchronizer
@@ -18,12 +20,17 @@ public:
   ~StateMachinesManager() {}
 
   void registerHolder(StateMachinesHolderBase* holder);
+  void insert(int id, resource_synchronizer_msgs::MetaStateMachineHeader header);
 
   void run();
   void stop();
 
 private:
   std::vector<StateMachinesHolderBase*> state_machines_holders_;
+  std::map<int, resource_synchronizer_msgs::MetaStateMachineHeader> headers_;
+  std::map<int, ros::Time> sm_start_time_;
+
+  std::vector<int> running_ids_;
   std::atomic<bool> run_;
 
   std::vector<bool> done_;
@@ -35,6 +42,7 @@ private:
 
   bool isDone();
 
+  void applyConstraints();
   void clean();
   void cleanPreempted();
 
