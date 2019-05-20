@@ -20,6 +20,8 @@ public:
   ~StateMachinesManager() {}
 
   void registerHolder(StateMachinesHolderBase* holder);
+  void registerSatusCallback(std::function<void(SubStateMachineStatus)> status_callback) { status_callback_ = status_callback; }
+
   void insert(int id, resource_synchronizer_msgs::MetaStateMachineHeader header);
 
   void run();
@@ -37,6 +39,8 @@ private:
   std::vector<std::vector<int> > ids_;
   std::vector<bool> preempt_;
 
+  std::function<void(SubStateMachineStatus)> status_callback_;
+
   void init();
   void reinit();
 
@@ -49,6 +53,10 @@ private:
   void select(int id);
   void remove(int id);
   bool isSelectable(size_t owner, int id);
+
+  void publishTimeoutStatus(int id);
+  void publishBDLStatus(int id);
+  void publishPreemptStatus(int id);
 };
 
 } // namespace resource_synchronizer

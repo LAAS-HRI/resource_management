@@ -26,6 +26,7 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
 !!for sub_fsm in sub_fsms
   _manager.registerHolder(&_holder_{sub_fsm.name});
 !!end
+  _manager.registerSatusCallback([this](auto status){ this->publishStatus(status); });
 
   ROS_INFO("${project_name} ready.");
 }
@@ -74,11 +75,13 @@ ${project_name_msgs}::MetaStateMachineRegister::Response &res){
     _status[_current_id].resource.push_back("{sub_fsm.name}");
 
 !!end
+  _status[_current_id].resource.push_back("_");
   _manager.insert(_current_id, req.header);
 
   res.id = _current_id;
 
   _status[_current_id].state_name.resize(_status[_current_id].resource.size(), "_");
+  _status[_current_id].state_name[_status[_current_id].state_name.size() - 1] = ""; // global status as no state
   _status[_current_id].state_event.resize(_status[_current_id].resource.size());
   _current_id++;
   return true;

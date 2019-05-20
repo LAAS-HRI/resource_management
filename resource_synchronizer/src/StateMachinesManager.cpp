@@ -92,6 +92,7 @@ void StateMachinesManager::run()
             running_ids_.erase(running_it);
           if(sm_start_time_.find(running_id) != sm_start_time_.end())
             sm_start_time_.erase(running_id);
+          publishPreemptStatus(running_id);
 
           state_machines_holders_[i]->send(ids_[i][0]);
           sm_start_time_[ids_[i][0]] = ros::Time::now();
@@ -157,7 +158,7 @@ void StateMachinesManager::applyConstraints()
             for(size_t j = 0; j < state_machines_holders_.size(); j++)
               state_machines_holders_[j]->cancel(it.first);
 
-            //send status ?
+            publishTimeoutStatus(it.first);
 
             headers_.erase(it.first);
             sm_start_time_.erase(it.first);
@@ -171,7 +172,7 @@ void StateMachinesManager::applyConstraints()
       for(size_t j = 0; j < state_machines_holders_.size(); j++)
         state_machines_holders_[j]->cancel(it.first);
 
-      //send status ?
+      publishBDLStatus(it.first);
 
       headers_.erase(it.first);
       sm_start_time_.erase(it.first);
@@ -265,6 +266,39 @@ bool StateMachinesManager::isSelectable(size_t owner, int id)
   }
 
   return res;
+}
+
+void StateMachinesManager::publishTimeoutStatus(int id)
+{
+  SubStateMachineStatus sub_status;
+  sub_status.id = id;
+  sub_status.resource = "_";
+  sub_status.state_name = "";
+  sub_status.event_name = "global_timeout";
+  if(status_callback_)
+    status_callback_(sub_status);
+}
+
+void StateMachinesManager::publishBDLStatus(int id)
+{
+  SubStateMachineStatus sub_status;
+  sub_status.id = id;
+  sub_status.resource = "_";
+  sub_status.state_name = "";
+  sub_status.event_name = "dead_line";
+  if(status_callback_)
+    status_callback_(sub_status);
+}
+
+void StateMachinesManager::publishPreemptStatus(int id)
+{
+  SubStateMachineStatus sub_status;
+  sub_status.id = id;
+  sub_status.resource = "_";
+  sub_status.state_name = "";
+  sub_status.event_name = "preampt";
+  if(status_callback_)
+    status_callback_(sub_status);
 }
 
 } //namespace resource_synchronizer
