@@ -31,7 +31,7 @@ public:
 private:
     std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> stateFromMsg(const ${project_name}_msgs::StateMachineRegister::Request &msg) override;
     std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
-    transitionFromMsg(const ${project_name}_msgs::StateMachineRegister::Request &msg) override;
+    transitionFromMsg(const ${project_name}_msgs::StateMachine &msg) override;
     ${project_name}_msgs::StateMachineRegister::Response generateResponseMsg(uint32_t id) override;
 
 !!for data_type in message_types

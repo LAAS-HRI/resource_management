@@ -15,12 +15,12 @@ std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> $
 }
 
 std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
-${class_name}::transitionFromMsg(const ${project_name}_msgs::StateMachineRegister::Request &msg)
+${class_name}::transitionFromMsg(const ${project_name}_msgs::StateMachine &msg)
 {
     std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>> transitions;
 !!for data_type in message_types
 
-    for(auto x : msg.state_machine.states_{data_type[0]}){{
+    for(auto x : msg.states_{data_type[0]}){{
         for(auto t : x.header.transitions){{
             transitions.push_back(
                         std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(

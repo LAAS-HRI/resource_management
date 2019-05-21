@@ -56,7 +56,7 @@ public:
 protected:
     virtual std::map<std::string,std::shared_ptr<MessageAbstraction>> stateFromMsg(const typename StateMachineType::Request &msg) = 0;
     virtual std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
-        transitionFromMsg(const typename StateMachineType::Request &msg) = 0;
+        transitionFromMsg(const typename StateMachineType::Request::_state_machine_type &msg) = 0;
     virtual typename StateMachineType::Response generateResponseMsg(uint32_t id) = 0;
 
     void done();

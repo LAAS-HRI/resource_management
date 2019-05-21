@@ -28,7 +28,7 @@ public:
 private:
     std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> stateFromMsg(const led_manager_msgs::StateMachineRegister::Request &msg) override;
     std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
-    transitionFromMsg(const led_manager_msgs::StateMachineRegister::Request &msg) override;
+    transitionFromMsg(const led_manager_msgs::StateMachine &msg) override;
     led_manager_msgs::StateMachineRegister::Response generateResponseMsg(uint32_t id) override;
 
     void publishColorMsg(float msg, bool is_new);
@@ -53,11 +53,11 @@ std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> L
 }
 
 std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>
-LedManager::transitionFromMsg(const led_manager_msgs::StateMachineRegister::Request &msg)
+LedManager::transitionFromMsg(const led_manager_msgs::StateMachine &msg)
 {
     std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>> transitions;
 
-    for(auto x : msg.state_machine.states_Color){
+    for(auto x : msg.states_Color){
         for(auto t : x.header.transitions){
             transitions.push_back(
                         std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
@@ -67,7 +67,7 @@ LedManager::transitionFromMsg(const led_manager_msgs::StateMachineRegister::Requ
         }
     }
 
-    for(auto x : msg.state_machine.states_OnOff){
+    for(auto x : msg.states_OnOff){
         for(auto t : x.header.transitions){
             transitions.push_back(
                         std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(

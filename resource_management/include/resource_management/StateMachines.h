@@ -26,7 +26,7 @@ class StateMachines : public StateMachinesBase
 {
 public:
     using StateFromMsgFn = boost::function<std::map<std::string,std::shared_ptr<MessageAbstraction>>(const typename T::Request&)>;
-    using TransitionFromMsgFn = boost::function<std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>(const typename T::Request&)>;
+    using TransitionFromMsgFn = boost::function<std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>>(const typename T::Request::_state_machine_type&)>;
     using GenerateResponseMsgFn = boost::function< typename T::Response(uint32_t)>;
 
     StateMachines(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn, std::shared_ptr<StateMachinesStorage> storage, bool synchronized = false);
@@ -80,7 +80,7 @@ bool StateMachines<T>::_serviceCallback(typename T::Request &req, typename T::Re
     }
     states->setPriority(priority);
 
-    auto transitions = _getTransitionsFromStateMachineMsg(req);
+    auto transitions = _getTransitionsFromStateMachineMsg(req.state_machine);
 
     for(auto &t : transitions){
         resource_management_msgs::EndCondition &end_condition = std::get<2>(t);
