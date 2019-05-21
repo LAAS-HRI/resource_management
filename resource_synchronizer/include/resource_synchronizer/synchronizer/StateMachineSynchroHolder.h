@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 
+#include <ros/ros.h>
+
 namespace resource_synchronizer
 {
 
@@ -19,6 +21,9 @@ public:
 private:
   std::map<std::string, std::vector<std::string> > synchros_;
   std::map<std::string, std::vector<bool> > activations_;
+
+  static ros::NodeHandle nh_;
+  static std::map<std::string, ros::Publisher> publishers_;
 };
 
 } // namespace resource_synchronizer

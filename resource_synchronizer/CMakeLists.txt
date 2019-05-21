@@ -24,6 +24,7 @@ include_directories(
 
 add_library(synchronizer_lib
   src/synchronizer/StateMachineSynchroHolder.cpp
+  src/synchronizer/StateMachinesSynchronizer.cpp
 )
 add_dependencies(synchronizer_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 

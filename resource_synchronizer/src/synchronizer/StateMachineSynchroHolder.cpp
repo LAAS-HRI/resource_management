@@ -1,5 +1,7 @@
 #include "resource_synchronizer/synchronizer/StateMachineSynchroHolder.h"
 
+#include "std_msgs/String.h"
+
 namespace resource_synchronizer
 {
 
@@ -27,6 +29,19 @@ bool StateMachineSynchroHolder::activate(const std::string& synchro, const std::
         activations_[synchro][i] = true;
 
       res = res && activations_[synchro][i];
+    }
+
+    if(res)
+    {
+      for(size_t i = 0; i < it->second.size(); i++)
+      {
+        if(publishers_.find(it->second[i]) == publishers_.end())
+          publishers_[it->second[i]] = nh_.advertise<std_msgs::String>(it->second[i] + "/str_events", 10);
+
+        std_msgs::String msg;
+        msg.data = "__synchro__" + it->first;
+        publishers_[it->second[i]].publish(msg);
+      }
     }
   }
 
