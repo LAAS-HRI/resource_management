@@ -13,7 +13,7 @@ namespace resource_synchronizer
 class StateMachineSynchroHolder
 {
 public:
-  void insert(const std::string& resource, std::vector<std::string>& synchros);
+  void insert(const std::string& resource, const std::vector<std::string>& synchros);
 
   bool activate(const std::string& synchro, const std::string& resource);
   void reset(const std::string& synchro);

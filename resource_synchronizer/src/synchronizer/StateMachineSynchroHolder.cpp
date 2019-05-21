@@ -5,7 +5,10 @@
 namespace resource_synchronizer
 {
 
-void StateMachineSynchroHolder::insert(const std::string& resource, std::vector<std::string>& synchros)
+ros::NodeHandle StateMachineSynchroHolder::nh_;
+std::map<std::string, ros::Publisher> StateMachineSynchroHolder::publishers_;
+
+void StateMachineSynchroHolder::insert(const std::string& resource, const std::vector<std::string>& synchros)
 {
   for(const auto& synchro : synchros)
   {

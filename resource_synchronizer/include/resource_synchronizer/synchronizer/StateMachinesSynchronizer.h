@@ -11,7 +11,7 @@ namespace resource_synchronizer
 class StateMachinesSynchronizer
 {
 public:
-  void insert(int id, const std::string& resource, std::vector<std::string>& synchros);
+  void insert(int id, const std::string& resource, const std::vector<std::string>& synchros);
 
   bool activate(int id, const std::string& synchro, const std::string& resource);
   void reset(int id, const std::string& synchro);

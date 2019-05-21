@@ -188,6 +188,13 @@ public:
 
   void registerSatusCallback(std::function<void(SubStateMachineStatus)> status_callback) { status_callback_ = status_callback; }
 
+  std::vector<std::string> getSynchros(int id)
+  {
+    std::vector<std::string> res;
+
+    return res;
+  }
+
 private:
   std::map<int, state_machine_type_> state_machines_;
   int running_id_;

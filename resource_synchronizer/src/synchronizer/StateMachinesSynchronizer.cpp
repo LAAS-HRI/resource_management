@@ -3,7 +3,7 @@
 namespace resource_synchronizer
 {
 
-void StateMachinesSynchronizer::insert(int id, const std::string& resource, std::vector<std::string>& synchros)
+void StateMachinesSynchronizer::insert(int id, const std::string& resource, const std::vector<std::string>& synchros)
 {
   if(synchro_holders_.find(id) == synchro_holders_.end())
     synchro_holders_[id] = StateMachineSynchroHolder();

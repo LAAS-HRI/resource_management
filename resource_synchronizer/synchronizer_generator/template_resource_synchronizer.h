@@ -11,6 +11,7 @@
 #include "${project_name_msgs}/MetaStateMachineRegister.h"
 #include "resource_synchronizer/StateMachinesHolder.h"
 #include "resource_synchronizer/StateMachinesManager.h"
+#include "resource_synchronizer/synchronizer/StateMachinesSynchronizer.h"
 
 !!for dep in unique_msgs_deps
 #include "{dep}/StateMachineRegister.h"
@@ -34,6 +35,7 @@ private:
   resource_synchronizer::StateMachinesHolder<${{project_name_msgs}}::{sub_fsm.type}, {sub_fsm.res_name}::StateMachineRegister> _holder_{sub_fsm.name};
 !!end
   resource_synchronizer::StateMachinesManager _manager;
+  resource_synchronizer::StateMachinesSynchronizer _synchronizer;
 
   unsigned int _current_id;
   std::map<int, resource_synchronizer_msgs::MetaStateMachinesStatus> _status;

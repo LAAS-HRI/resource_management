@@ -72,7 +72,10 @@ ${project_name_msgs}::MetaStateMachineRegister::Response &res){
 !!for sub_fsm in sub_fsms
   inserted = _holder_{sub_fsm.name}.insert(_current_id, req.state_machine_{sub_fsm.name}, req.header.priority);
   if(inserted)
+  {{
     _status[_current_id].resource.push_back("{sub_fsm.name}");
+    _synchronizer.insert(_current_id, "{sub_fsm.name}", _holder_{sub_fsm.name}.getSynchros(_current_id));
+  }}
 
 !!end
   _status[_current_id].resource.push_back("_");
