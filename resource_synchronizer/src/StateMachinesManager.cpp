@@ -160,8 +160,8 @@ void StateMachinesManager::applyConstraints()
 
             publishTimeoutStatus(it.first);
 
-            headers_.erase(it.first);
             sm_start_time_.erase(it.first);
+            headers_.erase(it.first);
           }
         }
       }
@@ -174,8 +174,8 @@ void StateMachinesManager::applyConstraints()
 
       publishBDLStatus(it.first);
 
-      headers_.erase(it.first);
       sm_start_time_.erase(it.first);
+      headers_.erase(it.first);
     }
   }
 }

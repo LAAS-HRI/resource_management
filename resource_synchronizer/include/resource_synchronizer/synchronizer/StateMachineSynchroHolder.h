@@ -18,11 +18,13 @@ public:
   bool activate(const std::string& synchro, const std::string& resource);
   void reset();
 
+  static void setNodeHandle(ros::NodeHandlePtr nh) { nh_ = nh; }
+
 private:
   std::map<std::string, std::vector<std::string> > synchros_;
   std::map<std::string, std::vector<bool> > activations_;
 
-  static ros::NodeHandle nh_;
+  static ros::NodeHandlePtr nh_;
   static std::map<std::string, ros::Publisher> publishers_;
 };
 

@@ -5,7 +5,7 @@
 namespace resource_synchronizer
 {
 
-ros::NodeHandle StateMachineSynchroHolder::nh_;
+ros::NodeHandlePtr StateMachineSynchroHolder::nh_;
 std::map<std::string, ros::Publisher> StateMachineSynchroHolder::publishers_;
 
 void StateMachineSynchroHolder::insert(const std::string& resource, const std::vector<std::string>& synchros)
@@ -39,7 +39,7 @@ bool StateMachineSynchroHolder::activate(const std::string& synchro, const std::
       for(size_t i = 0; i < it->second.size(); i++)
       {
         if(publishers_.find(it->second[i]) == publishers_.end())
-          publishers_[it->second[i]] = nh_.advertise<std_msgs::String>(it->second[i] + "/str_events", 10);
+          publishers_[it->second[i]] = nh_->advertise<std_msgs::String>(it->second[i] + "/str_events", 10);
 
         std_msgs::String msg;
         msg.data = "__synchro__" + it->first;

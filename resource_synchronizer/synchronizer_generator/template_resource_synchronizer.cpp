@@ -161,6 +161,8 @@ int main(int argc, char** argv){
   ros::init(argc, argv, "${project_name}");
   ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
 
+  resource_synchronizer::StateMachineSynchroHolder::setNodeHandle(nh);
+
   ${project_name}::${class_name} syn(nh);
 
   syn.run();
