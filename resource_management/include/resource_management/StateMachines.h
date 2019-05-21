@@ -114,6 +114,18 @@ bool StateMachines<T,E>::_serviceCallback(typename T::Request &req, typename T::
 template<class T, class E>
 bool StateMachines<T,E>::_extractCallback(typename E::Request &req, typename E::Response &res)
 {
+  auto transitions = _getTransitionsFromStateMachineMsg(req.state_machine);
+
+  for(auto& t : transitions)
+  {
+    resource_management_msgs::EndCondition &end_condition = std::get<2>(t);
+    for(auto& r : end_condition.regex_end_condition)
+    {
+      if(r.find("__synchro__") == 0)
+        res.synchros.push_back(r.substr(11));
+    }
+  }
+
   return true;
 }
 

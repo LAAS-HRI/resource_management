@@ -15,6 +15,7 @@
 
 !!for dep in unique_msgs_deps
 #include "{dep}/StateMachineRegister.h"
+#include "{dep}/StateMachineExtract.h"
 !!end
 
 namespace ${project_name}
@@ -32,7 +33,7 @@ public:
 private:
   ros::NodeHandlePtr _nh;
 !!for sub_fsm in sub_fsms
-  resource_synchronizer::StateMachinesHolder<${{project_name_msgs}}::{sub_fsm.type}, {sub_fsm.res_name}::StateMachineRegister> _holder_{sub_fsm.name};
+  resource_synchronizer::StateMachinesHolder<${{project_name_msgs}}::{sub_fsm.type}, {sub_fsm.res_name}::StateMachineRegister, {sub_fsm.res_name}::StateMachineExtract> _holder_{sub_fsm.name};
 !!end
   resource_synchronizer::StateMachinesManager _manager;
   resource_synchronizer::StateMachinesSynchronizer _synchronizer;

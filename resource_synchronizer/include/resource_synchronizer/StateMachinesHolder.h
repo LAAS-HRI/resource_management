@@ -6,6 +6,8 @@
 #include <mutex>
 #include <functional>
 
+#include <ros/ros.h>
+
 #include "resource_synchronizer/StateMachine.h"
 #include "resource_management/tools/StateMachineServer.h"
 
@@ -42,7 +44,7 @@ public:
   virtual void clean() = 0;
 };
 
-template<typename SMT, typename RMT>
+template<typename SMT, typename RMT, typename SMET>
 class StateMachinesHolder : public StateMachinesHolderBase
 {
   typedef StateMachine<typename SMT::_state_machine_type> state_machine_type_;
@@ -191,6 +193,17 @@ public:
   std::vector<std::string> getSynchros(int id)
   {
     std::vector<std::string> res;
+
+    auto it = state_machines_.find(id);
+    if(it != state_machines_.end())
+    {
+      SMET srv;
+      srv.request.state_machine = it->second.getStateMachineMsg();
+      ros::NodeHandle nh;
+      ros::ServiceClient client = nh.serviceClient<SMET>(name_ + "/extract_synchro__");
+      if (client.call(srv))
+        res = srv.response.synchros;
+    }
 
     return res;
   }
