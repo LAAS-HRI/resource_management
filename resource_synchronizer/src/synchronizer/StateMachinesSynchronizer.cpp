@@ -19,10 +19,10 @@ bool StateMachinesSynchronizer::activate(int id, const std::string& synchro, con
     return false;
 }
 
-void StateMachinesSynchronizer::reset(int id, const std::string& synchro)
+void StateMachinesSynchronizer::reset(int id)
 {
   if(synchro_holders_.find(id) != synchro_holders_.end())
-    synchro_holders_[id].reset(synchro);
+    synchro_holders_[id].reset();
 }
 
 void StateMachinesSynchronizer::erase(int id)

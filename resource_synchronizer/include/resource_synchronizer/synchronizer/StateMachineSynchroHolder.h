@@ -16,7 +16,7 @@ public:
   void insert(const std::string& resource, const std::vector<std::string>& synchros);
 
   bool activate(const std::string& synchro, const std::string& resource);
-  void reset(const std::string& synchro);
+  void reset();
 
 private:
   std::map<std::string, std::vector<std::string> > synchros_;

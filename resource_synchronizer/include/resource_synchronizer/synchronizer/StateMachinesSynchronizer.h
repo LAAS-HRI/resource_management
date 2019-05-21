@@ -14,7 +14,7 @@ public:
   void insert(int id, const std::string& resource, const std::vector<std::string>& synchros);
 
   bool activate(int id, const std::string& synchro, const std::string& resource);
-  void reset(int id, const std::string& synchro);
+  void reset(int id);
 
   void erase(int id);
 

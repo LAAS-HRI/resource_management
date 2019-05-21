@@ -51,14 +51,11 @@ bool StateMachineSynchroHolder::activate(const std::string& synchro, const std::
   return res;
 }
 
-void StateMachineSynchroHolder::reset(const std::string& synchro)
+void StateMachineSynchroHolder::reset()
 {
-  auto it = activations_.find(synchro);
-  if(it != activations_.end())
-  {
-    for(size_t i = 0; i < it->second.size(); i++)
-      it->second[i] = false;
-  }
+  for(auto it : activations_)
+    for(size_t i = 0; i < it.second.size(); i++)
+      it.second[i] = false;
 }
 
 } // namespace resource_synchronizer

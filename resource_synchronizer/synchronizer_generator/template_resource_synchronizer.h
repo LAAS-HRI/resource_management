@@ -53,6 +53,9 @@ private:
       resource_management_msgs::StateMachinesCancel::Response &res);
 
   void removeStatusIfNeeded(int id);
+
+  std::vector<std::string> getSynchros(std::string event);
+  std::vector<std::string> split(const std::string& str, const std::string& delim);
 };
 
 } // namespace ${project_name}

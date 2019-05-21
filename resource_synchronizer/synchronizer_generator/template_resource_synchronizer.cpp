@@ -46,6 +46,12 @@ void ${class_name}::publishStatus(resource_synchronizer::SubStateMachineStatus s
 
     if(sub_id != -1)
     {
+      if(it->second.state_name[sub_id] != status.state_name)
+        _synchronizer.reset(status.id);
+      auto tmp = getSynchros(status.event_name);
+      for(auto s : tmp)
+        _synchronizer.activate(status.id, s, status.resource);
+
       it->second.state_name[sub_id] = status.state_name;
       it->second.state_event[sub_id] = status.event_name;
       _state_machine_status_publisher.publish(it->second);
@@ -113,6 +119,40 @@ void ${class_name}::removeStatusIfNeeded(int id)
 
   if(remove)
     _status.erase(id);
+}
+
+std::vector<std::string> ${class_name}::getSynchros(std::string event)
+{
+  std::vector<std::string> res;
+
+  if(event.find("wait_synchro_") == 0)
+  {
+    event = event.substr(13);
+    res = split(event, "_");
+  }
+
+  return res;
+}
+
+std::vector<std::string> ${class_name}::split(const std::string& str, const std::string& delim)
+  {
+    std::vector<std::string> tokens;
+    size_t prev = 0, pos = 0;
+    do
+    {
+      pos = str.find(delim, prev);
+      if (pos == std::string::npos)
+        pos = str.length();
+
+      std::string token = str.substr(prev, pos-prev);
+
+      if (!token.empty())
+        tokens.push_back(token);
+      prev = pos + delim.length();
+    }
+    while ((pos < str.length()) && (prev < str.length()));
+
+    return tokens;
 }
 
 } // namespace ${project_name}
