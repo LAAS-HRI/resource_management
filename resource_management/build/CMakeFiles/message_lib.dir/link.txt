@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmessage_lib.a  CMakeFiles/message_lib.dir/src/message_storage/PriorityHolder.cpp.o CMakeFiles/message_lib.dir/src/message_storage/ReactiveBuffer.cpp.o CMakeFiles/message_lib.dir/src/message_storage/ReactiveBufferStorage.cpp.o
-/usr/bin/ranlib libmessage_lib.a

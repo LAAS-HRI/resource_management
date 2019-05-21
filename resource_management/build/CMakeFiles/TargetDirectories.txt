@@ -1,6 +1,0 @@
-/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/resource_management/build/CMakeFiles/edit_cache.dir
-/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/resource_management/build/CMakeFiles/signals.dir
-/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/resource_management/build/CMakeFiles/rebuild_cache.dir
-/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/resource_management/build/CMakeFiles/state_machine_lib.dir
-/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/resource_management/build/CMakeFiles/state_machine.dir
-/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/resource_management/build/CMakeFiles/message_lib.dir
