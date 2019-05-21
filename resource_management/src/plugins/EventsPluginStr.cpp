@@ -9,7 +9,7 @@ void EventsPluginStr::setNodeHandle(ros::NodeHandlePtr nh)
 {
   _nh = nh;
   if(_nh)
-    _subscriber = _nh->subscribe("str_events", 10, &EventsPluginStr::callback, this);
+    _subscriber = _nh->subscribe("str_events", 100, &EventsPluginStr::callback, this);
 }
 
 void EventsPluginStr::callback(const std_msgs::String::ConstPtr& msg)

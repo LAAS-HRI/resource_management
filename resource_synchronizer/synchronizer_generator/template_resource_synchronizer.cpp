@@ -16,7 +16,7 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
 {
 
   _register_service = _nh->advertiseService("state_machines_register", &${class_name}::registerMetaStateMachine, this);
-  _state_machine_status_publisher = _nh->advertise<resource_synchronizer_msgs::MetaStateMachinesStatus>("state_machine_status", 10);
+  _state_machine_status_publisher = _nh->advertise<resource_synchronizer_msgs::MetaStateMachinesStatus>("state_machine_status", 100);
   _state_machine_cancel_service = _nh->advertiseService("state_machine_cancel", &${class_name}::stateMachineCancel, this);
 
 !!for sub_fsm in sub_fsms
@@ -33,6 +33,7 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
 
 void ${class_name}::publishStatus(resource_synchronizer::SubStateMachineStatus status)
 {
+  mutex_.lock();
   auto it = _status.find(status.id);
   if(it != _status.end())
   {
@@ -58,6 +59,7 @@ void ${class_name}::publishStatus(resource_synchronizer::SubStateMachineStatus s
       removeStatusIfNeeded(sub_id);
     }
   }
+  mutex_.unlock();
 }
 
 void ${class_name}::run()

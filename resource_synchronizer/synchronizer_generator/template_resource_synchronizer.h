@@ -2,6 +2,7 @@
 #define ${project_name}_RESOURCE_SYNCHRONIZER_H
 
 #include <map>
+#include <mutex>
 
 #include <ros/ros.h>
 
@@ -40,6 +41,7 @@ private:
 
   unsigned int _current_id;
   std::map<int, resource_synchronizer_msgs::MetaStateMachinesStatus> _status;
+  std::mutex mutex_;
 
   ros::ServiceServer _register_service;
   ros::Publisher _state_machine_status_publisher;

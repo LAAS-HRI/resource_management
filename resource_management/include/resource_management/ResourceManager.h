@@ -128,9 +128,9 @@ ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::Res
     addBufferNames(reactiveInputNames);
     createReactiveBufferStorage();
     Impl<InputDataTypes...>::add(_reactiveInputs,_nh,reactiveInputNames,*_reactiveBufferStorage);
-    _activeBufferPublisher = _nh->advertise<std_msgs::String>("active_buffer", 10, true);
-    _prioritiesSubscriber = _nh->subscribe("set_priorities", 10, &ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::prioritiesCallback, this);
-    _stateMachineStatusPublisher = _nh->advertise<resource_management_msgs::StateMachinesStatus>(synchronized ? "state_machine_status__" : "state_machine_status", 10);
+    _activeBufferPublisher = _nh->advertise<std_msgs::String>("active_buffer", 100, true);
+    _prioritiesSubscriber = _nh->subscribe("set_priorities", 100, &ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::prioritiesCallback, this);
+    _stateMachineStatusPublisher = _nh->advertise<resource_management_msgs::StateMachinesStatus>(synchronized ? "state_machine_status__" : "state_machine_status", 100);
     _stateMachineCancelService = _nh->advertiseService(synchronized ? "state_machine_cancel__" : "state_machine_cancel", &ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::stateMachineCancel, this);
 
     if(!_nh->getParam("freq", _hz))

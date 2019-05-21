@@ -81,7 +81,7 @@ public:
             reactive_input_publishers.emplace_back(new MessageGenerator<::${{project_name}}_msgs::{data_type[0]}>(nh,"/${{project_name}}",n));
 !!end
         }
-        set_priorities = nh.advertise<resource_management_msgs::PrioritiesSetter>("/${project_name}/set_priorities",10,/*latch=*/true);
+        set_priorities = nh.advertise<resource_management_msgs::PrioritiesSetter>("/${project_name}/set_priorities",100,/*latch=*/true);
 
         boost::function<void(std_msgs::String)> cb=[this](auto msg){
                 std::lock_guard<std::mutex> lock(active_buffer_mutex);
