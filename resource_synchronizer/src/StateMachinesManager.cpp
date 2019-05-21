@@ -24,6 +24,7 @@ void StateMachinesManager::run()
 
   while(run_ && ros::ok())
   {
+    mutex_.lock();
     init();
 
     while(!isDone())
@@ -101,7 +102,7 @@ void StateMachinesManager::run()
         }
       }
     }
-
+    mutex_.unlock();
     r.sleep();
   }
 }

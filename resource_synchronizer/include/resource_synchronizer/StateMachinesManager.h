@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <atomic>
+#include <mutex>
 
 #include <ros/ros.h>
 
@@ -27,6 +28,9 @@ public:
   void run();
   void stop();
 
+  void halt() { mutex_.lock(); }
+  void realease() { mutex_.unlock(); }
+
 private:
   std::vector<StateMachinesHolderBase*> state_machines_holders_;
   std::map<int, resource_synchronizer_msgs::MetaStateMachineHeader> headers_;
@@ -34,6 +38,7 @@ private:
 
   std::vector<int> running_ids_;
   std::atomic<bool> run_;
+  std::mutex mutex_;
 
   std::vector<bool> done_;
   std::vector<std::vector<int> > ids_;

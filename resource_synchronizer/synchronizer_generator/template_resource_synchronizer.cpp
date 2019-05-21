@@ -72,6 +72,9 @@ void ${class_name}::run()
 
 bool ${class_name}::registerMetaStateMachine(${project_name_msgs}::MetaStateMachineRegister::Request &req,
 ${project_name_msgs}::MetaStateMachineRegister::Response &res){
+
+  _manager.halt();
+
   _status[_current_id].id = _current_id;
   bool inserted;
 
@@ -93,6 +96,9 @@ ${project_name_msgs}::MetaStateMachineRegister::Response &res){
   _status[_current_id].state_name[_status[_current_id].state_name.size() - 1] = ""; // global status as no state
   _status[_current_id].state_event.resize(_status[_current_id].resource.size());
   _current_id++;
+
+  _manager.realease();
+
   return true;
 }
 

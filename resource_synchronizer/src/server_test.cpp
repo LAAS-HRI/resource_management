@@ -64,9 +64,10 @@ int main(int argc, char *argv[])
     }
 
     signal.state_machine_led_R = sub;
+    signal.state_machine_led_G = sub;
   }
 
-  {
+  /*{
     led_resource_synchronizer_msgs::SubStateMachine_led_manager_msgs sub;
     sub.header.timeout = ros::Duration(10);
     sub.header.begin_dead_line = ros::Time(0);
@@ -74,7 +75,7 @@ int main(int argc, char *argv[])
 
     led_manager_msgs::StateMachineStateColor color_state;
 
-    /* STATE_0 */
+    // STATE_0
 
     {
       resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_0", 100);
@@ -82,7 +83,7 @@ int main(int argc, char *argv[])
       sub.state_machine.states_Color.push_back(state());
     }
 
-    /* STATE_1 */
+    // STATE_1
 
     {
       resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_1", 150);
@@ -91,7 +92,7 @@ int main(int argc, char *argv[])
     }
 
     signal.state_machine_led_G = sub;
-  }
+  }*/
 
   led_resource_synchronizer_msgs::MetaStateMachineRegister srv;
   srv.request = signal;
