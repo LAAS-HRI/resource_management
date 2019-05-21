@@ -21,7 +21,7 @@ class StateMachinesBase
 {
 };
 
-template<class T>
+template<class T, class E>
 class StateMachines : public StateMachinesBase
 {
 public:
@@ -33,8 +33,10 @@ public:
 
 private:
     bool _serviceCallback(typename T::Request &req, typename T::Response &res);
+    bool _extractCallback(typename E::Request &req, typename E::Response &res);
     ros::NodeHandlePtr _nh;
     ros::ServiceServer _serviceServer;
+    ros::ServiceServer _extractServer;
     StateFromMsgFn _getStateDataFromStateMachineMsg;
     TransitionFromMsgFn _getTransitionsFromStateMachineMsg;
     GenerateResponseMsgFn _generateResponseMsg;
@@ -42,8 +44,8 @@ private:
     uint32_t _stateMachinesId;
 };
 
-template<class T>
-StateMachines<T>::StateMachines(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn generateResponseMsg, std::shared_ptr<StateMachinesStorage> storage, bool synchronized):
+template<class T, class E>
+StateMachines<T,E>::StateMachines(ros::NodeHandlePtr nh, StateFromMsgFn stateFromMsg, TransitionFromMsgFn transitionFromMsg, GenerateResponseMsgFn generateResponseMsg, std::shared_ptr<StateMachinesStorage> storage, bool synchronized):
     _nh(std::move(nh)),
     _getStateDataFromStateMachineMsg(std::move(stateFromMsg)),
     _getTransitionsFromStateMachineMsg(std::move(transitionFromMsg)),
@@ -51,11 +53,12 @@ StateMachines<T>::StateMachines(ros::NodeHandlePtr nh, StateFromMsgFn stateFromM
 {
     _storage = storage;
     _stateMachinesId = 0;
-    _serviceServer = _nh->advertiseService(synchronized ? "state_machines_register__" : "state_machines_register", &StateMachines<T>::_serviceCallback,this);
+    _serviceServer = _nh->advertiseService(synchronized ? "state_machines_register__" : "state_machines_register", &StateMachines<T,E>::_serviceCallback,this);
+    _extractServer = _nh->advertiseService("extract_synchro__", &StateMachines<T,E>::_extractCallback,this);
 }
 
-template<class T>
-bool StateMachines<T>::_serviceCallback(typename T::Request &req, typename T::Response &res)
+template<class T, class E>
+bool StateMachines<T,E>::_serviceCallback(typename T::Request &req, typename T::Response &res)
 {
     std::shared_ptr<StateStorage> states = std::make_shared<StateStorage>(_stateMachinesId, req.header.timeout, req.header.begin_dead_line);
     states->setInitialState(req.header.initial_state);
@@ -105,6 +108,13 @@ bool StateMachines<T>::_serviceCallback(typename T::Request &req, typename T::Re
       ROS_ERROR_STREAM("No valid state machines container");
       return false;
     }
+}
+
+
+template<class T, class E>
+bool StateMachines<T,E>::_extractCallback(typename E::Request &req, typename E::Response &res)
+{
+  return true;
 }
 
 } // namespace resource_management

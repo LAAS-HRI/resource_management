@@ -43,7 +43,7 @@ struct Impl<>
     static void add(STLStorage &, Args&...){}
 };
 
-template<typename StateMachineType, typename ...InputDataTypes>
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
 class ResourceManager
 {
 public:
@@ -109,19 +109,19 @@ private:
     std::mutex _stateMachineMutex;
 };
 
-template<typename StateMachineType, typename ...InputDataTypes>
-ResourceManager<StateMachineType,InputDataTypes...>::ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames, const std::vector<std::string>& pluginsNames, bool synchronized):
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::ResourceManager(ros::NodeHandlePtr nh, std::vector<std::string> reactiveInputNames, const std::vector<std::string>& pluginsNames, bool synchronized):
     _nh(std::move(nh)), _loader("resource_management", "resource_management::EventsInterface")
 {
     loadEventsPlugins(pluginsNames);
     _stateMachineStorage = std::make_shared<StateMachinesStorage>();
     this->_stateMachineService =
-            std::make_shared<StateMachines<StateMachineType>>
+            std::make_shared<StateMachines<StateMachineType,StateMachineExtractType>>
                                           (
                                               _nh,
-                                              boost::bind(&ResourceManager<StateMachineType,InputDataTypes...>::stateFromMsg,this,_1),
-                                              boost::bind(&ResourceManager<StateMachineType,InputDataTypes...>::transitionFromMsg,this,_1),
-                                              boost::bind(&ResourceManager<StateMachineType,InputDataTypes...>::generateResponseMsg,this,_1),
+                                              boost::bind(&ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::stateFromMsg,this,_1),
+                                              boost::bind(&ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::transitionFromMsg,this,_1),
+                                              boost::bind(&ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::generateResponseMsg,this,_1),
                                               _stateMachineStorage,
                                               synchronized
                                           );
@@ -129,9 +129,9 @@ ResourceManager<StateMachineType,InputDataTypes...>::ResourceManager(ros::NodeHa
     createReactiveBufferStorage();
     Impl<InputDataTypes...>::add(_reactiveInputs,_nh,reactiveInputNames,*_reactiveBufferStorage);
     _activeBufferPublisher = _nh->advertise<std_msgs::String>("active_buffer", 10, true);
-    _prioritiesSubscriber = _nh->subscribe("set_priorities", 10, &ResourceManager<StateMachineType,InputDataTypes...>::prioritiesCallback, this);
+    _prioritiesSubscriber = _nh->subscribe("set_priorities", 10, &ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::prioritiesCallback, this);
     _stateMachineStatusPublisher = _nh->advertise<resource_management_msgs::StateMachinesStatus>(synchronized ? "state_machine_status__" : "state_machine_status", 10);
-    _stateMachineCancelService = _nh->advertiseService(synchronized ? "state_machine_cancel__" : "state_machine_cancel", &ResourceManager<StateMachineType,InputDataTypes...>::stateMachineCancel, this);
+    _stateMachineCancelService = _nh->advertiseService(synchronized ? "state_machine_cancel__" : "state_machine_cancel", &ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::stateMachineCancel, this);
 
     if(!_nh->getParam("freq", _hz))
     {
@@ -140,20 +140,20 @@ ResourceManager<StateMachineType,InputDataTypes...>::ResourceManager(ros::NodeHa
     }
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-ResourceManager<StateMachineType,InputDataTypes...>::~ResourceManager()
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::~ResourceManager()
 {
   _plugins.clear();
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-const std::vector<std::string> &ResourceManager<StateMachineType,InputDataTypes...>::getBufferNames() const
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+const std::vector<std::string> &ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::getBufferNames() const
 {
     return _bufferNames;
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-void ResourceManager<StateMachineType,InputDataTypes...>::addBufferNames(const std::vector<std::string> &bufferNames)
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+void ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::addBufferNames(const std::vector<std::string> &bufferNames)
 {
     _reactiveBuffersNames = bufferNames;
     _bufferNames.emplace_back("state_machine");
@@ -161,8 +161,8 @@ void ResourceManager<StateMachineType,InputDataTypes...>::addBufferNames(const s
     _bufferNames.emplace_back("artificial_life");
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-void ResourceManager<StateMachineType,InputDataTypes...>::createReactiveBufferStorage()
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+void ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::createReactiveBufferStorage()
 {
     _reactiveInputs.clear();
     _reactiveBufferStorage=std::make_shared<ReactiveBufferStorage>(getBufferNames());
@@ -174,8 +174,8 @@ void ResourceManager<StateMachineType,InputDataTypes...>::createReactiveBufferSt
     _stateMachineBuffer=_reactiveBufferStorage->operator[]("state_machine");
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-void ResourceManager<StateMachineType,InputDataTypes...>::prioritiesCallback(const resource_management_msgs::PrioritiesSetter& msg)
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+void ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::prioritiesCallback(const resource_management_msgs::PrioritiesSetter& msg)
 {
   size_t min = (msg.values.size() < msg.buffers.size()) ? msg.values.size() : msg.buffers.size();
 
@@ -208,8 +208,8 @@ void ResourceManager<StateMachineType,InputDataTypes...>::prioritiesCallback(con
   }
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-void ResourceManager<StateMachineType,InputDataTypes...>::run()
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+void ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::run()
 {
   std::thread sm_th;
   bool state_machine_running = false;
@@ -347,8 +347,8 @@ void ResourceManager<StateMachineType,InputDataTypes...>::run()
   }
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-void ResourceManager<StateMachineType,InputDataTypes...>::loadEventsPlugins(const std::vector<std::string>& pluginsNames)
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+void ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::loadEventsPlugins(const std::vector<std::string>& pluginsNames)
 {
   std::vector<std::string> reasoners = _loader.getDeclaredClasses();
 
@@ -371,20 +371,20 @@ void ResourceManager<StateMachineType,InputDataTypes...>::loadEventsPlugins(cons
   }
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-void ResourceManager<StateMachineType,InputDataTypes...>::done()
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+void ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::done()
 {
   insertEvent("__done__");
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-void ResourceManager<StateMachineType,InputDataTypes...>::insertEvent(const std::string& event)
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+void ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::insertEvent(const std::string& event)
 {
   _StateMachine.addEvent(event);
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-void ResourceManager<StateMachineType,InputDataTypes...>::setStateMachineData(bool newState)
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+void ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::setStateMachineData(bool newState)
 {
   if(_activeStateMachine)
   {
@@ -405,8 +405,8 @@ void ResourceManager<StateMachineType,InputDataTypes...>::setStateMachineData(bo
     _stateMachineBuffer->setData(nullptr);
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-void ResourceManager<StateMachineType,InputDataTypes...>::publishState(StateMachineInternalState_t state)
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+void ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::publishState(StateMachineInternalState_t state)
 {
   std::string state_event;
   switch (state.transition_state_) {
@@ -432,8 +432,8 @@ void ResourceManager<StateMachineType,InputDataTypes...>::publishState(StateMach
   _stateMachineStatusPublisher.publish(status);
 }
 
-template<typename StateMachineType, typename ...InputDataTypes>
-bool ResourceManager<StateMachineType,InputDataTypes...>::stateMachineCancel
+template<typename StateMachineType, typename StateMachineExtractType, typename ...InputDataTypes>
+bool ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>::stateMachineCancel
                           (resource_management_msgs::StateMachinesCancel::Request  &req,
                           resource_management_msgs::StateMachinesCancel::Response &res)
 {

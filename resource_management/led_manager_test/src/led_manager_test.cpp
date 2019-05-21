@@ -1,4 +1,5 @@
 #include "led_manager_msgs/StateMachineRegister.h"
+#include "led_manager_msgs/StateMachineExtract.h"
 #include "led_manager_msgs/Color.h"
 #include "led_manager_msgs/OnOff.h"
 #include "led_manager_test/ArtificialLife.h"
@@ -9,6 +10,7 @@
 #include <thread>
 
 class LedManager : public resource_management::ResourceManager<led_manager_msgs::StateMachineRegister
+      ,led_manager_msgs::StateMachineExtract
       ,led_manager_msgs::Color
       ,led_manager_msgs::OnOff
 >

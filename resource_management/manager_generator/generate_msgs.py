@@ -27,7 +27,7 @@ def createCatkinFiles(args,msg_files,srv_files, settings):
     'add_message_files(\n'
     'FILES\n'
     '{msgs}\n'
-    'StateMachine.msg'             
+    'StateMachine.msg'
     ')\n'
     '\n'
     '## Generate services in the \'srv\' folder\n'
@@ -190,6 +190,16 @@ def main():
     f_signal.write("StateMachine state_machine\n")
     f_signal.write("---\n")
     f_signal.write("uint32 id")
+
+    #   Extract Service
+    filename='StateMachineExtract.srv'
+    srv_files.append(filename)
+    f_signal=open(os.path.join(args.package_name,'srv',filename),'w+')
+    f_signal.write("StateMachine state_machine\n")
+    f_signal.write("---\n")
+    f_signal.write("string[] synchros")
+
+
     createCatkinFiles(args,msg_files, srv_files, settings)
 
 

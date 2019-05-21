@@ -1,4 +1,5 @@
 #include "${project_name}_msgs/StateMachineRegister.h"
+#include "${project_name}_msgs/StateMachineExtract.h"
 !!for data_type in message_types
 #include "${{project_name}}_msgs/{data_type[0]}.h"
 !!end
@@ -10,6 +11,7 @@
 #include <thread>
 
 class ${class_name} : public resource_management::ResourceManager<${project_name}_msgs::StateMachineRegister
+      ,${project_name}_msgs::StateMachineExtract
 !!for data_type in message_types
       ,${{project_name}}_msgs::{data_type[0]}
 !!end
