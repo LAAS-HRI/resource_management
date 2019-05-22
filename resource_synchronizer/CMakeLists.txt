@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES resource_synchronizer_lib synchronizer_lib
-    CATKIN_DEPENDS roscpp resource_management_msgs resource_synchronizer_msgs
+    CATKIN_DEPENDS roscpp resource_management_msgs resource_synchronizer_msgs resource_management
     )
 
 include_directories(

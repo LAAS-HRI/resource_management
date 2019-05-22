@@ -10,6 +10,7 @@
   <depend>roscpp</depend>
   <depend>resource_management_msgs</depend>
   <depend>resource_synchronizer_msgs</depend>
+  <depend>resource_management</depend>
   <buildtool_depend>catkin</buildtool_depend>
 
 </package>
