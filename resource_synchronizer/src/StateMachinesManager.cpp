@@ -168,7 +168,7 @@ void StateMachinesManager::applyConstraints()
       }
     }
     // if begin dead line is over
-    else if((it.second.begin_dead_line != ros::Time(0)) && (it.second.begin_dead_line != ros::Time::now()))
+    else if((it.second.begin_dead_line != ros::Time(0)) && (it.second.begin_dead_line <= ros::Time::now()))
     {
       for(size_t j = 0; j < state_machines_holders_.size(); j++)
         state_machines_holders_[j]->cancel(it.first);
