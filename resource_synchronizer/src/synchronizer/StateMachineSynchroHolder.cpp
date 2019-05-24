@@ -15,6 +15,11 @@ void StateMachineSynchroHolder::insert(const std::string& resource, const std::v
     synchros_[synchro].push_back(resource);
     activations_[synchro].push_back(false);
   }
+
+  if(publishers_.find(resource) == publishers_.end())
+  {
+    publishers_[resource] = nh_->advertise<std_msgs::String>("/" + resource + "/str_events", 100);
+  }
 }
 
 bool StateMachineSynchroHolder::activate(const std::string& synchro, const std::string& resource)
@@ -38,9 +43,6 @@ bool StateMachineSynchroHolder::activate(const std::string& synchro, const std::
     {
       for(size_t i = 0; i < it->second.size(); i++)
       {
-        if(publishers_.find(it->second[i]) == publishers_.end())
-          publishers_[it->second[i]] = nh_->advertise<std_msgs::String>("/" + it->second[i] + "/str_events", 100);
-
         std_msgs::String msg;
         msg.data = "__synchro__" + it->first;
         publishers_[it->second[i]].publish(msg);
