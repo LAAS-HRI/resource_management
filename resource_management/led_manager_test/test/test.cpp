@@ -79,13 +79,13 @@ public:
             reactive_input_publishers.emplace_back(new MessageGenerator<::led_manager_msgs::Color>(nh,"/led_manager_test",n));
             reactive_input_publishers.emplace_back(new MessageGenerator<::led_manager_msgs::OnOff>(nh,"/led_manager_test",n));
         }
-        set_priorities = nh.advertise<resource_management_msgs::PrioritiesSetter>("/led_manager_test/set_priorities",10,/*latch=*/true);
+        set_priorities = nh.advertise<resource_management_msgs::PrioritiesSetter>("/led_manager_test/set_priorities",100,/*latch=*/true);
 
         boost::function<void(std_msgs::String)> cb=[this](auto msg){
                 std::lock_guard<std::mutex> lock(active_buffer_mutex);
                 this->active_buffer_value = msg.data;
                 };
-        active_buffer = nh.subscribe<std_msgs::String>("/led_manager_test/active_buffer",10,cb);
+        active_buffer = nh.subscribe<std_msgs::String>("/led_manager_test/active_buffer",100,cb);
 
         //while(set_priorities.getNumSubscribers()<=0){
         //    std::this_thread::sleep_for(std::chrono::milliseconds(50));

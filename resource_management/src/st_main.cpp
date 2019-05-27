@@ -25,6 +25,7 @@ void publishState(resource_management::StateMachineInternalState_t state)
     case resource_management::transition_pass_on_duration : std::cout << "pass_on_duration"; break;
     case resource_management::transition_timeout : std::cout << "timeout"; break;
     case resource_management::transition_wait : std::cout << "wait"; break;
+    case resource_management::transition_wait_synchro : std::cout << "wait_synchro_" + state.synchro_name_; break;
     case resource_management::transition_global_timeout : std::cout << "global_timeout"; break;
     case resource_management::transition_preampt : std::cout << "preampt"; break;
     case resource_management::transition_dead_line : std::cout << "dead_line"; break;

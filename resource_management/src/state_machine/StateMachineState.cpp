@@ -11,6 +11,9 @@ void StateMachineState::setTransition(StateMachineState* next, StateMachineTrans
 {
   transitions_conditions_.push_back(tansition);
   transitions_next_state_.push_back(next);
+  std::vector<std::string> tmp = tansition.getSynchroNames();
+  if(tmp.size())
+    synchro_names_.insert(synchro_names_.end(), tmp.begin(), tmp.end());
 }
 
 void StateMachineState::startState()
@@ -54,7 +57,7 @@ transtition_state_t StateMachineState::update(StateMachineState** current_state,
   }
   else if(transtition_state == transition_timeout)
     *current_state =  nullptr;
-  else if(transtition_state == transition_wait)
+  else if((transtition_state == transition_wait) || (transtition_state == transition_wait_synchro))
     *current_state = this;
 
   return transtition_state;

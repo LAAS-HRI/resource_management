@@ -10,6 +10,8 @@ StateMachineTransition::StateMachineTransition(ros::Duration duration, ros::Dura
   {
     regexs_.push_back(std::regex(regex));
     regexs_validation_.push_back(false);
+    if(regex.find("__synchro__") == 0)
+      synchro_names_.push_back(regex.substr(11));
   }
 }
 

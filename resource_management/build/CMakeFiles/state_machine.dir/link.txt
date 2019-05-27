@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/state_machine.dir/src/st_main.cpp.o  -o state_machine libstate_machine_lib.a -lpthread 

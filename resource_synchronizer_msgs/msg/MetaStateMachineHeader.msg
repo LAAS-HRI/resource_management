@@ -1,0 +1,3 @@
+duration timeout
+time begin_dead_line
+resource_management_msgs/MessagePriority priority

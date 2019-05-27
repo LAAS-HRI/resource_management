@@ -165,6 +165,15 @@ void StateMachineRunner::runOnceNoEvent()
   StateMachineState* tmp_state = internal_state_.state_;
   transtition_state_t tmp_transition = internal_state_.state_->update(&tmp_state);
 
+  internal_state_.synchro_name_ = "";
+  if(tmp_transition == transition_wait)
+  {
+    for(auto x : internal_state_.state_->getSynchroNames())
+      internal_state_.synchro_name_ += x + "_";
+    if(internal_state_.synchro_name_ != "")
+      tmp_transition = transition_wait_synchro;
+  }
+
   if(tmp_state != internal_state_.state_)
   {
     internal_state_.state_ = tmp_state;
@@ -198,6 +207,15 @@ void StateMachineRunner::runOnceWithEvents(std::queue<std::string>& events)
 
     StateMachineState* tmp_state = internal_state_.state_;
     transtition_state_t tmp_transition = internal_state_.state_->update(&tmp_state, event);
+
+    internal_state_.synchro_name_ = "";
+    if(tmp_transition == transition_wait)
+    {
+      for(auto x : internal_state_.state_->getSynchroNames())
+        internal_state_.synchro_name_ += x + "_";
+      if(internal_state_.synchro_name_ != "")
+        tmp_transition = transition_wait_synchro;
+    }
 
     if(tmp_state != internal_state_.state_)
     {

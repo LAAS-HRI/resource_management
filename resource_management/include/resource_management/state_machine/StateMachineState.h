@@ -15,6 +15,7 @@ struct StateMachineInternalState_t
   uint32_t state_machine_id;
   StateMachineState* state_;
   transtition_state_t transition_state_;
+  std::string synchro_name_;
 
   StateMachineInternalState_t()
   {
@@ -41,10 +42,13 @@ public:
   transtition_state_t update(StateMachineState** current_state, const std::string& event = "");
   bool endState();
 
+  std::vector<std::string> getSynchroNames() { return synchro_names_; }
+
 private:
   std::string id_;
   std::vector<StateMachineTransition> transitions_conditions_;
   std::vector<StateMachineState*> transitions_next_state_;
+  std::vector<std::string> synchro_names_;
 };
 
 } // namespace resource_management
