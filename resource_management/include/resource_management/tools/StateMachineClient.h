@@ -33,11 +33,11 @@ struct stateMachineState_t
 };
 
 template<class MessageType>
-class StateMachineServer
+class StateMachineClient
 {
 public:
-  StateMachineServer(std::string name, bool synchronised = false, bool spin_thread = true);
-  ~StateMachineServer();
+  StateMachineClient(std::string name, bool synchronised = false, bool spin_thread = true);
+  ~StateMachineClient();
 
   void waitForServer(ros::Duration timeout = ros::Duration(-1));
   void waitForServer(int32_t timeout);
@@ -75,7 +75,7 @@ private:
 };
 
 template<class MessageType>
-StateMachineServer<MessageType>::StateMachineServer(std::string name, bool synchronised, bool spin_thread)
+StateMachineClient<MessageType>::StateMachineClient(std::string name, bool synchronised, bool spin_thread)
 {
   name_ = "/" + name;
   id_ = -1;
@@ -87,11 +87,11 @@ StateMachineServer<MessageType>::StateMachineServer(std::string name, bool synch
   cancel_topic_name_ = synchronised_ ? name_ + "/state_machine_cancel__" : name_ + "/state_machine_cancel";
   status_topic_name_ = synchronised_ ? name_ + "/state_machine_status__" : name_ + "/state_machine_status";
 
-  status_subscriber_ = nh_.subscribe(status_topic_name_, 100, &StateMachineServer::statusCallback, this);
+  status_subscriber_ = nh_.subscribe(status_topic_name_, 100, &StateMachineClient::statusCallback, this);
 }
 
 template<class MessageType>
-StateMachineServer<MessageType>::~StateMachineServer()
+StateMachineClient<MessageType>::~StateMachineClient()
 {
   if(spin_thread_)
   {
@@ -104,19 +104,19 @@ StateMachineServer<MessageType>::~StateMachineServer()
 }
 
 template<class MessageType>
-void StateMachineServer<MessageType>::waitForServer(ros::Duration timeout)
+void StateMachineClient<MessageType>::waitForServer(ros::Duration timeout)
 {
   ros::service::waitForService(register_topic_name_, timeout);
 }
 
 template<class MessageType>
-void StateMachineServer<MessageType>::waitForServer(int32_t timeout)
+void StateMachineClient<MessageType>::waitForServer(int32_t timeout)
 {
   ros::service::waitForService(register_topic_name_, timeout);
 }
 
 template<class MessageType>
-bool StateMachineServer<MessageType>::send(MessageType srv)
+bool StateMachineClient<MessageType>::send(MessageType srv)
 {
   ros::ServiceClient client = nh_.serviceClient<MessageType>(register_topic_name_);
 
@@ -132,7 +132,7 @@ bool StateMachineServer<MessageType>::send(MessageType srv)
 }
 
 template<class MessageType>
-bool StateMachineServer<MessageType>::waitForResult(ros::Duration timeout)
+bool StateMachineClient<MessageType>::waitForResult(ros::Duration timeout)
 {
   ros::Time strat = ros::Time(0);
   bool end = false;
@@ -150,7 +150,7 @@ bool StateMachineServer<MessageType>::waitForResult(ros::Duration timeout)
 }
 
 template<class MessageType>
-bool StateMachineServer<MessageType>::cancel()
+bool StateMachineClient<MessageType>::cancel()
 {
   if(id_ == -1)
     return false;
@@ -166,14 +166,14 @@ bool StateMachineServer<MessageType>::cancel()
 }
 
 template<class MessageType>
-void StateMachineServer<MessageType>::init(ros::NodeHandle& n, bool spin_thread)
+void StateMachineClient<MessageType>::init(ros::NodeHandle& n, bool spin_thread)
 {
   if(spin_thread)
   {
-    ROS_DEBUG("Spinning up a thread for the StateMachineServer");
+    ROS_DEBUG("Spinning up a thread for the StateMachineClient");
     need_to_terminate_ = false;
     n.setCallbackQueue(&callback_queue_);
-    spin_thread_ = new std::thread(std::bind(&StateMachineServer<MessageType>::spinThread, this));
+    spin_thread_ = new std::thread(std::bind(&StateMachineClient<MessageType>::spinThread, this));
   }
   else
   {
@@ -182,7 +182,7 @@ void StateMachineServer<MessageType>::init(ros::NodeHandle& n, bool spin_thread)
 }
 
 template<class MessageType>
-void StateMachineServer<MessageType>::spinThread()
+void StateMachineClient<MessageType>::spinThread()
 {
   while(nh_.ok())
   {
@@ -195,7 +195,7 @@ void StateMachineServer<MessageType>::spinThread()
 }
 
 template<class MessageType>
-void StateMachineServer<MessageType>::statusCallback(const resource_management_msgs::StateMachinesStatus msg)
+void StateMachineClient<MessageType>::statusCallback(const resource_management_msgs::StateMachinesStatus msg)
 {
   if((int)msg.id == id_)
   {

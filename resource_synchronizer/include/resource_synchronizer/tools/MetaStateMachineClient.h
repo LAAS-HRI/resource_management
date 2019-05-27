@@ -1,5 +1,5 @@
-#ifndef _RESOURCE_SYNCHRONIZER_INCLUDE_RESOURCE_SYNCHRONIZER_METASTATEMACHINESERVER_H_
-#define _RESOURCE_SYNCHRONIZER_INCLUDE_RESOURCE_SYNCHRONIZER_METASTATEMACHINESERVER_H_
+#ifndef _RESOURCE_SYNCHRONIZER_INCLUDE_RESOURCE_SYNCHRONIZER_METASTATEMACHINECLIENT_H_
+#define _RESOURCE_SYNCHRONIZER_INCLUDE_RESOURCE_SYNCHRONIZER_METASTATEMACHINECLIENT_H_
 
 #include <functional>
 #include <thread>
@@ -13,7 +13,7 @@
 #include "resource_synchronizer_msgs/MetaStateMachinesStatus.h"
 #include "resource_management_msgs/StateMachinesCancel.h"
 
-namespace resource_management
+namespace resource_synchronizer
 {
 
 struct MetaStateMachineState_t
@@ -62,11 +62,11 @@ struct MetaStateMachineState_t
 };
 
 template<class MessageType>
-class MetaStateMachineServer
+class MetaStateMachineClient
 {
 public:
-  MetaStateMachineServer(std::string name, bool spin_thread = true);
-  ~MetaStateMachineServer();
+  MetaStateMachineClient(std::string name, bool spin_thread = true);
+  ~MetaStateMachineClient();
 
   void waitForServer(ros::Duration timeout = ros::Duration(-1));
   void waitForServer(int32_t timeout);
@@ -103,7 +103,7 @@ private:
 };
 
 template<class MessageType>
-MetaStateMachineServer<MessageType>::MetaStateMachineServer(std::string name, bool spin_thread)
+MetaStateMachineClient<MessageType>::MetaStateMachineClient(std::string name, bool spin_thread)
 {
   name_ = "/" + name;
   id_ = -1;
@@ -114,11 +114,11 @@ MetaStateMachineServer<MessageType>::MetaStateMachineServer(std::string name, bo
   cancel_topic_name_ = name_ + "/state_machine_cancel";
   status_topic_name_ = name_ + "/state_machine_status";
 
-  status_subscriber_ = nh_.subscribe(status_topic_name_, 100, &MetaStateMachineServer::statusCallback, this);
+  status_subscriber_ = nh_.subscribe(status_topic_name_, 100, &MetaStateMachineClient::statusCallback, this);
 }
 
 template<class MessageType>
-MetaStateMachineServer<MessageType>::~MetaStateMachineServer()
+MetaStateMachineClient<MessageType>::~MetaStateMachineClient()
 {
   if(spin_thread_)
   {
@@ -131,19 +131,19 @@ MetaStateMachineServer<MessageType>::~MetaStateMachineServer()
 }
 
 template<class MessageType>
-void MetaStateMachineServer<MessageType>::waitForServer(ros::Duration timeout)
+void MetaStateMachineClient<MessageType>::waitForServer(ros::Duration timeout)
 {
   ros::service::waitForService(register_topic_name_, timeout);
 }
 
 template<class MessageType>
-void MetaStateMachineServer<MessageType>::waitForServer(int32_t timeout)
+void MetaStateMachineClient<MessageType>::waitForServer(int32_t timeout)
 {
   ros::service::waitForService(register_topic_name_, timeout);
 }
 
 template<class MessageType>
-bool MetaStateMachineServer<MessageType>::send(MessageType srv)
+bool MetaStateMachineClient<MessageType>::send(MessageType srv)
 {
   ros::ServiceClient client = nh_.serviceClient<MessageType>(register_topic_name_);
 
@@ -158,7 +158,7 @@ bool MetaStateMachineServer<MessageType>::send(MessageType srv)
 }
 
 template<class MessageType>
-bool MetaStateMachineServer<MessageType>::waitForResult(ros::Duration timeout)
+bool MetaStateMachineClient<MessageType>::waitForResult(ros::Duration timeout)
 {
   ros::Time strat = ros::Time(0);
   bool end = false;
@@ -176,7 +176,7 @@ bool MetaStateMachineServer<MessageType>::waitForResult(ros::Duration timeout)
 }
 
 template<class MessageType>
-bool MetaStateMachineServer<MessageType>::cancel()
+bool MetaStateMachineClient<MessageType>::cancel()
 {
   if(id_ == -1)
     return false;
@@ -192,14 +192,14 @@ bool MetaStateMachineServer<MessageType>::cancel()
 }
 
 template<class MessageType>
-void MetaStateMachineServer<MessageType>::init(ros::NodeHandle& n, bool spin_thread)
+void MetaStateMachineClient<MessageType>::init(ros::NodeHandle& n, bool spin_thread)
 {
   if(spin_thread)
   {
-    ROS_DEBUG("Spinning up a thread for the MetaStateMachineServer");
+    ROS_DEBUG("Spinning up a thread for the MetaStateMachineClient");
     need_to_terminate_ = false;
     n.setCallbackQueue(&callback_queue_);
-    spin_thread_ = new std::thread(std::bind(&MetaStateMachineServer<MessageType>::spinThread, this));
+    spin_thread_ = new std::thread(std::bind(&MetaStateMachineClient<MessageType>::spinThread, this));
   }
   else
   {
@@ -208,7 +208,7 @@ void MetaStateMachineServer<MessageType>::init(ros::NodeHandle& n, bool spin_thr
 }
 
 template<class MessageType>
-void MetaStateMachineServer<MessageType>::spinThread()
+void MetaStateMachineClient<MessageType>::spinThread()
 {
   while(nh_.ok())
   {
@@ -221,7 +221,7 @@ void MetaStateMachineServer<MessageType>::spinThread()
 }
 
 template<class MessageType>
-void MetaStateMachineServer<MessageType>::statusCallback(const resource_synchronizer_msgs::MetaStateMachinesStatus msg)
+void MetaStateMachineClient<MessageType>::statusCallback(const resource_synchronizer_msgs::MetaStateMachinesStatus msg)
 {
   if((int)msg.id == id_)
   {
@@ -232,6 +232,6 @@ void MetaStateMachineServer<MessageType>::statusCallback(const resource_synchron
   }
 }
 
-} // namespace resource_management
+} // namespace resource_synchronizer
 
-#endif // _RESOURCE_SYNCHRONIZER_INCLUDE_RESOURCE_SYNCHRONIZER_METASTATEMACHINESERVER_H_
+#endif // _RESOURCE_SYNCHRONIZER_INCLUDE_RESOURCE_SYNCHRONIZER_METASTATEMACHINECLIENT_H_

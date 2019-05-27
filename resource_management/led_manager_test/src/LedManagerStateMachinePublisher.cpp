@@ -1,6 +1,6 @@
 #include "led_manager_msgs/StateMachineRegister.h"
 
-#include "resource_management/tools/StateMachineServer.h"
+#include "resource_management/tools/StateMachineClient.h"
 #include "resource_management/tools/StateMsg.h"
 
 #include <ros/ros.h>
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   ros::AsyncSpinner spinner(1); // Use 4 threads
   spinner.start();
 
-  resource_management::StateMachineServer<led_manager_msgs::StateMachineRegister> server("led_manager_test");
+  resource_management::StateMachineClient<led_manager_msgs::StateMachineRegister> server("led_manager_test");
   server.waitForServer();
 
   led_manager_msgs::StateMachineRegister::Request signal;

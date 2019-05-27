@@ -1,6 +1,6 @@
 #include "led_resource_synchronizer_msgs/MetaStateMachineRegister.h"
 
-#include "resource_synchronizer/tools/MetaStateMachineServer.h"
+#include "resource_synchronizer/tools/MetaStateMachineClient.h"
 #include "resource_management/tools/StateMsg.h"
 
 #include <ros/ros.h>
@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
   ros::init(argc,argv,"led_synchronizer_test_pub");
   ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
 
-  resource_management::MetaStateMachineServer<led_resource_synchronizer_msgs::MetaStateMachineRegister> server("led_resource_synchronizer");
+  resource_synchronizer::MetaStateMachineClient<led_resource_synchronizer_msgs::MetaStateMachineRegister> server("led_resource_synchronizer");
   server.waitForServer();
 
   led_resource_synchronizer_msgs::MetaStateMachineRegister::Request signal;

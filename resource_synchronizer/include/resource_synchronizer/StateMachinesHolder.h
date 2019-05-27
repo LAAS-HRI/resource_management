@@ -9,7 +9,7 @@
 #include <ros/ros.h>
 
 #include "resource_synchronizer/StateMachine.h"
-#include "resource_management/tools/StateMachineServer.h"
+#include "resource_management/tools/StateMachineClient.h"
 
 namespace resource_synchronizer
 {
@@ -214,7 +214,7 @@ private:
   std::mutex mutex_;
   std::string name_;
 
-  resource_management::StateMachineServer<RMT> server_;
+  resource_management::StateMachineClient<RMT> server_;
   std::function<void(SubStateMachineStatus)> status_callback_;
 
   void stateMachineStatus(resource_management::stateMachineState_t status)
