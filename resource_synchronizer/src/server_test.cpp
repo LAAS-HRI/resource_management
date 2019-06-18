@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
   server.waitForServer();
 
   led_resource_synchronizer_msgs::MetaStateMachineRegister::Request signal;
-  signal.header.timeout = ros::Duration(9);
-  signal.header.begin_dead_line = ros::Time(0);
+  signal.header.timeout = ros::Duration(-1);
+  signal.header.begin_dead_line = ros::Time::now() + ros::Duration(5);
   signal.header.priority.value = resource_management_msgs::MessagePriority::URGENT;
 
 
@@ -29,8 +29,49 @@ int main(int argc, char *argv[])
 
   {
     led_resource_synchronizer_msgs::SubStateMachine_led_manager_msgs sub;
-    sub.header.timeout = ros::Duration(10);
-    sub.header.begin_dead_line = ros::Time(0);
+    sub.header.timeout = ros::Duration(-1);
+    sub.header.begin_dead_line = ros::Time::now() + ros::Duration(5);
+    sub.header.initial_state = "state_0";
+
+    led_manager_msgs::StateMachineStateColor color_state;
+
+    /* STATE_0 */
+
+    {
+      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_0", 100);
+      state.addTransition("state_01", ros::Duration(-1), ros::Duration(-1));
+      sub.state_machine.states_Color.push_back(state());
+    }
+
+    {
+      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_01", 100);
+      state.addTransition("state_1", ros::Duration(-1), ros::Duration(-1), {"__synchro__blip"});
+      sub.state_machine.states_Color.push_back(state());
+    }
+
+    /* STATE_1 */
+
+    {
+      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_1", 150);
+      state.addTransition("state_10", ros::Duration(-1), ros::Duration(1.5));
+      sub.state_machine.states_Color.push_back(state());
+    }
+
+    {
+      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_10", 150);
+      state.addTransition("state_0", ros::Duration(-1), ros::Duration(-1), {"__synchro__blop"});
+      sub.state_machine.states_Color.push_back(state());
+    }
+
+    signal.state_machine_led_G = sub;
+  }
+
+  // CREATE SM //
+
+  {
+    led_resource_synchronizer_msgs::SubStateMachine_led_manager_msgs sub;
+    sub.header.timeout = ros::Duration(-1);
+    sub.header.begin_dead_line = ros::Time::now() + ros::Duration(5);
     sub.header.initial_state = "state_0";
 
     led_manager_msgs::StateMachineStateColor color_state;
@@ -64,35 +105,7 @@ int main(int argc, char *argv[])
     }
 
     signal.state_machine_led_R = sub;
-    signal.state_machine_led_G = sub;
   }
-
-  /*{
-    led_resource_synchronizer_msgs::SubStateMachine_led_manager_msgs sub;
-    sub.header.timeout = ros::Duration(10);
-    sub.header.begin_dead_line = ros::Time(0);
-    sub.header.initial_state = "state_0";
-
-    led_manager_msgs::StateMachineStateColor color_state;
-
-    // STATE_0
-
-    {
-      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_0", 100);
-      state.addTransition("state_1", ros::Duration(-1), ros::Duration(-1), {"__synchro__blip"});
-      sub.state_machine.states_Color.push_back(state());
-    }
-
-    // STATE_1
-
-    {
-      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_1", 150);
-      state.addTransition("state_0", ros::Duration(-1), ros::Duration(-1), {"__synchro__blop"});
-      sub.state_machine.states_Color.push_back(state());
-    }
-
-    signal.state_machine_led_G = sub;
-  }*/
 
   led_resource_synchronizer_msgs::MetaStateMachineRegister srv;
   srv.request = signal;
