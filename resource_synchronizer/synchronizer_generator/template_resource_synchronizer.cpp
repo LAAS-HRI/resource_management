@@ -15,6 +15,7 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
   _current_id(0)
 {
 
+  resource_synchronizer::StateMachineSynchroHolder::setNodeHandle(_nh);
   _register_service = _nh->advertiseService("state_machines_register", &${class_name}::registerMetaStateMachine, this);
   _state_machine_status_publisher = _nh->advertise<resource_synchronizer_msgs::MetaStateMachinesStatus>("state_machine_status", 100);
   _state_machine_cancel_service = _nh->advertiseService("state_machine_cancel", &${class_name}::stateMachineCancel, this);
@@ -27,6 +28,10 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
   _manager.registerHolder(&_holder_{sub_fsm.name});
 !!end
   _manager.registerSatusCallback([this](auto status){ this->publishStatus(status); });
+
+!!for sub_fsm in sub_fsms
+  resource_synchronizer::StateMachineSynchroHolder::registerResource("{sub_fsm.name}");
+!!end
 
   ROS_INFO("${project_name} ready.");
 }
@@ -168,8 +173,6 @@ std::vector<std::string> ${class_name}::split(const std::string& str, const std:
 int main(int argc, char** argv){
   ros::init(argc, argv, "${project_name}");
   ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
-
-  resource_synchronizer::StateMachineSynchroHolder::setNodeHandle(nh);
 
   ${project_name}::${class_name} syn(nh);
 
