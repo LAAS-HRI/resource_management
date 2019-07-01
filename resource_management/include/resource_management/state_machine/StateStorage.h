@@ -16,7 +16,7 @@ public:
   StateStorage(uint32_t id = -1, ros::Duration time_out = ros::Duration(-1), ros::Time begin_dead_line = ros::Time(0));
   ~StateStorage();
 
-  void addState(const std::string& id);
+  void addState(const std::string& id, bool partially_defined = false);
   void addTransition(const std::string& id, const std::string& id_next, StateMachineTransition& transition);
   void addData(const std::string& id, std::shared_ptr<MessageAbstraction> data);
 
@@ -30,6 +30,9 @@ public:
   bool isTooLate();
 
   StateMachineState* operator[](const std::string& id);
+
+  void analyse();
+
 private:
   uint32_t id_;
   std::map<std::string, StateMachineState*> states_;

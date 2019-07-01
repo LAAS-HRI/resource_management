@@ -95,6 +95,8 @@ bool StateMachines<T,E>::_serviceCallback(typename T::Request &req, typename T::
     for(auto it : stateData)
       states->addData(it.first, it.second);
 
+    states->analyse();
+
     if(_storage)
     {
       _storage->push(states);
