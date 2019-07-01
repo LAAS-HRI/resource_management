@@ -108,15 +108,8 @@ public:
       server_.waitForResult();
     }
     else
-    {
-      for(auto it = state_machines_.begin(); it != state_machines_.end();)
-      {
-        if(it->first == id)
-          state_machines_.erase(it);
-        else
-          ++it;
-      }
-    }
+      state_machines_.erase(id);
+
     return true;
   }
 
@@ -232,8 +225,7 @@ private:
       if(status.state_name_ == "")
       {
         mutex_.lock();
-        auto it = state_machines_.find(running_id_);
-        state_machines_.erase(it);
+        state_machines_.erase(running_id_);
         running_id_ = -1;
         mutex_.unlock();
       }
