@@ -1,5 +1,12 @@
 #include "resource_synchronizer/StateMachinesManager.h"
 
+#ifndef COLOR_OFF
+#define COLOR_OFF     "\x1B[0m"
+#endif
+#ifndef COLOR_ORANGE
+#define COLOR_ORANGE  "\x1B[1;33m"
+#endif
+
 namespace resource_synchronizer
 {
 
@@ -11,6 +18,9 @@ void StateMachinesManager::registerHolder(StateMachinesHolderBase* holder)
 void StateMachinesManager::insert(int id, resource_synchronizer_msgs::MetaStateMachineHeader header)
 {
   headers_[id] = header;
+
+  if(header.timeout == ros::Duration(0))
+    std::cout << COLOR_ORANGE << "[WARNING] meta state machine " << id << ": timeout set to 0" << COLOR_OFF << std::endl;
 }
 
 void StateMachinesManager::run()
