@@ -9,7 +9,7 @@
 #include <ros/ros.h>
 
 #include "resource_synchronizer/StateMachine.h"
-#include "resource_management/tools/StateMachineClient.h"
+#include "resource_management/API/StateMachineClient.h"
 
 namespace resource_synchronizer
 {
