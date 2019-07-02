@@ -56,7 +56,8 @@ void ${class_name}::publishStatus(resource_synchronizer::SubStateMachineStatus s
       it->second.state_name[sub_id] = status.state_name;
       it->second.state_event[sub_id] = status.event_name;
       _state_machine_status_publisher.publish(it->second);
-      removeStatusIfNeeded(sub_id);
+
+      removeStatusIfNeeded(status.id);
     }
   }
   mutex_.unlock();
@@ -123,13 +124,21 @@ bool ${class_name}::stateMachineCancel
 
 void ${class_name}::removeStatusIfNeeded(int id)
 {
-  bool remove = true;
+  mutex_.lock();
+  bool need_remove = true;
   for(size_t i = 0; i < _status[id].state_name.size(); i++)
     if(_status[id].state_name[i] != "")
-      remove = false;
+    {
+      need_remove = false;
+      std::cout << _status[id].state_name[i] << std::endl;
+    }
 
-  if(remove)
+  if(need_remove)
+  {
     _status.erase(id);
+    std::cout << "[" << ros::this_node::getName() << "] remove " << id << "; " << _status.size() << " meta state machines waiting" << std::endl;
+  }
+  mutex_.unlock();
 }
 
 std::vector<std::string> ${class_name}::getSynchros(std::string event)
