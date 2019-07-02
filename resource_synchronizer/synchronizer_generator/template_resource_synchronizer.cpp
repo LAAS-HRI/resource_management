@@ -117,6 +117,7 @@ bool ${class_name}::stateMachineCancel
   done = done || _holder_{sub_fsm.name}.cancel(req.id);
 !!end
 
+  _status.erase(req.id);
   res.ack = done;
 
   return true;
@@ -128,10 +129,11 @@ void ${class_name}::removeStatusIfNeeded(int id)
   bool need_remove = true;
   for(size_t i = 0; i < _status[id].state_name.size(); i++)
     if(_status[id].state_name[i] != "")
-    {
       need_remove = false;
-      std::cout << _status[id].state_name[i] << std::endl;
-    }
+
+  if(_status[id].state_event.size())
+    if(_status[id].state_event[_status[id].state_event.size() - 1] != "")
+      need_remove = true;
 
   if(need_remove)
   {

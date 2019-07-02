@@ -73,9 +73,9 @@ void StateMachinesManager::run()
             to_take = false;
 
           if(to_take)
-            select(st_id);
+            selectSm(st_id);
           else // remove state machine not executable for this run
-            remove(st_id);
+            removeSm(st_id);
         }
       }
     }
@@ -237,7 +237,7 @@ void StateMachinesManager::cleanPreempted()
   }
 }
 
-void StateMachinesManager::select(int id)
+void StateMachinesManager::selectSm(int id)
 {
   for(size_t j = 0; j < ids_.size(); j++)
   {
@@ -249,7 +249,7 @@ void StateMachinesManager::select(int id)
   clean();
 }
 
-void StateMachinesManager::remove(int id)
+void StateMachinesManager::removeSm(int id)
 {
   for(size_t j = 0; j < ids_.size(); j++)
   {
