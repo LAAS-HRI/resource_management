@@ -426,7 +426,10 @@ void ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>
   if(state.state_ != nullptr)
     status.state_name = state.state_->getName();
   else
+  {
     status.state_name = "";
+    std::cout << "[" << ros::this_node::getName() << "] remove " << state.state_machine_id << "; " << _stateMachineStorage->size() << " state machines waiting" << std::endl;
+  }
   status.id = state.state_machine_id;
 
   _stateMachineStatusPublisher.publish(status);
