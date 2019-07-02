@@ -91,24 +91,32 @@ public:
 
   bool cancel()
   {
+    bool res = true;
+    mutex_.lock();
     if(running_id_ != -1)
     {
       server_.cancel();
       server_.waitForResult();
-      return true;
+      state_machines_.erase(running_id_);
     }
-    return false;
+    else
+      res = false;
+    mutex_.unlock();
+    return res;
   }
 
   bool cancel(int id)
   {
+    mutex_.lock();
     if(running_id_ == id)
     {
       server_.cancel();
       server_.waitForResult();
+      state_machines_.erase(id);
     }
     else
       state_machines_.erase(id);
+    mutex_.unlock();
 
     return true;
   }
@@ -163,7 +171,7 @@ public:
     {
       auto it_id = state_machines_.find(id);
       auto it_running_id = state_machines_.find(running_id_);
-      if(it_id->second.getHeaderMsg().priority.value > it_running_id->second.getHeaderMsg().priority.value)
+      if((int)it_id->second.getHeaderMsg().priority.value > (int)it_running_id->second.getHeaderMsg().priority.value)
         return true;
       else
         return false;

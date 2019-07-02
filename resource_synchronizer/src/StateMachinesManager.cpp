@@ -35,12 +35,11 @@ void StateMachinesManager::run()
   while(run_ && ros::ok())
   {
     mutex_.lock();
+    applyConstraints();
     init();
 
     while(!isDone())
     {
-      applyConstraints();
-
       for(size_t i = 0; i < ids_.size(); i++)
       {
         //get state machine to run
