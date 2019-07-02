@@ -105,7 +105,11 @@ bool StateMachines<T,E>::_serviceCallback(typename T::Request &req, typename T::
       _storage->push(states);
 
       res = _generateResponseMsg(_stateMachinesId);
+
+      std::cout << "[" << ros::this_node::getName() << "] register " << _stateMachinesId << "; " << _storage->size() << " state machines waiting" << std::endl;
+
       _stateMachinesId++;
+
       return true;
     }
     else

@@ -97,6 +97,9 @@ ${project_name_msgs}::MetaStateMachineRegister::Response &res){
   _status[_current_id].state_name.resize(_status[_current_id].resource.size(), "_");
   _status[_current_id].state_name[_status[_current_id].state_name.size() - 1] = ""; // global status as no state
   _status[_current_id].state_event.resize(_status[_current_id].resource.size());
+
+  std::cout << "[" << ros::this_node::getName() << "] register " << _current_id << "; " << _status.size() << " meta state machines waiting" << std::endl;
+
   _current_id++;
 
   _manager.realease();
