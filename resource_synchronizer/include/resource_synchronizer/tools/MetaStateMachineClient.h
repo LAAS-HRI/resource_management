@@ -39,6 +39,12 @@ struct MetaStateMachineState_t
         res = res && (name == "");
     }
 
+    if(state_event_.size())
+    {
+      if(state_event_[state_event_.size() - 1] != "")
+        res = true;
+    }
+
     return res;
   }
 
@@ -115,6 +121,7 @@ MetaStateMachineClient<MessageType>::MetaStateMachineClient(std::string name, bo
   status_topic_name_ = name_ + "/state_machine_status";
 
   status_subscriber_ = nh_.subscribe(status_topic_name_, 100, &MetaStateMachineClient::statusCallback, this);
+  ros::Duration(0.5).sleep();
 }
 
 template<class MessageType>

@@ -17,8 +17,9 @@ public:
 
   bool activate(const std::string& synchro, const std::string& resource);
   void reset();
-
+  void reset(const std::string& synchro);
   static void setNodeHandle(ros::NodeHandlePtr nh) { nh_ = nh; }
+  static void registerResource(const std::string& resource);
 
 private:
   std::map<std::string, std::vector<std::string> > synchros_;

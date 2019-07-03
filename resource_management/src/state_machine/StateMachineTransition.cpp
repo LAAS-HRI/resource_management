@@ -68,4 +68,13 @@ transtition_state_t StateMachineTransition::evaluate(const std::string& event)
   }
 }
 
+void StateMachineTransition::analyse(const std::string& state_name)
+{
+  if(time_out_ == ros::Duration(0))
+    std::cout << "\t\t[WARNING] state " << state_name << ": transition timeout set to 0" << std::endl;
+
+  if(duration_ == ros::Duration(0))
+    std::cout << "\t\t[WARNING] state " << state_name << ": transition duration set to 0" << std::endl;
+}
+
 } // namespace resource_management

@@ -55,8 +55,8 @@ private:
   void clean();
   void cleanPreempted();
 
-  void select(int id);
-  void remove(int id);
+  void selectSm(int id);
+  void removeSm(int id);
   bool isSelectable(size_t owner, int id);
 
   void publishTimeoutStatus(int id);

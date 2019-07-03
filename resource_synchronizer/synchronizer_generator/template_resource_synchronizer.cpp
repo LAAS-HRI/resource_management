@@ -15,6 +15,7 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
   _current_id(0)
 {
 
+  resource_synchronizer::StateMachineSynchroHolder::setNodeHandle(_nh);
   _register_service = _nh->advertiseService("state_machines_register", &${class_name}::registerMetaStateMachine, this);
   _state_machine_status_publisher = _nh->advertise<resource_synchronizer_msgs::MetaStateMachinesStatus>("state_machine_status", 100);
   _state_machine_cancel_service = _nh->advertiseService("state_machine_cancel", &${class_name}::stateMachineCancel, this);
@@ -27,6 +28,10 @@ ${class_name}::${class_name}(ros::NodeHandlePtr nh) : _nh(std::move(nh)),
   _manager.registerHolder(&_holder_{sub_fsm.name});
 !!end
   _manager.registerSatusCallback([this](auto status){ this->publishStatus(status); });
+
+!!for sub_fsm in sub_fsms
+  resource_synchronizer::StateMachineSynchroHolder::registerResource("{sub_fsm.name}");
+!!end
 
   ROS_INFO("${project_name} ready.");
 }
@@ -56,7 +61,8 @@ void ${class_name}::publishStatus(resource_synchronizer::SubStateMachineStatus s
       it->second.state_name[sub_id] = status.state_name;
       it->second.state_event[sub_id] = status.event_name;
       _state_machine_status_publisher.publish(it->second);
-      removeStatusIfNeeded(sub_id);
+
+      removeStatusIfNeeded(status.id);
     }
   }
   mutex_.unlock();
@@ -97,6 +103,9 @@ ${project_name_msgs}::MetaStateMachineRegister::Response &res){
   _status[_current_id].state_name.resize(_status[_current_id].resource.size(), "_");
   _status[_current_id].state_name[_status[_current_id].state_name.size() - 1] = ""; // global status as no state
   _status[_current_id].state_event.resize(_status[_current_id].resource.size());
+
+  std::cout << "[" << ros::this_node::getName() << "] register " << _current_id << "; " << _status.size() << " meta state machines waiting" << std::endl;
+
   _current_id++;
 
   _manager.realease();
@@ -113,6 +122,7 @@ bool ${class_name}::stateMachineCancel
   done = done || _holder_{sub_fsm.name}.cancel(req.id);
 !!end
 
+  _status.erase(req.id);
   res.ack = done;
 
   return true;
@@ -120,13 +130,22 @@ bool ${class_name}::stateMachineCancel
 
 void ${class_name}::removeStatusIfNeeded(int id)
 {
-  bool remove = true;
+  mutex_.lock();
+  bool need_remove = true;
   for(size_t i = 0; i < _status[id].state_name.size(); i++)
     if(_status[id].state_name[i] != "")
-      remove = false;
+      need_remove = false;
 
-  if(remove)
+  if(_status[id].state_event.size())
+    if(_status[id].state_event[_status[id].state_event.size() - 1] != "")
+      need_remove = true;
+
+  if(need_remove)
+  {
     _status.erase(id);
+    std::cout << "[" << ros::this_node::getName() << "] remove " << id << "; " << _status.size() << " meta state machines waiting" << std::endl;
+  }
+  mutex_.unlock();
 }
 
 std::vector<std::string> ${class_name}::getSynchros(std::string event)
@@ -168,8 +187,6 @@ std::vector<std::string> ${class_name}::split(const std::string& str, const std:
 int main(int argc, char** argv){
   ros::init(argc, argv, "${project_name}");
   ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
-
-  resource_synchronizer::StateMachineSynchroHolder::setNodeHandle(nh);
 
   ${project_name}::${class_name} syn(nh);
 

@@ -35,6 +35,8 @@ public:
 
   std::vector<std::string> getSynchroNames() { return synchro_names_; }
 
+  void analyse(const std::string& state_name);
+
 private:
   ros::Duration duration_;
   ros::Duration time_out_;
