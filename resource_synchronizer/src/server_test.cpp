@@ -20,15 +20,15 @@ int main(int argc, char *argv[])
   server.waitForServer();
 
   led_resource_synchronizer_msgs::MetaStateMachineRegister::Request signal;
-  signal.header.timeout = ros::Duration(9);
-  signal.header.begin_dead_line = ros::Time(0);
+  signal.header.timeout = ros::Duration(-1);
+  signal.header.begin_dead_line = ros::Time::now() + ros::Duration(5);
   signal.header.priority.value = resource_management_msgs::MessagePriority::URGENT;
 
   // CREATE SM //
   {
     led_resource_synchronizer_msgs::SubStateMachine_led_manager_msgs sub;
-    sub.header.timeout = ros::Duration(10);
-    sub.header.begin_dead_line = ros::Time(0);
+    sub.header.timeout = ros::Duration(-1);
+    sub.header.begin_dead_line = ros::Time::now() + ros::Duration(5);
     sub.header.initial_state = "state_0";
 
     resource_management::StatesMsg<led_manager_msgs::StateMachineStateOnOff> states_OnOff;
@@ -58,8 +58,8 @@ int main(int argc, char *argv[])
   // CREATE SM //
   {
     led_resource_synchronizer_msgs::SubStateMachine_led_manager_msgs sub;
-    sub.header.timeout = ros::Duration(10);
-    sub.header.begin_dead_line = ros::Time(0);
+    sub.header.timeout = ros::Duration(-1);
+    sub.header.begin_dead_line = ros::Time::now() + ros::Duration(5);
     sub.header.initial_state = "state_0";
 
     resource_management::StatesMsg<led_manager_msgs::StateMachineStateOnOff> states_OnOff;

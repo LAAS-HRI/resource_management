@@ -41,7 +41,6 @@ public:
   virtual bool canReplace(int id) = 0;
 
   virtual std::vector<int> getIdsPerPriorities() = 0;
-  virtual void clean() = 0;
 };
 
 template<typename SMT, typename RMT, typename SMET>
@@ -117,7 +116,6 @@ public:
     else
       state_machines_.erase(id);
     mutex_.unlock();
-
     return true;
   }
 
@@ -175,17 +173,6 @@ public:
         return true;
       else
         return false;
-    }
-  }
-
-  void clean()
-  {
-    for(auto it = state_machines_.begin(); it != state_machines_.end();)
-    {
-      if(it->second.isTooLate())
-        state_machines_.erase(it);
-      else
-        ++it;
     }
   }
 
