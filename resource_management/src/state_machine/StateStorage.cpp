@@ -91,21 +91,21 @@ void StateStorage::analyse()
 {
   std::cout << COLOR_ORANGE;
   if(time_out_ == ros::Duration(0))
-    std::cout << "[WARNING] state machine " << id_ << ": timeout to 0" << std::endl;
+    std::cout << ros::this_node::getName() << "[WARNING] state machine " << id_ << ": timeout to 0" << std::endl;
 
   if(initial_state_ == "")
-    std::cout << "[WARNING] state machine " << id_ << ": initial state has no value" << std::endl;
+    std::cout << ros::this_node::getName() << "[WARNING] state machine " << id_ << ": initial state has no value" << std::endl;
 
   if(getInitialState() == nullptr)
-    std::cout << "[WARNING] state machine " << id_ << ": initial state is not defined" << std::endl;
+    std::cout << ros::this_node::getName() << "[WARNING] state machine " << id_ << ": initial state \"" << initial_state_ << "\" is not defined" << std::endl;
 
   for(auto state : states_)
   {
     if(state.second->isPartiallyDefined())
-      std::cout << "[WARNING] state machine " << id_ << ": state " << state.second->getName() << " is not defined" << std::endl;
+      std::cout << ros::this_node::getName() << "[WARNING] state machine " << id_ << ": state \"" << state.second->getName() << "\" is not defined" << std::endl;
 
     if(datas_.find(state.second->getName()) == datas_.end())
-      std::cout << "[WARNING] state machine " << id_ << ": state " << state.second->getName() << " do not have data" << std::endl;
+      std::cout << ros::this_node::getName() << "[WARNING] state machine " << id_ << ": state \"" << state.second->getName() << "\" do not have data" << std::endl;
 
     state.second->analyse();
   }
