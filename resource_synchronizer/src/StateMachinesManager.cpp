@@ -27,6 +27,9 @@ void StateMachinesManager::cancel(int meta_sm_id)
 {
   for(size_t i = 0; i < state_machines_holders_.size(); i++)
     state_machines_holders_[i]->cancel(meta_sm_id);
+
+  sm_start_time_.erase(meta_sm_id);
+  headers_.erase(meta_sm_id);
 }
 
 void StateMachinesManager::run()

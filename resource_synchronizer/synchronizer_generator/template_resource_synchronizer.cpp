@@ -44,7 +44,7 @@ void ${class_name}::publishStatus(resource_synchronizer::SubStateMachineStatus s
   {
     if((status.event_name == "timeout") || (status.event_name == "preampt"))
       _manager.cancel(status.id);
-      
+
     int sub_id = -1;
     for(size_t i = 0; i < it->second.resource.size(); i++)
       if(it->second.resource[i] == status.resource)
