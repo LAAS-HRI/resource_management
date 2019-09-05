@@ -24,6 +24,7 @@ public:
   void registerSatusCallback(std::function<void(SubStateMachineStatus)> status_callback) { status_callback_ = status_callback; }
 
   void insert(int id, resource_synchronizer_msgs::MetaStateMachineHeader header);
+  void cancel(int meta_sm_id);
 
   void run();
   void stop();

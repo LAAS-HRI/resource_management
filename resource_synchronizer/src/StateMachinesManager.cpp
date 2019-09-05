@@ -23,6 +23,12 @@ void StateMachinesManager::insert(int id, resource_synchronizer_msgs::MetaStateM
     std::cout << COLOR_ORANGE << "[WARNING] meta state machine " << id << ": timeout set to 0" << COLOR_OFF << std::endl;
 }
 
+void StateMachinesManager::cancel(int meta_sm_id)
+{
+  for(size_t i = 0; i < state_machines_holders_.size(); i++)
+    state_machines_holders_[i]->cancel(meta_sm_id);
+}
+
 void StateMachinesManager::run()
 {
   ros::Rate r(100);
@@ -165,9 +171,7 @@ void StateMachinesManager::applyConstraints()
         {
           if(ros::Time::now() - st_it->second >= it.second.timeout)
           {
-            for(size_t j = 0; j < state_machines_holders_.size(); j++)
-              state_machines_holders_[j]->cancel(it.first);
-
+            cancel(it.first);
             publishTimeoutStatus(it.first);
 
             sm_start_time_.erase(it.first);
@@ -179,9 +183,7 @@ void StateMachinesManager::applyConstraints()
     // if begin dead line is over
     else if((it.second.begin_dead_line != ros::Time(0)) && (it.second.begin_dead_line <= ros::Time::now()))
     {
-      for(size_t j = 0; j < state_machines_holders_.size(); j++)
-        state_machines_holders_[j]->cancel(it.first);
-
+      cancel(it.first);
       publishBDLStatus(it.first);
 
       sm_start_time_.erase(it.first);
