@@ -115,11 +115,7 @@ public:
     }
     else
       state_machines_.erase(id);
-<<<<<<< HEAD
-      
-=======
     mutex_.unlock();
->>>>>>> ec156f54c00740567d7c659c0445c0bf6a41e7d9
     return true;
   }
 

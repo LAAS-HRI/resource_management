@@ -38,23 +38,9 @@ int main(int argc, char *argv[])
     states_Color.addState("state_0", 100);
     states_Color["state_0"]->addTransition("state_01", ros::Duration(-1), ros::Duration(1.5));
 
-<<<<<<< HEAD
-    {
-      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_0", 100);
-      state.addTransition("state_01", ros::Duration(-1), ros::Duration(-1));
-      sub.state_machine.states_Color.push_back(state());
-    }
-
-    {
-      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_01", 100);
-      state.addTransition("state_1", ros::Duration(-1), ros::Duration(-1), {"__synchro__blip"});
-      sub.state_machine.states_Color.push_back(state());
-    }
-=======
     /* STATE_01 */
     states_Color.addState("state_01", 100);
     states_Color["state_01"]->addTransition("state_1", ros::Duration(-1), ros::Duration(-1), {"__synchro__blip"});
->>>>>>> ec156f54c00740567d7c659c0445c0bf6a41e7d9
 
     /* STATE_1 */
     states_Color.addState("state_1", 150);
@@ -66,18 +52,10 @@ int main(int argc, char *argv[])
     sub.state_machine.states_OnOff = states_OnOff();
     sub.state_machine.states_Color = states_Color();
 
-<<<<<<< HEAD
-    signal.state_machine_led_G = sub;
-  }
-
-  // CREATE SM //
-
-=======
     signal.state_machine_led_R = sub;
   }
 
   // CREATE SM //
->>>>>>> ec156f54c00740567d7c659c0445c0bf6a41e7d9
   {
     led_resource_synchronizer_msgs::SubStateMachine_led_manager_msgs sub;
     sub.header.timeout = ros::Duration(-1);
@@ -88,36 +66,6 @@ int main(int argc, char *argv[])
     resource_management::StatesMsg<led_manager_msgs::StateMachineStateColor> states_Color;
 
     /* STATE_0 */
-<<<<<<< HEAD
-
-    {
-      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_0", 100);
-      state.addTransition("state_01", ros::Duration(-1), ros::Duration(1.5));
-      sub.state_machine.states_Color.push_back(state());
-    }
-
-    {
-      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_01", 100);
-      state.addTransition("state_1", ros::Duration(-1), ros::Duration(-1), {"__synchro__blip"});
-      sub.state_machine.states_Color.push_back(state());
-    }
-
-    /* STATE_1 */
-
-    {
-      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_1", 150);
-      state.addTransition("state_10", ros::Duration(-1), ros::Duration(1.5));
-      sub.state_machine.states_Color.push_back(state());
-    }
-
-    {
-      resource_management::StateMsg<led_manager_msgs::StateMachineStateColor, int> state("state_10", 150);
-      state.addTransition("state_0", ros::Duration(-1), ros::Duration(-1), {"__synchro__blop"});
-      sub.state_machine.states_Color.push_back(state());
-    }
-
-    signal.state_machine_led_R = sub;
-=======
     states_Color.addState("state_0", 100);
     states_Color["state_0"]->addTransition("state_01", ros::Duration(-1), ros::Duration(1.5));
 
@@ -136,7 +84,6 @@ int main(int argc, char *argv[])
     sub.state_machine.states_Color = states_Color();
 
     signal.state_machine_led_G = sub;
->>>>>>> ec156f54c00740567d7c659c0445c0bf6a41e7d9
   }
 
   led_resource_synchronizer_msgs::MetaStateMachineRegister srv;
