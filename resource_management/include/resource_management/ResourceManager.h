@@ -64,6 +64,8 @@ protected:
     std::shared_ptr<ArtificialLife> _artificialLife;
     std::shared_ptr<ReactiveBuffer> _artificialLifeBuffer;
 
+    ros::NodeHandlePtr _nh;
+
 private:
 
     const std::vector<std::string> &getBufferNames() const;
@@ -83,7 +85,6 @@ private:
 
     void setStateMachineData(bool newState);
 
-    ros::NodeHandlePtr _nh;
 
     std::shared_ptr<StateMachinesStorage> _stateMachineStorage;
     std::shared_ptr<StateMachinesBase> _stateMachineService;
@@ -426,7 +427,10 @@ void ResourceManager<StateMachineType,StateMachineExtractType,InputDataTypes...>
   if(state.state_ != nullptr)
     status.state_name = state.state_->getName();
   else
+  {
     status.state_name = "";
+    std::cout << "[" << ros::this_node::getName() << "] remove " << state.state_machine_id << "; " << _stateMachineStorage->size() << " state machines waiting" << std::endl;
+  }
   status.id = state.state_machine_id;
 
   _stateMachineStatusPublisher.publish(status);

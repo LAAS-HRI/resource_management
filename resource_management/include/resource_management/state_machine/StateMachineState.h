@@ -33,7 +33,7 @@ struct StateMachineInternalState_t
 class StateMachineState
 {
 public:
-  StateMachineState(std::string id);
+  StateMachineState(std::string id, bool partially_defined = false);
 
   void setTransition(StateMachineState* next, StateMachineTransition tansition);
   std::string getName() { return id_; }
@@ -44,8 +44,13 @@ public:
 
   std::vector<std::string> getSynchroNames() { return synchro_names_; }
 
+  bool isPartiallyDefined() { return partially_defined_; }
+  void setAsDefined() { partially_defined_ = false; }
+  void analyse();
+
 private:
   std::string id_;
+  bool partially_defined_;
   std::vector<StateMachineTransition> transitions_conditions_;
   std::vector<StateMachineState*> transitions_next_state_;
   std::vector<std::string> synchro_names_;

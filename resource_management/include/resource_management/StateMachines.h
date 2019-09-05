@@ -83,6 +83,13 @@ bool StateMachines<T,E>::_serviceCallback(typename T::Request &req, typename T::
     }
     states->setPriority(priority);
 
+    auto stateData = _getStateDataFromStateMachineMsg(req);
+    for(auto it : stateData)
+    {
+      states->addState(it.first);
+      states->addData(it.first, it.second);
+    }
+
     auto transitions = _getTransitionsFromStateMachineMsg(req.state_machine);
 
     for(auto &t : transitions){
@@ -91,16 +98,18 @@ bool StateMachines<T,E>::_serviceCallback(typename T::Request &req, typename T::
         states->addTransition(std::get<0>(t),std::get<1>(t),transition);
     }
 
-    auto stateData = _getStateDataFromStateMachineMsg(req);
-    for(auto it : stateData)
-      states->addData(it.first, it.second);
+    states->analyse();
 
     if(_storage)
     {
       _storage->push(states);
 
       res = _generateResponseMsg(_stateMachinesId);
+
+      std::cout << "[" << ros::this_node::getName() << "] register " << _stateMachinesId << "; " << _storage->size() << " state machines waiting" << std::endl;
+
       _stateMachinesId++;
+
       return true;
     }
     else

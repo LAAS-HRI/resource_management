@@ -2,9 +2,10 @@
 
 namespace resource_management {
 
-StateMachineState::StateMachineState(std::string id)
+StateMachineState::StateMachineState(std::string id, bool partially_defined)
 {
   id_ = id;
+  partially_defined_ = partially_defined;
 }
 
 void StateMachineState::setTransition(StateMachineState* next, StateMachineTransition tansition)
@@ -69,6 +70,18 @@ bool StateMachineState::endState()
     return true;
   else
     return false;
+}
+
+void StateMachineState::analyse()
+{
+  if(transitions_conditions_.size() == 0)
+    std::cout << "\t" << ros::this_node::getName() << "[WARNING] " << id_ << " has no transition" << std::endl;
+
+  if(transitions_next_state_.size() == 0)
+    std::cout << "\t" << ros::this_node::getName() << "[WARNING] " << id_ << " has no next state" << std::endl;
+
+  for(auto& condition : transitions_conditions_)
+    condition.analyse(id_);
 }
 
 } // namespace resource_management

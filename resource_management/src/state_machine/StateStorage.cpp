@@ -1,5 +1,12 @@
 #include "resource_management/state_machine/StateStorage.h"
 
+#ifndef COLOR_OFF
+#define COLOR_OFF     "\x1B[0m"
+#endif
+#ifndef COLOR_ORANGE
+#define COLOR_ORANGE  "\x1B[1;33m"
+#endif
+
 namespace resource_management {
 
 StateStorage::StateStorage(uint32_t id, ros::Duration time_out, ros::Time begin_dead_line)
@@ -15,19 +22,21 @@ StateStorage::~StateStorage()
     delete it.second;
 }
 
-void StateStorage::addState(const std::string& id)
+void StateStorage::addState(const std::string& id, bool partially_defined)
 {
   if(states_.find(id) == states_.end())
-    states_[id] = new StateMachineState(id);
+    states_[id] = new StateMachineState(id, partially_defined);
+  else if(partially_defined == false)
+    states_[id]->setAsDefined();
 }
 
 void StateStorage::addTransition(const std::string& id, const std::string& id_next, StateMachineTransition& transition)
 {
   if(states_.find(id) == states_.end())
-    addState(id);
+    addState(id, true);
 
   if(states_.find(id_next) == states_.end())
-    addState(id_next);
+    addState(id_next, true);
 
   states_[id]->setTransition(states_[id_next], transition);
 }
@@ -35,7 +44,7 @@ void StateStorage::addTransition(const std::string& id, const std::string& id_ne
 void StateStorage::addData(const std::string& id, std::shared_ptr<MessageAbstraction> data)
 {
   if(states_.find(id) == states_.end())
-    addState(id);
+    addState(id, true);
 
   datas_[id] = data;
 }
@@ -76,6 +85,32 @@ bool StateStorage::isTooLate()
     return true;
   else
     return false;
+}
+
+void StateStorage::analyse()
+{
+  std::cout << COLOR_ORANGE;
+  if(time_out_ == ros::Duration(0))
+    std::cout << ros::this_node::getName() << "[WARNING] state machine " << id_ << ": timeout to 0" << std::endl;
+
+  if(initial_state_ == "")
+    std::cout << ros::this_node::getName() << "[WARNING] state machine " << id_ << ": initial state has no value" << std::endl;
+
+  if(getInitialState() == nullptr)
+    std::cout << ros::this_node::getName() << "[WARNING] state machine " << id_ << ": initial state \"" << initial_state_ << "\" is not defined" << std::endl;
+
+  for(auto state : states_)
+  {
+    if(state.second->isPartiallyDefined())
+      std::cout << ros::this_node::getName() << "[WARNING] state machine " << id_ << ": state \"" << state.second->getName() << "\" is not defined" << std::endl;
+
+    if(datas_.find(state.second->getName()) == datas_.end())
+      std::cout << ros::this_node::getName() << "[WARNING] state machine " << id_ << ": state \"" << state.second->getName() << "\" do not have data" << std::endl;
+
+    state.second->analyse();
+  }
+
+  std::cout << COLOR_OFF;
 }
 
 } // namespace resource_management

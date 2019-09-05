@@ -13,6 +13,7 @@ class StateMachinesStorage
 public:
   StateMachinesStorage() { unpoppable_ = false; }
   bool empty();
+  size_t size() { return states_storage_.size(); }
   void push(std::shared_ptr<StateStorage>& state_storage);
   std::shared_ptr<StateStorage> pop(double priority = -100);
   bool poppable(double priority = -100);

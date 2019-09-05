@@ -11,11 +11,12 @@
 namespace resource_management
 {
 
-template<typename ST, typename DT>
+template<typename ST>
 class StateMsg
 {
+  typedef typename ST::_data_type DataType;
 public:
-  StateMsg(const std::string& name, DT data)
+  StateMsg(const std::string& name, DataType data)
   {
     state_.header.id = name;
     state_.data = data;

@@ -9,7 +9,7 @@
 #include <ros/ros.h>
 
 #include "resource_synchronizer/StateMachine.h"
-#include "resource_management/tools/StateMachineClient.h"
+#include "resource_management/API/StateMachineClient.h"
 
 namespace resource_synchronizer
 {
@@ -90,25 +90,36 @@ public:
 
   bool cancel()
   {
+    bool res = true;
+    mutex_.lock();
     if(running_id_ != -1)
     {
       server_.cancel();
       server_.waitForResult();
-      return true;
+      state_machines_.erase(running_id_);
     }
-    return false;
+    else
+      res = false;
+    mutex_.unlock();
+    return res;
   }
 
   bool cancel(int id)
   {
+    mutex_.lock();
     if(running_id_ == id)
     {
       server_.cancel();
       server_.waitForResult();
+      state_machines_.erase(id);
     }
     else
       state_machines_.erase(id);
+<<<<<<< HEAD
       
+=======
+    mutex_.unlock();
+>>>>>>> ec156f54c00740567d7c659c0445c0bf6a41e7d9
     return true;
   }
 
@@ -162,7 +173,7 @@ public:
     {
       auto it_id = state_machines_.find(id);
       auto it_running_id = state_machines_.find(running_id_);
-      if(it_id->second.getHeaderMsg().priority.value > it_running_id->second.getHeaderMsg().priority.value)
+      if((int)it_id->second.getHeaderMsg().priority.value > (int)it_running_id->second.getHeaderMsg().priority.value)
         return true;
       else
         return false;
@@ -213,8 +224,7 @@ private:
       if(status.state_name_ == "")
       {
         mutex_.lock();
-        auto it = state_machines_.find(running_id_);
-        state_machines_.erase(it);
+        state_machines_.erase(running_id_);
         running_id_ = -1;
         mutex_.unlock();
       }

@@ -92,6 +92,7 @@ bool StateMachinesStorage::remove(uint32_t id)
     if(states_storage_[i]->getId() > id)
     {
       states_storage_.erase(states_storage_.begin() + i);
+      std::cout << "[" << ros::this_node::getName() << "] remove " << id << "; " << states_storage_.size() << " state machines waiting" << std::endl;
       found = true;
     }
     else
@@ -120,6 +121,7 @@ void StateMachinesStorage::clean()
       if(publishState_)
         publishState_(internal_state);
       states_storage_.erase(states_storage_.begin() + i);
+      std::cout << "[" << ros::this_node::getName() << "] remove " << internal_state.state_machine_id  << "; " << states_storage_.size() << " state machines waiting" << std::endl;
     }
     else
       i++;

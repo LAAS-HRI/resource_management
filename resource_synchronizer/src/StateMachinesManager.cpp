@@ -1,5 +1,12 @@
 #include "resource_synchronizer/StateMachinesManager.h"
 
+#ifndef COLOR_OFF
+#define COLOR_OFF     "\x1B[0m"
+#endif
+#ifndef COLOR_ORANGE
+#define COLOR_ORANGE  "\x1B[1;33m"
+#endif
+
 namespace resource_synchronizer
 {
 
@@ -11,6 +18,9 @@ void StateMachinesManager::registerHolder(StateMachinesHolderBase* holder)
 void StateMachinesManager::insert(int id, resource_synchronizer_msgs::MetaStateMachineHeader header)
 {
   headers_[id] = header;
+
+  if(header.timeout == ros::Duration(0))
+    std::cout << COLOR_ORANGE << "[WARNING] meta state machine " << id << ": timeout set to 0" << COLOR_OFF << std::endl;
 }
 
 void StateMachinesManager::run()
@@ -25,12 +35,11 @@ void StateMachinesManager::run()
   while(run_ && ros::ok())
   {
     mutex_.lock();
+    applyConstraints();
     init();
 
     while(!isDone())
     {
-      applyConstraints();
-
       for(size_t i = 0; i < ids_.size(); i++)
       {
         //get state machine to run
@@ -63,9 +72,9 @@ void StateMachinesManager::run()
             to_take = false;
 
           if(to_take)
-            select(st_id);
+            selectSm(st_id);
           else // remove state machine not executable for this run
-            remove(st_id);
+            removeSm(st_id);
         }
       }
     }
@@ -227,7 +236,7 @@ void StateMachinesManager::cleanPreempted()
   }
 }
 
-void StateMachinesManager::select(int id)
+void StateMachinesManager::selectSm(int id)
 {
   for(size_t j = 0; j < ids_.size(); j++)
   {
@@ -239,7 +248,7 @@ void StateMachinesManager::select(int id)
   clean();
 }
 
-void StateMachinesManager::remove(int id)
+void StateMachinesManager::removeSm(int id)
 {
   for(size_t j = 0; j < ids_.size(); j++)
   {
