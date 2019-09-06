@@ -30,6 +30,7 @@ void StateMachinesManager::cancel(int meta_sm_id)
 
   sm_start_time_.erase(meta_sm_id);
   headers_.erase(meta_sm_id);
+  sm_start_time_.erase(meta_sm_id);
 }
 
 void StateMachinesManager::run()
@@ -105,12 +106,7 @@ void StateMachinesManager::run()
         }
         else
         {
-          state_machines_holders_[i]->cancel();
-          auto running_it = std::find(running_ids_.begin(), running_ids_.end(), running_id);
-          if(running_it != running_ids_.end())
-            running_ids_.erase(running_it);
-          if(sm_start_time_.find(running_id) != sm_start_time_.end())
-            sm_start_time_.erase(running_id);
+          cancel(running_id);
           publishPreemptStatus(running_id);
 
           state_machines_holders_[i]->send(ids_[i][0]);
@@ -174,11 +170,8 @@ void StateMachinesManager::applyConstraints()
         {
           if(ros::Time::now() - st_it->second >= it.second.timeout)
           {
-            cancel(it.first);
             publishTimeoutStatus(it.first);
-
-            sm_start_time_.erase(it.first);
-            headers_.erase(it.first);
+            cancel(it.first);
           }
         }
       }
@@ -186,11 +179,8 @@ void StateMachinesManager::applyConstraints()
     // if begin dead line is over
     else if((it.second.begin_dead_line != ros::Time(0)) && (it.second.begin_dead_line <= ros::Time::now()))
     {
-      cancel(it.first);
       publishBDLStatus(it.first);
-
-      sm_start_time_.erase(it.first);
-      headers_.erase(it.first);
+      cancel(it.first);
     }
   }
 }
