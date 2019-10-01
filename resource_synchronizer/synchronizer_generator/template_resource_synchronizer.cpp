@@ -133,7 +133,6 @@ bool ${class_name}::stateMachineCancel
 
 void ${class_name}::removeStatusIfNeeded(int id)
 {
-  mutex_.lock();
   bool need_remove = true;
   for(size_t i = 0; i < _status[id].state_name.size(); i++)
     if(_status[id].state_name[i] != "")
@@ -148,7 +147,6 @@ void ${class_name}::removeStatusIfNeeded(int id)
     _status.erase(id);
     std::cout << "[" << ros::this_node::getName() << "] remove " << id << "; " << _status.size() << " meta state machines waiting" << std::endl;
   }
-  mutex_.unlock();
 }
 
 std::vector<std::string> ${class_name}::getSynchros(std::string event)
