@@ -28,9 +28,7 @@ void StateMachinesManager::cancel(int meta_sm_id)
   for(size_t i = 0; i < state_machines_holders_.size(); i++)
     state_machines_holders_[i]->cancel(meta_sm_id);
 
-  sm_start_time_.erase(meta_sm_id);
-  headers_.erase(meta_sm_id);
-  sm_start_time_.erase(meta_sm_id);
+  removeSm(meta_sm_id);
 }
 
 void StateMachinesManager::run()
@@ -249,7 +247,11 @@ void StateMachinesManager::removeSm(int id)
   {
     auto it = std::find(ids_[j].begin(), ids_[j].end(), id);
     if (it != ids_[j].end())
+    {
       ids_[j].erase(it);
+      headers_.erase(id);
+      sm_start_time_.erase(id);
+    }
   }
 }
 

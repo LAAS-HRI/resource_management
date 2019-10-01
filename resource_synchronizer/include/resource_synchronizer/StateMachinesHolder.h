@@ -36,6 +36,8 @@ public:
   virtual bool cancel() = 0;
   virtual bool cancel(int id) = 0;
 
+  virtual size_t size() = 0;
+
   virtual int isRunning() = 0;
   virtual bool isOneRunning(int id) = 0;
   virtual bool canReplace(int id) = 0;
@@ -117,6 +119,11 @@ public:
       state_machines_.erase(id);
     mutex_.unlock();
     return true;
+  }
+
+  size_t size()
+  {
+    return state_machines_.size();
   }
 
   int isRunning()
