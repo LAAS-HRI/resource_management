@@ -57,6 +57,7 @@ private:
   void cleanPreempted();
 
   void selectSm(int id);
+  void removeSmFromSelection(int id);
   void removeSm(int id);
   bool isSelectable(size_t owner, int id);
 

@@ -144,6 +144,7 @@ void ${class_name}::removeStatusIfNeeded(int id)
 
   if(need_remove)
   {
+    _manager.cancel(id);
     _status.erase(id);
     std::cout << "[" << ros::this_node::getName() << "] remove " << id << "; " << _status.size() << " meta state machines waiting" << std::endl;
   }

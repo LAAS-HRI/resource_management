@@ -82,7 +82,7 @@ void StateMachinesManager::run()
           if(to_take)
             selectSm(st_id);
           else // remove state machine not executable for this run
-            removeSm(st_id);
+            removeSmFromSelection(st_id);
         }
       }
     }
@@ -241,18 +241,27 @@ void StateMachinesManager::selectSm(int id)
   clean();
 }
 
+void StateMachinesManager::removeSmFromSelection(int id)
+{
+  for(size_t j = 0; j < ids_.size(); j++)
+  {
+    auto it = std::find(ids_[j].begin(), ids_[j].end(), id);
+    if (it != ids_[j].end())
+      ids_[j].erase(it);
+  }
+}
+
 void StateMachinesManager::removeSm(int id)
 {
   for(size_t j = 0; j < ids_.size(); j++)
   {
     auto it = std::find(ids_[j].begin(), ids_[j].end(), id);
     if (it != ids_[j].end())
-    {
       ids_[j].erase(it);
-      headers_.erase(id);
-      sm_start_time_.erase(id);
-    }
   }
+
+  headers_.erase(id);
+  sm_start_time_.erase(id);
 }
 
 bool StateMachinesManager::isSelectable(size_t owner, int id)
